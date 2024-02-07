@@ -13,7 +13,10 @@ export default defineConfig({
 	},
 	build: {
 		rollupOptions: {
-			plugins: [inject({ Buffer: ['Buffer', 'Buffer'] })],
+			plugins: inject({
+				include: ['node_modules/@ledgerhq/**'],
+				modules: { Buffer: ['buffer', 'Buffer'] },
+			}),
 		},
 	},
 
