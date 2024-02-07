@@ -7,7 +7,8 @@ import Editor, { OnChange } from '@monaco-editor/react';
 import {
 	generateCodeByAST,
 	TypescriptGenerator,
-} from '@polyprogrammist_test/tlbgen';
+	// @ts-ignore
+} from '@polyprogrammist_test/tlbgen/build';
 
 let getGenerator = (tlbCode: any) => {
 	return new TypescriptGenerator(tlbCode);
