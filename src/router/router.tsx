@@ -6,8 +6,8 @@ import { Main } from '@/pages/Main';
 
 export const paths = {
 	index: import.meta.env.BASE_URL,
-	main: '/main',
-	about: '/about',
+	main: `${import.meta.env.BASE_URL}main`,
+	about: `${import.meta.env.BASE_URL}about`,
 };
 
 export const routes: RouteObject[] = [
