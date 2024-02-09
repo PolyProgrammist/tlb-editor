@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import * as ts from 'typescript';
 import { Box, Flex } from '@chakra-ui/react';
 import { ast } from '@igorivaniuk/tlb-parser';
-import Editor, { OnChange, useMonaco } from '@monaco-editor/react';
+import Editor, { OnChange } from '@monaco-editor/react';
 import {
 	generateCodeByAST,
 	TypescriptGenerator,
@@ -60,7 +60,7 @@ export const Main: React.FC = () => {
 		setJsonData(
 			JSON.stringify(
 				json,
-				(key, value) => (typeof value === 'bigint' ? value.toString() : value), // return everything else unchanged
+				(_, value) => (typeof value === 'bigint' ? value.toString() : value), // return everything else unchanged
 				'\t'
 			)
 		);
