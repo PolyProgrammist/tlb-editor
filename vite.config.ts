@@ -26,5 +26,6 @@ export default defineConfig(({ command }) => {
 	if (command !== 'serve') {
 		config.base = '/tlb-editor/';
 	}
+	console.log(config);
 	return config;
 });
