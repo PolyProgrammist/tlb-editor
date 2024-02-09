@@ -4,6 +4,9 @@ import { CodeBuilder } from "../CodeBuilder"
 import { CodeGenerator, CommonGenDeclaration } from "../generator"
 import { Expression, GenDeclaration, ObjectExpression, ObjectProperty, TheNode, id, tDeclareVariable, tIdentifier, tNumericLiteral, tObjectExpression, tObjectProperty, tStringLiteral, tTypedIdentifier, toCode } from "../typescript/tsgen"
 
+export type JsonContext = {
+    constructorsReached: Map<String, number>;
+}
 
 export class DefaultJsonGenerator implements CodeGenerator {
     jsCodeDeclarations: GenDeclaration[] = [];
@@ -19,63 +22,76 @@ export class DefaultJsonGenerator implements CodeGenerator {
     addBitLenFunction(): void {}
 
     addTlbType(tlbType: TLBType): void {
-        let x = this.getTLBTypeNameResult(tlbType.name);
+
+        let ctx :JsonContext = {
+            constructorsReached: new Map<String, number>(),
+        }
+
+        let x = this.getTLBTypeNameResult(tlbType.name, ctx);
 
         if (x) {
             this.jsCodeConstructorDeclarations.push(tDeclareVariable(id('json' + tlbType.name), x));
         }
     }
 
-    getTLBTypeNameResult(tlbTypeName: string): ObjectExpression | undefined {
+    getTLBTypeNameResult(tlbTypeName: string, ctx: JsonContext): ObjectExpression | undefined {
         let tlbType = this.tlbCode.types.get(tlbTypeName);
         if (tlbType) {
-            return this.getTLBTypeResult(tlbType);
+            return this.getTLBTypeResult(tlbType, ctx);
         }
     }
 
-    getTLBTypeResult(tlbType: TLBType): ObjectExpression | undefined {
-        let constructor = tlbType.constructors[0];
-        let x: ObjectProperty[] = [];
-
-        let hasParams = false;
-        constructor.parameters.forEach(parameter => {
-            if (parameter.variable.type == 'Type') {
-                hasParams = true;
-                return;
-            }
-        })
-
-        if (hasParams) { // TODO add params if inside 
-            return;
+    getTLBTypeResult(tlbType: TLBType, ctx: JsonContext): ObjectExpression | undefined {
+        if (ctx.constructorsReached.has(tlbType.name)) {
+            return undefined;
         }
 
-        x.push(tObjectProperty(id('kind'), tStringLiteral(tlbType.name)));
-        
-        constructor.variables.forEach(variable => {
-            if (variable.type == "#" && !variable.isField) {
-                x.push(
-                  tObjectProperty(id(variable.name), tNumericLiteral(0))
-                );
+        for (let i = 0; i < tlbType.constructors.length; i++) {
+            let constructor = tlbType.constructors[i];
+            ctx.constructorsReached.set(tlbType.name, i);
+            let x: ObjectProperty[] = [];
+    
+            let hasParams = false;
+            constructor.parameters.forEach(parameter => {
+                if (parameter.variable.type == 'Type') {
+                    hasParams = true;
+                    return;
+                }
+            })
+    
+            if (hasParams) { // TODO add params if inside 
+                return;
             }
-        })
-
-        constructor.fields.forEach((field) => {
-            this.handleField(field, x);
-        });
-        return tObjectExpression(x);
+    
+            x.push(tObjectProperty(id('kind'), tStringLiteral(tlbType.name)));
+            
+            constructor.variables.forEach(variable => {
+                if (variable.type == "#" && !variable.isField) {
+                    x.push(
+                      tObjectProperty(id(variable.name), tNumericLiteral(0))
+                    );
+                }
+            })
+    
+            constructor.fields.forEach((field) => {
+                this.handleField(field, x, ctx);
+            });
+            return tObjectExpression(x);
+        }  
     }
 
     handleField(
         field: TLBField,
-        x: ObjectProperty[]
+        x: ObjectProperty[],
+        ctx: JsonContext
       ) {
         if (field.subFields.length > 0) {
             field.subFields.forEach((fieldDef) => {
-                this.handleField(fieldDef, x);
+                this.handleField(fieldDef, x, ctx);
             });
         }
         if (field.subFields.length == 0) { 
-            let res = this.handleType(field, field.fieldType, x);
+            let res = this.handleType(field, field.fieldType, ctx);
             if (res) {
                 x.push(tObjectProperty(id(field.name), res))
             }
@@ -85,7 +101,7 @@ export class DefaultJsonGenerator implements CodeGenerator {
     handleType(
         field: TLBField,
         fieldType: TLBFieldType,
-        x: ObjectProperty[]
+        ctx: JsonContext
       ) : Expression | undefined {
         let res: Expression | undefined = undefined;
 
@@ -108,7 +124,7 @@ export class DefaultJsonGenerator implements CodeGenerator {
         } else if (fieldType.kind == "TLBNegatedType") {
             res = tNumericLiteral(0);
         } else if (fieldType.kind == "TLBNamedType") {
-           res = this.getTLBTypeNameResult(fieldType.name)
+           res = this.getTLBTypeNameResult(fieldType.name, ctx)
            // TODO handle infinite recursion
         } else if (fieldType.kind == "TLBCondType") {
             // TODO

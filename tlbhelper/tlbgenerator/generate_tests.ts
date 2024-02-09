@@ -7,5 +7,5 @@ function genCodeForTest(name: string) {
   generateCode(path.resolve(fixturesDir, 'tlb', name + '.tlb'), 'test/generated_files/generated_' + name + '.ts', 'json')
 }
 
-// genCodeForTest('block')
+genCodeForTest('block')
 genCodeForTest('test')
