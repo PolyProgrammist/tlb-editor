@@ -1,13 +1,13 @@
-import { createBrowserRouter, Navigate, RouteObject } from 'react-router-dom';
+import { createHashRouter, Navigate, RouteObject } from 'react-router-dom';
 
 import App from '@/App';
 import { About } from '@/pages/About';
 import { Main } from '@/pages/Main';
 
 export const paths = {
-	index: import.meta.env.BASE_URL,
-	main: `${import.meta.env.BASE_URL}main`,
-	about: `${import.meta.env.BASE_URL}about`,
+	index: '/',
+	main: '/main',
+	about: '/about',
 };
 
 export const routes: RouteObject[] = [
@@ -26,4 +26,4 @@ export const routes: RouteObject[] = [
 	{ path: '*', element: <Navigate to={paths.main} /> },
 ];
 
-export const router = createBrowserRouter(routes);
+export const router = createHashRouter(routes);
