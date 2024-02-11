@@ -9,4 +9,5 @@ body {
   position: relative;
   display: flex;
   flex-direction: column;
+  background-color: #f7f9fb;
 }

@@ -5,6 +5,7 @@ import ReactDOM from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
 import { ChakraProvider } from '@chakra-ui/react';
 
+import { AppContextProvider } from '@/context/AppContext';
 import { router } from '@/router';
 
 import './index.css';
@@ -14,7 +15,9 @@ import './index.css';
 ReactDOM.createRoot(document.getElementById('root')!).render(
 	<React.StrictMode>
 		<ChakraProvider>
-			<RouterProvider router={router} />
+			<AppContextProvider>
+				<RouterProvider router={router} />
+			</AppContextProvider>
 		</ChakraProvider>
 	</React.StrictMode>
 );
