@@ -3,6 +3,15 @@ let jsonSimple = {
     a: 0,
     b: 0,
 }
+let jsonTypedArg = {
+    kind: 'TypedArg',
+}
+let jsonTypedArgUser = {
+    kind: 'TypedArgUser',
+    x: {
+    kind: 'TypedArg',
+},
+}
 let jsonTwoConstructors = {
     kind: 'TwoConstructors',
     a: 0,
@@ -29,8 +38,17 @@ let jsonSharpConstructor = {
 },
     c: 0,
 }
+let jsonMaybe = {
+    kind: 'Maybe',
+}
 let jsonTypedParam = {
     kind: 'TypedParam',
+    x: {
+    kind: 'Maybe',
+},
+}
+let jsonEither = {
+    kind: 'Either',
 }
 let jsonBitLenArg = {
     kind: 'BitLenArg',
@@ -90,15 +108,33 @@ let jsonCellsSimple = {
     d: 0,
     c: 0,
 }
+let jsonIntBits = {
+    kind: 'IntBits',
+    d: 0,
+    g: 0b0,
+    x: 'te6cckEBAQEAAgAAAEysuc0=',
+}
 let jsonIntBitsInside = {
     kind: 'IntBitsInside',
     x: 0,
+    a: {
+    kind: 'IntBits',
+    d: 0,
+    g: 0b0,
+    x: 'te6cckEBAQEAAgAAAEysuc0=',
+},
 }
 let jsonIntBitsOutside = {
     kind: 'IntBitsOutside',
     x: {
     kind: 'IntBitsInside',
     x: 0,
+    a: {
+    kind: 'IntBits',
+    d: 0,
+    g: 0b0,
+    x: 'te6cckEBAQEAAgAAAEysuc0=',
+},
 },
 }
 let jsonIntBitsParametrized = {
@@ -147,6 +183,10 @@ let jsonLessThan = {
     x: 0,
     y: 0,
 }
+let jsonOneComb = {
+    kind: 'OneComb',
+    t: 0,
+}
 let jsonManyComb = {
     kind: 'ManyComb',
 }
@@ -182,8 +222,22 @@ let jsonUnaryUserCheckOrder = {
     kind: 'Unary',
 },
 }
+let jsonCombArgCellRef = {
+    kind: 'CombArgCellRef',
+    info: 0,
+    init: {
+    kind: 'Maybe',
+},
+}
 let jsonCombArgCellRefUser = {
     kind: 'CombArgCellRefUser',
+    x: {
+    kind: 'CombArgCellRef',
+    info: 0,
+    init: {
+    kind: 'Maybe',
+},
+},
 }
 let jsonMathExprAsCombArg = {
     kind: 'MathExprAsCombArg',
@@ -208,6 +262,26 @@ let jsonDollarTag = {
 }
 let jsonTupleCheck = {
     kind: 'TupleCheck',
+}
+let jsonHashmap = {
+    kind: 'Hashmap',
+    n: 0,
+    l: 0,
+    m: 0,
+    label: {
+    kind: 'HmLabel',
+    m: 0,
+    n: 0,
+    len: {
+    kind: 'Unary',
+},
+},
+    node: {
+    kind: 'HashmapNode',
+},
+}
+let jsonHashmapNode = {
+    kind: 'HashmapNode',
 }
 let jsonHmLabel = {
     kind: 'HmLabel',
@@ -247,6 +321,9 @@ let jsonParamNamedArgInSecondConstr = {
 }
 let jsonRefCombinatorAny = {
     kind: 'RefCombinatorAny',
+    msg: {
+    kind: 'Maybe',
+},
 }
 let jsonEqualityExpression = {
     kind: 'EqualityExpression',
@@ -286,8 +363,22 @@ let jsonCheckKeyword = {
     kind: 'CheckKeyword',
     const0: 0,
 }
+let jsonRefCombinatorInRefHelper = {
+    kind: 'RefCombinatorInRefHelper',
+    t: 0,
+    y: {
+    kind: 'Maybe',
+},
+}
 let jsonRefCombinatorInRef = {
     kind: 'RefCombinatorInRef',
+    msg: {
+    kind: 'RefCombinatorInRefHelper',
+    t: 0,
+    y: {
+    kind: 'Maybe',
+},
+},
 }
 let jsonBoolUser = {
     kind: 'BoolUser',
@@ -366,8 +457,38 @@ let jsonHashmapExprKeyUser = {
 },
 },
 }
+let jsonHashmapOneComb = {
+    kind: 'HashmapOneComb',
+    x: {
+},
+}
 let jsonHashmapOneCombUser = {
     kind: 'HashmapOneCombUser',
+    x: {
+    kind: 'HashmapOneComb',
+    x: {
+},
+},
+}
+let jsonHashmapAug = {
+    kind: 'HashmapAug',
+    n: 0,
+    l: 0,
+    m: 0,
+    label: {
+    kind: 'HmLabel',
+    m: 0,
+    n: 0,
+    len: {
+    kind: 'Unary',
+},
+},
+    node: {
+    kind: 'HashmapAugNode',
+},
+}
+let jsonHashmapAugNode = {
+    kind: 'HashmapAugNode',
 }
 let jsonHashmapAugEUser = {
     kind: 'HashmapAugEUser',

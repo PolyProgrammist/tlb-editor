@@ -1,5 +1,8 @@
 tmpa$_ a:# b:# = Simple;
 
+a$_ {Arg:Type} b:Arg = TypedArg Arg;
+a$_ x:(TypedArg Simple) = TypedArgUser;
+
 bool_false$0 a:# b:(## 7) c:# = TwoConstructors;
 bool_true$1 b:# = TwoConstructors; 
 

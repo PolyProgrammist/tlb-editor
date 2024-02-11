@@ -1,5 +1,5 @@
 import { beginCell } from "ton";
-import { TLBCode, TLBField, TLBFieldType, TLBType } from "../../ast"
+import { TLBCode, TLBField, TLBFieldType, TLBParameter, TLBType } from "../../ast"
 import { CodeBuilder } from "../CodeBuilder"
 import { CodeGenerator, CommonGenDeclaration } from "../generator"
 import { Expression, GenDeclaration, ObjectExpression, ObjectProperty, TheNode, id, tDeclareVariable, tIdentifier, tNumericLiteral, tObjectExpression, tObjectProperty, tStringLiteral, tTypedIdentifier, toCode } from "../typescript/tsgen"
@@ -27,25 +27,47 @@ export class DefaultJsonGenerator implements CodeGenerator {
             constructorsReached: new Map<String, number>(),
         }
 
-        let x = this.getTLBTypeNameResult(tlbType.name, ctx);
+        let x = this.getTLBTypeNameResult(tlbType.name, ctx, []);
 
         if (x) {
             this.jsCodeConstructorDeclarations.push(tDeclareVariable(id('json' + tlbType.name), x));
         }
     }
 
-    getTLBTypeNameResult(tlbTypeName: string, ctx: JsonContext): ObjectExpression | undefined {
+    getTLBTypeNameResult(tlbTypeName: string, ctx: JsonContext, parameters: Expression[]): ObjectExpression | undefined {
         let tlbType = this.tlbCode.types.get(tlbTypeName);
         if (tlbType) {
-            return this.getTLBTypeResult(tlbType, ctx);
+            return this.getTLBTypeResult(tlbType, ctx, parameters);
         }
     }
 
-    getTLBTypeResult(tlbType: TLBType, ctx: JsonContext): ObjectExpression | undefined {
+    getTLBTypeResult(tlbType: TLBType, ctx: JsonContext, parameters: Expression[]): ObjectExpression | undefined {
         if (ctx.constructorsReached.has(tlbType.name)) {
             return undefined;
         }
+/*
+tmpa$_ a:# b:# = Simple;
+a$_ {Arg:Type} b:Arg = TypedArg Arg;
+a$_ x:(TypedArg Simple) = TypedArgUser;
 
+Сейчас:
+let jsonTypedArgUser = {
+    kind: 'TypedArgUser',
+}
+
+Нужно:
+let jsonTypedArgUser = {
+    kind: 'TypedArgUser',
+    x: {
+        kind: 'TypedArg',
+        b: {
+            kind: 'Simple',
+            a: 5,
+            b: 6
+        }
+    }
+}
+*/
         for (let i = 0; i < tlbType.constructors.length; i++) {
             let constructor = tlbType.constructors[i];
             ctx.constructorsReached.set(tlbType.name, i);
@@ -58,9 +80,13 @@ export class DefaultJsonGenerator implements CodeGenerator {
                     return;
                 }
             })
-    
-            if (hasParams) { // TODO add params if inside 
-                return;
+
+            let y: Map<String, Expression> = new Map<String, Expression>();
+            for (let i = 0; i < parameters.length; i++) {
+                if (constructor.parameters[i].variable.type == 'Type') {
+                    console.log(tlbType.name, constructor.name, i, toCode(parameters[i]).code)
+                }
+                y.set(constructor.parameters[i].variable.name, parameters[i]);
             }
     
             x.push(tObjectProperty(id('kind'), tStringLiteral(tlbType.name)));
@@ -124,7 +150,16 @@ export class DefaultJsonGenerator implements CodeGenerator {
         } else if (fieldType.kind == "TLBNegatedType") {
             res = tNumericLiteral(0);
         } else if (fieldType.kind == "TLBNamedType") {
-           res = this.getTLBTypeNameResult(fieldType.name, ctx)
+            let parameters: Expression[] = [];
+            fieldType.arguments.forEach(argument => {
+                if (argument.kind == 'TLBNamedType') {
+                    let tmp = this.getTLBTypeNameResult(argument.name, ctx, []);
+                    if (tmp) {
+                        parameters.push(tmp);
+                    }
+                }
+            })
+            res = this.getTLBTypeNameResult(fieldType.name, ctx, parameters)
            // TODO handle infinite recursion
         } else if (fieldType.kind == "TLBCondType") {
             // TODO
