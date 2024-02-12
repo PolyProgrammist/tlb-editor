@@ -1,5 +1,3 @@
-.Editor {
-    box-sizing: border-box;
-    /* flex-grow: 1; */
-    overflow: hidden;
+.Editor--hidden {
+    opacity: 1;
 }

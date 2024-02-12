@@ -12,6 +12,7 @@ import {
 } from '@polyprogrammist_test/tlbgen/build';
 
 import { Editor } from '@/components/Editor';
+import { TypeMenu } from '@/components/TypeMenu';
 import { AppContext } from '@/context/AppContext';
 
 let generator: TypescriptGenerator;
@@ -30,39 +31,65 @@ export const Main: React.FC = () => {
 		jsonData,
 		setJsonData,
 		setCode,
+		isCodeLoading,
+		setIsCodeLoading,
 		tlbError,
 		setTlbError,
 		serializedDataError,
 		setSerializedDataError,
 		setTypes,
+		setModule,
+		module,
+		isSerializedDataLoading,
+		setIsSerializedDataLoading,
+		selectedType,
 	} = useContext(AppContext);
 
 	const handleTlbChange: OnChange = useCallback(
-		(value = '') => {
+		async (value = '') => {
 			try {
 				setTlbSchema(value);
 				if (!value) {
 					setCode('');
 					return;
 				}
+				setIsCodeLoading(true);
 				const tree = ast(value);
 				const newCode = generateCodeByAST(tree, value, getGenerator);
 
 				setTypes([...generator.tlbCode.types.keys()]);
 				setCode(newCode);
+
+				const jsCode = ts
+					.transpile(newCode, { target: 2 })
+					.replace(/import { ([^}]+) } from 'ton';/g, '');
+				const blob = new Blob([jsCode], {
+					type: 'application/javascript; charset=utf-8',
+				});
+
+				const scriptURL = URL.createObjectURL(blob);
+
+				const newModule = await import(scriptURL);
+				setModule(newModule);
+
 				setTlbError('');
 			} catch (error) {
 				console.error(error);
 				setCode('');
 				setTlbError('Scheme is incorrect');
+			} finally {
+				setIsCodeLoading(false);
 			}
 		},
-		[setCode, setTlbError, setTlbSchema, setTypes]
+		[setCode, setTlbError, setTlbSchema, setTypes, setModule, setIsCodeLoading]
 	);
 
-	const handleTlbChangeDebounced = useCallback(
-		debounce(handleTlbChange, 1000),
-		[handleTlbChange]
+	const handleTlbChangeDebounced: OnChange = useCallback(
+		(value, model) => {
+			setIsCodeLoading(true);
+			debounce(handleTlbChange, 1000)(value, model);
+		},
+		[handleTlbChange, setIsCodeLoading]
 	);
 
 	const handleSerializedDataChange: OnChange = useCallback(
@@ -70,14 +97,6 @@ export const Main: React.FC = () => {
 			try {
 				setSerializedData(value);
 
-				const jsCode = ts
-					.transpile(code, { target: 2 })
-					.replace(/import { ([^}]+) } from 'ton';/g, '');
-				const blob = new Blob([jsCode], {
-					type: 'application/javascript; charset=utf-8',
-				});
-
-				const scriptURL = URL.createObjectURL(blob);
 				const ton = await import('ton');
 
 				const {
@@ -98,11 +117,12 @@ export const Main: React.FC = () => {
 				(window as any).Cell = Cell;
 				(window as any).Address = Address;
 
-				const module = await import(scriptURL);
-
 				const cs = Cell.fromBase64(value);
 				const slice = cs.beginParse();
-				const json = module['loadBlock'](slice);
+				if (!selectedType) {
+					return;
+				}
+				const json = module[`load${selectedType}`](slice);
 				setJsonData(
 					JSON.stringify(
 						json,
@@ -111,18 +131,31 @@ export const Main: React.FC = () => {
 						'\t'
 					)
 				);
-				setSerializedDataError('Data is invalid');
+				setSerializedDataError('');
 			} catch (error) {
+				console.error(error);
 				setJsonData('');
 				setSerializedDataError('Data is invalid');
+			} finally {
+				setIsSerializedDataLoading(false);
 			}
 		},
-		[code, setJsonData, setSerializedData, setSerializedDataError]
+		[
+			setJsonData,
+			setSerializedData,
+			setSerializedDataError,
+			module,
+			setIsSerializedDataLoading,
+			selectedType,
+		]
 	);
 
-	const handleSerializedDataChangeDebounced = useCallback(
-		debounce(handleSerializedDataChange, 1000),
-		[handleSerializedDataChange]
+	const handleSerializedDataChangeDebounced: OnChange = useCallback(
+		(value, model) => {
+			setIsSerializedDataLoading(true);
+			debounce(handleSerializedDataChange, 1000)(value, model);
+		},
+		[handleSerializedDataChange, setIsSerializedDataLoading]
 	);
 
 	return (
@@ -141,6 +174,7 @@ export const Main: React.FC = () => {
 					options={{
 						minimap: { enabled: false },
 					}}
+					footer={<TypeMenu />}
 					errorMessage={tlbError}
 				/>
 
@@ -162,6 +196,7 @@ export const Main: React.FC = () => {
 			</Flex>
 
 			<Editor
+				isLoading={isSerializedDataLoading}
 				header={
 					<Text ml={3} p={3}>
 						JSON
@@ -178,6 +213,7 @@ export const Main: React.FC = () => {
 			/>
 
 			<Editor
+				isLoading={isCodeLoading}
 				header={
 					<Text ml={3} p={3}>
 						Code
