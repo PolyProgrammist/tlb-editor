@@ -70,7 +70,7 @@ export const Editor: React.FC<EditorProps> = ({
 				</MenuButton>
 				<MenuList maxHeight={'10rem'} overflow={'scroll'}>
 					{types.map((type) => (
-						<MenuItem>{type}</MenuItem>
+						<MenuItem key={type}>{type}</MenuItem>
 					))}
 				</MenuList>
 			</Menu>
