@@ -1,6 +1,6 @@
-import React, { useContext } from 'react';
+import React from 'react';
 
-import { Box, BoxProps, Flex, Spinner, Text } from '@chakra-ui/react';
+import { BoxProps, Flex, Spinner, Text } from '@chakra-ui/react';
 import {
 	Editor as MonacoEditor,
 	EditorProps as MonacoEditorProps,
