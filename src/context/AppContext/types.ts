@@ -11,4 +11,6 @@ export interface IAppContext {
 	setSerializedDataError: React.Dispatch<React.SetStateAction<string>>;
 	jsonData: string;
 	setJsonData: React.Dispatch<React.SetStateAction<string>>;
+	types: string[];
+	setTypes: React.Dispatch<React.SetStateAction<string[]>>;
 }

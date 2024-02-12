@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 
 import {
 	Box,
@@ -15,6 +15,8 @@ import {
 	Editor as MonacoEditor,
 	EditorProps as MonacoEditorProps,
 } from '@monaco-editor/react';
+
+import { AppContext } from '@/context/AppContext';
 
 import './Editor.css';
 
@@ -33,6 +35,7 @@ export const Editor: React.FC<EditorProps> = ({
 	errorMessage,
 	...props
 }) => {
+	const { types } = useContext(AppContext);
 	return (
 		<Flex
 			{...props}
@@ -65,12 +68,10 @@ export const Editor: React.FC<EditorProps> = ({
 				<MenuButton as={Button} alignSelf={'center'}>
 					Actions
 				</MenuButton>
-				<MenuList>
-					<MenuItem>Download</MenuItem>
-					<MenuItem>Create a Copy</MenuItem>
-					<MenuItem>Mark as Draft</MenuItem>
-					<MenuItem>Delete</MenuItem>
-					<MenuItem>Attend a Workshop</MenuItem>
+				<MenuList maxHeight={'10rem'} overflow={'scroll'}>
+					{types.map((type) => (
+						<MenuItem>{type}</MenuItem>
+					))}
 				</MenuList>
 			</Menu>
 

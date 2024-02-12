@@ -13,10 +13,13 @@ export const AppContextProvider: React.FC<PropsWithChildren> = ({
 	const [serializedData, setSerializedData] = useState<string>('');
 	const [serializedDataError, setSerializedDataError] = useState<string>('');
 	const [jsonData, setJsonData] = useState<string>('');
+	const [types, setTypes] = useState<string[]>([]);
 
 	return (
 		<AppContext.Provider
 			value={{
+				types,
+				setTypes,
 				tlbSchema,
 				setTlbSchema,
 				code,

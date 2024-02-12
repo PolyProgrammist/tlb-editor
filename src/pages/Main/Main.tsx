@@ -14,8 +14,10 @@ import {
 import { Editor } from '@/components/Editor';
 import { AppContext } from '@/context/AppContext';
 
+let generator: TypescriptGenerator;
 let getGenerator = (tlbCode: any) => {
-	return new TypescriptGenerator(tlbCode);
+	generator = new TypescriptGenerator(tlbCode);
+	return generator;
 };
 
 export const Main: React.FC = () => {
@@ -32,6 +34,7 @@ export const Main: React.FC = () => {
 		setTlbError,
 		serializedDataError,
 		setSerializedDataError,
+		setTypes,
 	} = useContext(AppContext);
 
 	const handleTlbChange: OnChange = useCallback(
@@ -42,9 +45,10 @@ export const Main: React.FC = () => {
 					setCode('');
 					return;
 				}
-
 				const tree = ast(value);
 				const newCode = generateCodeByAST(tree, value, getGenerator);
+
+				setTypes([...generator.tlbCode.types.keys()]);
 				setCode(newCode);
 				setTlbError('');
 			} catch (error) {
@@ -53,7 +57,7 @@ export const Main: React.FC = () => {
 				setTlbError('Scheme is incorrect');
 			}
 		},
-		[setCode, setTlbError, setTlbSchema]
+		[setCode, setTlbError, setTlbSchema, setTypes]
 	);
 
 	const handleTlbChangeDebounced = useCallback(
