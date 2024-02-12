@@ -11,15 +11,15 @@ let jsonBoolTrue = {
     kind: 'BoolTrue',
 }
 let jsonHmLabel = {
-    kind: 'HmLabel',
+    kind: 'HmLabel_hml_short',
     m: 0,
     n: 0,
     len: {
-    kind: 'Unary',
+    kind: 'Unary_unary_zero',
 },
 }
 let jsonUnary = {
-    kind: 'Unary',
+    kind: 'Unary_unary_zero',
 }
 let jsonBitstringSet = {
     kind: 'BitstringSet',
@@ -49,7 +49,7 @@ let jsonCurrencyCollection = {
 },
 }
 let jsonCommonMsgInfo = {
-    kind: 'CommonMsgInfo',
+    kind: 'CommonMsgInfo_int_msg_info',
     ihr_disabled: false,
     bounce: false,
     bounced: false,
@@ -70,7 +70,7 @@ let jsonCommonMsgInfo = {
     created_at: 0,
 }
 let jsonCommonMsgInfoRelaxed = {
-    kind: 'CommonMsgInfoRelaxed',
+    kind: 'CommonMsgInfoRelaxed_int_msg_info',
     ihr_disabled: false,
     bounce: false,
     bounced: false,
@@ -112,19 +112,19 @@ let jsonMessageAny = {
     kind: 'MessageAny',
 }
 let jsonIntermediateAddress = {
-    kind: 'IntermediateAddress',
+    kind: 'IntermediateAddress_interm_addr_regular',
     use_dest_bits: 0,
 }
 let jsonMsgEnvelope = {
     kind: 'MsgEnvelope',
     cur_addr: {
-    kind: 'IntermediateAddress',
+    kind: 'IntermediateAddress_interm_addr_regular',
     use_dest_bits: 0,
 },
     fwd_fee_remaining: 0,
 }
 let jsonInMsg = {
-    kind: 'InMsg',
+    kind: 'InMsg_msg_import_ext',
     transaction: {
     kind: 'Transaction',
     account_addr: 0b0,
@@ -134,7 +134,7 @@ let jsonInMsg = {
     now: 0,
     outmsg_cnt: 0,
     orig_status: {
-    kind: 'AccountStatus',
+    kind: 'AccountStatus_acc_state_uninit',
 },
     out_msgs: {
 },
@@ -153,12 +153,12 @@ let jsonInMsg = {
     new_hash: 0b0,
 },
     description: {
-    kind: 'TransactionDescr',
+    kind: 'TransactionDescr_trans_ord',
     credit_first: false,
     compute_ph: {
-    kind: 'TrComputePhase',
+    kind: 'TrComputePhase_tr_phase_compute_skipped',
     reason: {
-    kind: 'ComputeSkipReason',
+    kind: 'ComputeSkipReason_cskip_no_state',
 },
 },
     aborted: false,
@@ -185,7 +185,7 @@ let jsonInMsgDescr = {
 },
 }
 let jsonOutMsg = {
-    kind: 'OutMsg',
+    kind: 'OutMsg_msg_export_ext',
     transaction: {
     kind: 'Transaction',
     account_addr: 0b0,
@@ -195,7 +195,7 @@ let jsonOutMsg = {
     now: 0,
     outmsg_cnt: 0,
     orig_status: {
-    kind: 'AccountStatus',
+    kind: 'AccountStatus_acc_state_uninit',
 },
     out_msgs: {
 },
@@ -214,12 +214,12 @@ let jsonOutMsg = {
     new_hash: 0b0,
 },
     description: {
-    kind: 'TransactionDescr',
+    kind: 'TransactionDescr_trans_ord',
     credit_first: false,
     compute_ph: {
-    kind: 'TrComputePhase',
+    kind: 'TrComputePhase_tr_phase_compute_skipped',
     reason: {
-    kind: 'ComputeSkipReason',
+    kind: 'ComputeSkipReason_cskip_no_state',
 },
 },
     aborted: false,
@@ -233,7 +233,7 @@ let jsonEnqueuedMsg = {
     out_msg: {
     kind: 'MsgEnvelope',
     cur_addr: {
-    kind: 'IntermediateAddress',
+    kind: 'IntermediateAddress_interm_addr_regular',
     use_dest_bits: 0,
 },
     fwd_fee_remaining: 0,
@@ -308,7 +308,7 @@ let jsonStorageInfo = {
     last_paid: 0,
 }
 let jsonAccount = {
-    kind: 'Account',
+    kind: 'Account_account_none',
 }
 let jsonAccountStorage = {
     kind: 'AccountStorage',
@@ -323,19 +323,19 @@ let jsonAccountStorage = {
 },
 },
     state: {
-    kind: 'AccountState',
+    kind: 'AccountState_account_uninit',
 },
 }
 let jsonAccountState = {
-    kind: 'AccountState',
+    kind: 'AccountState_account_uninit',
 }
 let jsonAccountStatus = {
-    kind: 'AccountStatus',
+    kind: 'AccountStatus_acc_state_uninit',
 }
 let jsonShardAccount = {
     kind: 'ShardAccount',
     account: {
-    kind: 'Account',
+    kind: 'Account_account_none',
 },
     last_trans_hash: 0b0,
     last_trans_lt: 0,
@@ -367,7 +367,7 @@ let jsonTransaction = {
     now: 0,
     outmsg_cnt: 0,
     orig_status: {
-    kind: 'AccountStatus',
+    kind: 'AccountStatus_acc_state_uninit',
 },
     out_msgs: {
 },
@@ -386,12 +386,12 @@ let jsonTransaction = {
     new_hash: 0b0,
 },
     description: {
-    kind: 'TransactionDescr',
+    kind: 'TransactionDescr_trans_ord',
     credit_first: false,
     compute_ph: {
-    kind: 'TrComputePhase',
+    kind: 'TrComputePhase_tr_phase_compute_skipped',
     reason: {
-    kind: 'ComputeSkipReason',
+    kind: 'ComputeSkipReason_cskip_no_state',
 },
 },
     aborted: false,
@@ -416,11 +416,11 @@ let jsonTrStoragePhase = {
     kind: 'TrStoragePhase',
     storage_fees_collected: 0,
     status_change: {
-    kind: 'AccStatusChange',
+    kind: 'AccStatusChange_acst_unchanged',
 },
 }
 let jsonAccStatusChange = {
-    kind: 'AccStatusChange',
+    kind: 'AccStatusChange_acst_unchanged',
 }
 let jsonTrCreditPhase = {
     kind: 'TrCreditPhase',
@@ -435,13 +435,13 @@ let jsonTrCreditPhase = {
 },
 }
 let jsonTrComputePhase = {
-    kind: 'TrComputePhase',
+    kind: 'TrComputePhase_tr_phase_compute_skipped',
     reason: {
-    kind: 'ComputeSkipReason',
+    kind: 'ComputeSkipReason_cskip_no_state',
 },
 }
 let jsonComputeSkipReason = {
-    kind: 'ComputeSkipReason',
+    kind: 'ComputeSkipReason_cskip_no_state',
 }
 let jsonTrActionPhase = {
     kind: 'TrActionPhase',
@@ -449,7 +449,7 @@ let jsonTrActionPhase = {
     valid: false,
     no_funds: false,
     status_change: {
-    kind: 'AccStatusChange',
+    kind: 'AccStatusChange_acst_unchanged',
 },
     result_code: 0,
     tot_actions: 0,
@@ -464,15 +464,15 @@ let jsonTrActionPhase = {
 },
 }
 let jsonTrBouncePhase = {
-    kind: 'TrBouncePhase',
+    kind: 'TrBouncePhase_tr_phase_bounce_negfunds',
 }
 let jsonTransactionDescr = {
-    kind: 'TransactionDescr',
+    kind: 'TransactionDescr_trans_ord',
     credit_first: false,
     compute_ph: {
-    kind: 'TrComputePhase',
+    kind: 'TrComputePhase_tr_phase_compute_skipped',
     reason: {
-    kind: 'ComputeSkipReason',
+    kind: 'ComputeSkipReason_cskip_no_state',
 },
 },
     aborted: false,
@@ -505,21 +505,21 @@ let jsonSmartContractInfo = {
     myself: '0:0000000000000000000000000000000000000000000000000000000000000000',
 }
 let jsonOutList = {
-    kind: 'OutList',
+    kind: 'OutList_out_list_empty',
 }
 let jsonOutAction = {
-    kind: 'OutAction',
+    kind: 'OutAction_action_send_msg',
     mode: 0,
 }
 let jsonLibRef = {
-    kind: 'LibRef',
+    kind: 'LibRef_libref_hash',
     lib_hash: 0b0,
 }
 let jsonOutListNode = {
     kind: 'OutListNode',
     prev: 'te6cckEBAQEAAgAAAEysuc0=',
     action: {
-    kind: 'OutAction',
+    kind: 'OutAction_action_send_msg',
     mode: 0,
 },
 }
@@ -610,11 +610,11 @@ let jsonShardStateUnsplit = {
     libraries: {
 },
     master_ref: {
-    kind: 'Maybe',
+    kind: 'Maybe_nothing',
 },
 }
 let jsonShardState = {
-    kind: 'ShardState',
+    kind: 'ShardState_split_state',
     left: {
     kind: 'ShardStateUnsplit',
     global_id: 0,
@@ -667,7 +667,7 @@ let jsonShardState = {
     libraries: {
 },
     master_ref: {
-    kind: 'Maybe',
+    kind: 'Maybe_nothing',
 },
 },
 }
@@ -704,7 +704,7 @@ let jsonBlockInfo = {
     min_ref_mc_seqno: 0,
     prev_key_block_seqno: 0,
     prev_ref: {
-    kind: 'BlkPrevInfo',
+    kind: 'BlkPrevInfo_prev_blk_info',
     prev: {
     kind: 'ExtBlkRef',
     end_lt: 0,
@@ -715,7 +715,7 @@ let jsonBlockInfo = {
 },
 }
 let jsonBlkPrevInfo = {
-    kind: 'BlkPrevInfo',
+    kind: 'BlkPrevInfo_prev_blk_info',
     prev: {
     kind: 'ExtBlkRef',
     end_lt: 0,
@@ -756,7 +756,7 @@ let jsonBlock = {
     min_ref_mc_seqno: 0,
     prev_key_block_seqno: 0,
     prev_ref: {
-    kind: 'BlkPrevInfo',
+    kind: 'BlkPrevInfo_prev_blk_info',
     prev: {
     kind: 'ExtBlkRef',
     end_lt: 0,
@@ -767,7 +767,7 @@ let jsonBlock = {
 },
 },
     value_flow: {
-    kind: 'ValueFlow',
+    kind: 'ValueFlow_value_flow',
     from_prev_blk: {
     kind: 'CurrencyCollection',
     grams: 0,
@@ -820,7 +820,7 @@ let jsonBlockExtra = {
     created_by: 0b0,
 }
 let jsonValueFlow = {
-    kind: 'ValueFlow',
+    kind: 'ValueFlow_value_flow',
     from_prev_blk: {
     kind: 'CurrencyCollection',
     grams: 0,
@@ -832,10 +832,10 @@ let jsonValueFlow = {
 },
 }
 let jsonFutureSplitMerge = {
-    kind: 'FutureSplitMerge',
+    kind: 'FutureSplitMerge_fsm_none',
 }
 let jsonShardDescr = {
-    kind: 'ShardDescr',
+    kind: 'ShardDescr_shard_descr',
     seq_no: 0,
     reg_mc_seqno: 0,
     start_lt: 0,
@@ -853,7 +853,7 @@ let jsonShardDescr = {
     min_ref_mc_seqno: 0,
     gen_utime: 0,
     split_merge_at: {
-    kind: 'FutureSplitMerge',
+    kind: 'FutureSplitMerge_fsm_none',
 },
     fees_collected: {
     kind: 'CurrencyCollection',
@@ -941,7 +941,7 @@ let jsonCreatorStats = {
 },
 }
 let jsonBlockCreateStats = {
-    kind: 'BlockCreateStats',
+    kind: 'BlockCreateStats_block_create_stats',
     counters: {
 },
 }
@@ -970,7 +970,7 @@ let jsonMcStateExtra = {
 },
     after_key_block: false,
     last_key_block: {
-    kind: 'Maybe',
+    kind: 'Maybe_nothing',
 },
     global_balance: {
     kind: 'CurrencyCollection',
@@ -992,7 +992,7 @@ let jsonCryptoSignatureSimple = {
     s: 0b0,
 }
 let jsonCryptoSignature = {
-    kind: 'CryptoSignature',
+    kind: 'CryptoSignature_chained_signature',
     signed_cert: {
     kind: 'SignedCertificate',
     certificate: {
@@ -1015,7 +1015,7 @@ let jsonCryptoSignaturePair = {
     kind: 'CryptoSignaturePair',
     node_id_short: 0b0,
     sign: {
-    kind: 'CryptoSignature',
+    kind: 'CryptoSignature_chained_signature',
     signed_cert: {
     kind: 'SignedCertificate',
     certificate: {
@@ -1068,7 +1068,7 @@ let jsonSignedCertificate = {
     valid_until: 0,
 },
     certificate_signature: {
-    kind: 'CryptoSignature',
+    kind: 'CryptoSignature_chained_signature',
     temp_key_signature: {
     kind: 'CryptoSignatureSimple',
     R: 0b0,
@@ -1093,7 +1093,7 @@ let jsonMcBlockExtra = {
 },
 }
 let jsonValidatorDescr = {
-    kind: 'ValidatorDescr',
+    kind: 'ValidatorDescr_validator',
     public_key: {
     kind: 'SigPubKey',
     pubkey: 0b0,
@@ -1101,14 +1101,14 @@ let jsonValidatorDescr = {
     weight: 0,
 }
 let jsonValidatorSet = {
-    kind: 'ValidatorSet',
+    kind: 'ValidatorSet_validators',
     utime_since: 0,
     utime_until: 0,
     total: 0,
     main: 0,
 }
 let jsonConfigParam = {
-    kind: 'ConfigParam',
+    kind: 'ConfigParam__',
     config_addr: 0b0,
 }
 let jsonBurningConfig = {
@@ -1167,7 +1167,7 @@ let jsonConfigProposalStatus = {
     losses: 0,
 }
 let jsonWorkchainFormat = {
-    kind: 'WorkchainFormat',
+    kind: 'WorkchainFormat_wfmt_basic',
     vm_version: 0,
     vm_mode: 0,
 }
@@ -1179,7 +1179,7 @@ let jsonWcSplitMergeTimings = {
     max_split_merge_delay: 0,
 }
 let jsonWorkchainDescr = {
-    kind: 'WorkchainDescr',
+    kind: 'WorkchainDescr_workchain',
     enabled_since: 0,
     actual_min_split: 0,
     min_split: 0,
@@ -1192,7 +1192,7 @@ let jsonWorkchainDescr = {
     zerostate_file_hash: 0b0,
     version: 0,
     format: {
-    kind: 'WorkchainFormat',
+    kind: 'WorkchainFormat_wfmt_basic',
     vm_version: 0,
     vm_mode: 0,
 },
@@ -1217,7 +1217,7 @@ let jsonStoragePrices = {
     mc_cell_price_ps: 0,
 }
 let jsonGasLimitsPrices = {
-    kind: 'GasLimitsPrices',
+    kind: 'GasLimitsPrices_gas_prices',
     gas_price: 0,
     gas_limit: 0,
     gas_credit: 0,
@@ -1250,14 +1250,14 @@ let jsonMsgForwardPrices = {
     next_frac: 0,
 }
 let jsonCatchainConfig = {
-    kind: 'CatchainConfig',
+    kind: 'CatchainConfig_catchain_config',
     mc_catchain_lifetime: 0,
     shard_catchain_lifetime: 0,
     shard_validators_lifetime: 0,
     shard_validators_num: 0,
 }
 let jsonConsensusConfig = {
-    kind: 'ConsensusConfig',
+    kind: 'ConsensusConfig_consensus_config',
     round_candidates: 0,
     next_candidate_delay_ms: 0,
     consensus_timeout_ms: 0,
@@ -1290,7 +1290,7 @@ let jsonValidatorSignedTempKey = {
     valid_until: 0,
 },
     signature: {
-    kind: 'CryptoSignature',
+    kind: 'CryptoSignature_chained_signature',
     signed_cert: {
     kind: 'SignedCertificate',
     certificate: {
@@ -1321,7 +1321,7 @@ let jsonMisbehaviourPunishmentConfig = {
     medium_proportional_mult: 0,
 }
 let jsonSizeLimitsConfig = {
-    kind: 'SizeLimitsConfig',
+    kind: 'SizeLimitsConfig_size_limits_config',
     max_msg_bits: 0,
     max_msg_cells: 0,
     max_library_cells: 0,
@@ -1351,7 +1351,7 @@ let jsonJettonBridgePrices = {
 },
 }
 let jsonJettonBridgeParams = {
-    kind: 'JettonBridgeParams',
+    kind: 'JettonBridgeParams_jetton_bridge_params_v0',
     bridge_address: 0b0,
     oracles_address: 0b0,
     oracles: {
@@ -1401,7 +1401,7 @@ let jsonBlockProof = {
     root: 'te6cckEBAQEAAgAAAEysuc0=',
 }
 let jsonProofChain = {
-    kind: 'ProofChain',
+    kind: 'ProofChain_chain_empty',
 }
 let jsonTopBlockDescr = {
     kind: 'TopBlockDescr',
@@ -1419,7 +1419,7 @@ let jsonTopBlockDescr = {
 },
     len: 0,
     chain: {
-    kind: 'ProofChain',
+    kind: 'ProofChain_chain_empty',
 },
 }
 let jsonTopBlockDescrSet = {
@@ -1473,11 +1473,11 @@ let jsonProducerInfo = {
     min_ref_mc_seqno: 0,
     prev_key_block_seqno: 0,
     prev_ref: {
-    kind: 'BlkPrevInfo',
+    kind: 'BlkPrevInfo_prev_blk_info',
 },
 },
     value_flow: {
-    kind: 'ValueFlow',
+    kind: 'ValueFlow_value_flow',
     from_prev_blk: {
     kind: 'CurrencyCollection',
     grams: 0,
@@ -1512,7 +1512,7 @@ let jsonProducerInfo = {
 },
 }
 let jsonComplaintDescr = {
-    kind: 'ComplaintDescr',
+    kind: 'ComplaintDescr_no_blk_gen',
     from_utime: 0,
     prod_info: {
     kind: 'ProducerInfo',
@@ -1560,11 +1560,11 @@ let jsonComplaintDescr = {
     min_ref_mc_seqno: 0,
     prev_key_block_seqno: 0,
     prev_ref: {
-    kind: 'BlkPrevInfo',
+    kind: 'BlkPrevInfo_prev_blk_info',
 },
 },
     value_flow: {
-    kind: 'ValueFlow',
+    kind: 'ValueFlow_value_flow',
     from_prev_blk: {
     kind: 'CurrencyCollection',
     grams: 0,
@@ -1603,7 +1603,7 @@ let jsonValidatorComplaint = {
     kind: 'ValidatorComplaint',
     validator_pubkey: 0b0,
     description: {
-    kind: 'ComplaintDescr',
+    kind: 'ComplaintDescr_no_blk_gen',
     from_utime: 0,
     prod_info: {
     kind: 'ProducerInfo',
@@ -1651,11 +1651,11 @@ let jsonValidatorComplaint = {
     min_ref_mc_seqno: 0,
     prev_key_block_seqno: 0,
     prev_ref: {
-    kind: 'BlkPrevInfo',
+    kind: 'BlkPrevInfo_prev_blk_info',
 },
 },
     value_flow: {
-    kind: 'ValueFlow',
+    kind: 'ValueFlow_value_flow',
     from_prev_blk: {
     kind: 'CurrencyCollection',
     grams: 0,
@@ -1703,7 +1703,7 @@ let jsonValidatorComplaintStatus = {
     kind: 'ValidatorComplaint',
     validator_pubkey: 0b0,
     description: {
-    kind: 'ComplaintDescr',
+    kind: 'ComplaintDescr_no_blk_gen',
     from_utime: 0,
     prod_info: {
     kind: 'ProducerInfo',
@@ -1751,11 +1751,11 @@ let jsonValidatorComplaintStatus = {
     min_ref_mc_seqno: 0,
     prev_key_block_seqno: 0,
     prev_ref: {
-    kind: 'BlkPrevInfo',
+    kind: 'BlkPrevInfo_prev_blk_info',
 },
 },
     value_flow: {
-    kind: 'ValueFlow',
+    kind: 'ValueFlow_value_flow',
     from_prev_blk: {
     kind: 'CurrencyCollection',
     grams: 0,
@@ -1803,7 +1803,7 @@ let jsonValidatorComplaintStatus = {
     weight_remaining: 0,
 }
 let jsonVmStackValue = {
-    kind: 'VmStackValue',
+    kind: 'VmStackValue_vm_stk_null',
 }
 let jsonVmCellSlice = {
     kind: 'VmCellSlice',
@@ -1814,20 +1814,20 @@ let jsonVmCellSlice = {
     end_ref: 0,
 }
 let jsonVmTupleRef = {
-    kind: 'VmTupleRef',
+    kind: 'VmTupleRef_vm_tupref_nil',
 }
 let jsonVmTuple = {
-    kind: 'VmTuple',
+    kind: 'VmTuple_vm_tuple_nil',
 }
 let jsonVmStack = {
     kind: 'VmStack',
     depth: 0,
     stack: {
-    kind: 'VmStackList',
+    kind: 'VmStackList_vm_stk_nil',
 },
 }
 let jsonVmStackList = {
-    kind: 'VmStackList',
+    kind: 'VmStackList_vm_stk_nil',
 }
 let jsonVmSaveList = {
     kind: 'VmSaveList',
@@ -1855,7 +1855,7 @@ let jsonVmControlData = {
 },
 }
 let jsonVmCont = {
-    kind: 'VmCont',
+    kind: 'VmCont_vmc_std',
     cdata: {
     kind: 'VmControlData',
     save: {
@@ -1879,39 +1879,39 @@ let jsonDNS_RecordSet = {
 },
 }
 let jsonTextChunkRef = {
-    kind: 'TextChunkRef',
+    kind: 'TextChunkRef_chunk_ref_empty',
 }
 let jsonTextChunks = {
-    kind: 'TextChunks',
+    kind: 'TextChunks_text_chunk_empty',
 }
 let jsonText = {
     kind: 'Text',
     chunks: 0,
     rest: {
-    kind: 'TextChunks',
+    kind: 'TextChunks_text_chunk_empty',
 },
 }
 let jsonDNSRecord = {
-    kind: 'DNSRecord',
+    kind: 'DNSRecord_dns_text',
     _: {
     kind: 'Text',
     chunks: 0,
     rest: {
-    kind: 'TextChunks',
+    kind: 'TextChunks_text_chunk_empty',
 },
 },
 }
 let jsonProtoList = {
-    kind: 'ProtoList',
+    kind: 'ProtoList_proto_list_nil',
 }
 let jsonProtocol = {
     kind: 'Protocol',
 }
 let jsonSmcCapList = {
-    kind: 'SmcCapList',
+    kind: 'SmcCapList_cap_list_nil',
 }
 let jsonSmcCapability = {
-    kind: 'SmcCapability',
+    kind: 'SmcCapability_cap_method_seqno',
 }
 let jsonChanConfig = {
     kind: 'ChanConfig',
@@ -1925,7 +1925,7 @@ let jsonChanConfig = {
     min_A_extra: 0,
 }
 let jsonChanState = {
-    kind: 'ChanState',
+    kind: 'ChanState_chan_state_init',
     signed_A: false,
     signed_B: false,
     min_A: 0,
@@ -1950,7 +1950,7 @@ let jsonChanSignedPromise = {
 },
 }
 let jsonChanMsg = {
-    kind: 'ChanMsg',
+    kind: 'ChanMsg_chan_msg_init',
     inc_A: 0,
     inc_B: 0,
     min_A: 0,
@@ -1960,7 +1960,7 @@ let jsonChanMsg = {
 let jsonChanSignedMsg = {
     kind: 'ChanSignedMsg',
     msg: {
-    kind: 'ChanMsg',
+    kind: 'ChanMsg_chan_msg_init',
     inc_A: 0,
     inc_B: 0,
     min_A: 0,
@@ -1973,7 +1973,7 @@ let jsonChanOp = {
     msg: {
     kind: 'ChanSignedMsg',
     msg: {
-    kind: 'ChanMsg',
+    kind: 'ChanMsg_chan_msg_init',
     inc_A: 0,
     inc_B: 0,
     min_A: 0,
@@ -1996,7 +1996,7 @@ let jsonChanData = {
     min_A_extra: 0,
 },
     state: {
-    kind: 'ChanState',
+    kind: 'ChanState_chan_state_init',
     signed_A: false,
     signed_B: false,
     min_A: 0,

@@ -15,7 +15,7 @@ let jsonTypedArgUser = {
     },
 }
 let jsonTwoConstructors = {
-    kind: 'TwoConstructors',
+    kind: 'TwoConstructors_bool_false',
     a: 0,
     b: 0,
     c: 0,
@@ -43,7 +43,7 @@ let jsonSharpConstructor = {
 let jsonTypedParam = {
     kind: 'TypedParam',
     x: {
-        kind: 'Maybe',
+        kind: 'Maybe_nothing',
     },
 }
 let jsonBitLenArg = {
@@ -165,21 +165,21 @@ let jsonManyComb = {
     kind: 'ManyComb',
 }
 let jsonUnary = {
-    kind: 'Unary',
+    kind: 'Unary_unary_zero',
 }
 let jsonParamConst = {
-    kind: 'ParamConst',
+    kind: 'ParamConst_b',
     m: 0,
     k: 0,
 }
 let jsonParamDifNames = {
-    kind: 'ParamDifNames',
+    kind: 'ParamDifNames_a',
 }
 let jsonParamDifNamesUser = {
     kind: 'ParamDifNamesUser',
     k: 0,
     x: {
-        kind: 'ParamDifNames',
+        kind: 'ParamDifNames_a',
     },
 }
 let jsonNegationFromImplicit = {
@@ -193,7 +193,7 @@ let jsonUnaryUserCheckOrder = {
     l: 0,
     m: 0,
     label: {
-        kind: 'Unary',
+        kind: 'Unary_unary_zero',
     },
 }
 let jsonCombArgCellRefUser = {
@@ -224,11 +224,11 @@ let jsonTupleCheck = {
     kind: 'TupleCheck',
 }
 let jsonHmLabel = {
-    kind: 'HmLabel',
+    kind: 'HmLabel_hml_short',
     m: 0,
     n: 0,
     len: {
-        kind: 'Unary',
+        kind: 'Unary_unary_zero',
     },
 }
 let jsonHashmapEUser = {
@@ -249,14 +249,14 @@ let jsonImplicitCondition = {
     flags: 0,
 }
 let jsonMultipleEmptyConstructor = {
-    kind: 'MultipleEmptyConstructor',
+    kind: 'MultipleEmptyConstructor__',
     a: 0,
 }
 let jsonTrue = {
     kind: 'True',
 }
 let jsonParamNamedArgInSecondConstr = {
-    kind: 'ParamNamedArgInSecondConstr',
+    kind: 'ParamNamedArgInSecondConstr_a',
     n: 0,
 }
 let jsonRefCombinatorAny = {
@@ -285,7 +285,7 @@ let jsonFalseAnonField = {
     value: 0,
 }
 let jsonConstructorOrder = {
-    kind: 'ConstructorOrder',
+    kind: 'ConstructorOrder_b',
     anon0: {
         kind: 'Simple',
         a: 0,
@@ -293,7 +293,7 @@ let jsonConstructorOrder = {
     },
 }
 let jsonCheckCrc32 = {
-    kind: 'CheckCrc32',
+    kind: 'CheckCrc32_a',
     a: 0,
 }
 let jsonCheckKeyword = {

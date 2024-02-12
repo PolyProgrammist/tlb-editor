@@ -3,6 +3,7 @@ import { TLBCode, TLBField, TLBFieldType, TLBParameter, TLBType } from "../../as
 import { CodeBuilder } from "../CodeBuilder"
 import { CodeGenerator, CommonGenDeclaration } from "../generator"
 import { Expression, GenDeclaration, ObjectExpression, ObjectProperty, TheNode, id, tDeclareVariable, tIdentifier, tNumericLiteral, tObjectExpression, tObjectProperty, tStringLiteral, tTypedIdentifier, toCode } from "../typescript/tsgen"
+import { getSubStructName } from "../../utils";
 
 export type JsonContext = {
     constructorsReached: Map<String, number>;
@@ -92,7 +93,7 @@ let jsonTypedArgUser = {
                 y.set(constructor.parameters[i].variable.name, parameters[i]);
             }
     
-            x.push(tObjectProperty(id('kind'), tStringLiteral(tlbType.name)));
+            x.push(tObjectProperty(id('kind'), tStringLiteral(getSubStructName(tlbType, constructor))));
             
             constructor.variables.forEach(variable => {
                 if (variable.type == "#" && !variable.isField) {
