@@ -82,6 +82,9 @@ let jsonTypedArgUser = {
             })
 
             let y: Map<String, Expression> = new Map<String, Expression>();
+            if (parameters.length != constructor.parameters.length && hasParams) {
+                return;
+            }
             for (let i = 0; i < parameters.length; i++) {
                 if (constructor.parameters[i].variable.type == 'Type') {
                     console.log(tlbType.name, constructor.name, i, toCode(parameters[i]).code)
@@ -100,7 +103,7 @@ let jsonTypedArgUser = {
             })
     
             constructor.fields.forEach((field) => {
-                this.handleField(field, x, ctx);
+                this.handleField(field, x, ctx, y);
             });
             return tObjectExpression(x);
         }  
@@ -109,15 +112,16 @@ let jsonTypedArgUser = {
     handleField(
         field: TLBField,
         x: ObjectProperty[],
-        ctx: JsonContext
+        ctx: JsonContext,
+        y: Map<String, Expression>
       ) {
         if (field.subFields.length > 0) {
             field.subFields.forEach((fieldDef) => {
-                this.handleField(fieldDef, x, ctx);
+                this.handleField(fieldDef, x, ctx, y);
             });
         }
         if (field.subFields.length == 0) { 
-            let res = this.handleType(field, field.fieldType, ctx);
+            let res = this.handleType(field, field.fieldType, ctx, y);
             if (res) {
                 x.push(tObjectProperty(id(field.name), res))
             }
@@ -127,7 +131,8 @@ let jsonTypedArgUser = {
     handleType(
         field: TLBField,
         fieldType: TLBFieldType,
-        ctx: JsonContext
+        ctx: JsonContext,
+        y: Map<String, Expression>
       ) : Expression | undefined {
         let res: Expression | undefined = undefined;
 
@@ -150,17 +155,20 @@ let jsonTypedArgUser = {
         } else if (fieldType.kind == "TLBNegatedType") {
             res = tNumericLiteral(0);
         } else if (fieldType.kind == "TLBNamedType") {
-            let parameters: Expression[] = [];
-            fieldType.arguments.forEach(argument => {
-                if (argument.kind == 'TLBNamedType') {
-                    let tmp = this.getTLBTypeNameResult(argument.name, ctx, []);
-                    if (tmp) {
-                        parameters.push(tmp);
+            if (y.has(fieldType.name)) {
+                res = y.get(fieldType.name)
+            } else {
+                let parameters: Expression[] = [];
+                fieldType.arguments.forEach(argument => {
+                    if (argument.kind == 'TLBNamedType') {
+                        let tmp = this.getTLBTypeNameResult(argument.name, ctx, []);
+                        if (tmp) {
+                            parameters.push(tmp);
+                        }
                     }
-                }
-            })
-            res = this.getTLBTypeNameResult(fieldType.name, ctx, parameters)
-           // TODO handle infinite recursion
+                })
+                res = this.getTLBTypeNameResult(fieldType.name, ctx, parameters)
+            }
         } else if (fieldType.kind == "TLBCondType") {
             // TODO
         } else if (fieldType.kind == "TLBMultipleType") {
