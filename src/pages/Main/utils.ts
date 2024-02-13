@@ -1,3 +1,5 @@
+import { Buffer } from 'buffer';
+
 export const importTonDependencies = async () => {
 	const ton = await import('ton');
 
@@ -21,4 +23,12 @@ export const importTonDependencies = async () => {
 		Cell,
 		Address,
 	};
+};
+
+export const base64ToHex = (base64: string): string => {
+	return Buffer.from(base64, 'base64').toString('hex');
+};
+
+export const hexToBase64 = (hex: string): string => {
+	return Buffer.from(hex, 'hex').toString('base64');
 };

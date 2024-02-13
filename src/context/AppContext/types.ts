@@ -9,8 +9,10 @@ export interface IAppContext {
 	setCode: React.Dispatch<React.SetStateAction<string>>;
 	isCodeLoading: boolean;
 	setIsCodeLoading: React.Dispatch<React.SetStateAction<boolean>>;
-	serializedData: string;
-	setSerializedData: React.Dispatch<React.SetStateAction<string>>;
+	base64: string;
+	setBase64: React.Dispatch<React.SetStateAction<string>>;
+	hex: string;
+	setHex: React.Dispatch<React.SetStateAction<string>>;
 	isSerializedDataLoading: boolean;
 	setIsSerializedDataLoading: React.Dispatch<React.SetStateAction<boolean>>;
 	serializedDataError: string;
@@ -27,6 +29,10 @@ export interface IAppContext {
 	setSelectedType: React.Dispatch<React.SetStateAction<string>>;
 	module: Record<string, any>;
 	setModule: React.Dispatch<React.SetStateAction<Record<string, any>>>;
+	selectedSerializedDataType: SerializedDataType;
+	setSelectedSerializedDataType: React.Dispatch<
+		React.SetStateAction<SerializedDataType>
+	>;
 }
 
-export type DataField = 'SERIALIZED' | 'JSON';
+export type SerializedDataType = 'base64' | 'hex';

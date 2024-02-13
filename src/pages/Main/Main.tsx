@@ -12,10 +12,11 @@ import {
 } from '@polyprogrammist_test/tlbgen/build';
 
 import { Editor } from '@/components/Editor';
+import { SerializedDataTypeTab } from '@/components/SerializedDataTypeTab';
 import { TypeMenu } from '@/components/TypeMenu';
 import { AppContext } from '@/context/AppContext';
 
-import { importTonDependencies } from './utils';
+import { base64ToHex, hexToBase64, importTonDependencies } from './utils';
 
 let generator: TypescriptGenerator;
 let getGenerator = (tlbCode: any) => {
@@ -28,8 +29,6 @@ export const Main: React.FC = () => {
 		tlbSchema,
 		setTlbSchema,
 		code,
-		serializedData,
-		setSerializedData,
 		jsonData,
 		setJsonData,
 		setCode,
@@ -46,9 +45,14 @@ export const Main: React.FC = () => {
 		isJsonDataLoading,
 		setIsSerializedDataLoading,
 		selectedType,
+		selectedSerializedDataType,
 		setIsJsonDataLoading,
 		jsonDataError,
 		setJsonDataError,
+		base64,
+		setBase64,
+		hex,
+		setHex,
 	} = useContext(AppContext);
 
 	const handleTlbChange: OnChange = useCallback(
@@ -101,7 +105,17 @@ export const Main: React.FC = () => {
 	const handleSerializedDataChange: OnChange = useCallback(
 		async (value = '') => {
 			try {
-				setSerializedData(value);
+				if (selectedSerializedDataType === 'base64') {
+					setBase64(value);
+					const newHex = base64ToHex(value);
+					setHex(newHex);
+				} else {
+					setHex(value);
+					const newBase64 = hexToBase64(value);
+					setBase64(newBase64);
+
+					value = newBase64;
+				}
 
 				if (value === '') {
 					setJsonData('');
@@ -137,10 +151,12 @@ export const Main: React.FC = () => {
 		[
 			setIsJsonDataLoading,
 			setJsonData,
-			setSerializedData,
 			setSerializedDataError,
 			module,
 			selectedType,
+			selectedSerializedDataType,
+			setBase64,
+			setHex,
 		]
 	);
 
@@ -157,8 +173,10 @@ export const Main: React.FC = () => {
 		async (value = '') => {
 			try {
 				setJsonData(value);
+
 				if (!value) {
-					setSerializedData('');
+					setHex('');
+					setBase64('');
 					return;
 				}
 
@@ -169,9 +187,12 @@ export const Main: React.FC = () => {
 				}
 
 				const builder = beginCell();
-				const data = module[`store${selectedType}`](value)(builder);
 
-				setSerializedData(data);
+				const data = module[`store${selectedType}`](value)(builder) || '';
+
+				setBase64(data);
+				setHex(base64ToHex(data));
+
 				setJsonDataError('');
 			} catch (error) {
 				console.error(error);
@@ -182,7 +203,8 @@ export const Main: React.FC = () => {
 		},
 		[
 			setJsonData,
-			setSerializedData,
+			setBase64,
+			setHex,
 			setJsonDataError,
 			setIsSerializedDataLoading,
 			module,
@@ -219,14 +241,10 @@ export const Main: React.FC = () => {
 				/>
 
 				<Editor
-					header={
-						<Text ml={3} p={3}>
-							Base64
-						</Text>
-					}
+					header={<SerializedDataTypeTab />}
 					flexGrow={1}
 					isLoading={isSerializedDataLoading}
-					value={serializedData}
+					value={selectedSerializedDataType === 'base64' ? base64 : hex}
 					options={{
 						minimap: { enabled: false },
 						readOnly: !tlbSchema || Boolean(tlbError) || !selectedType,

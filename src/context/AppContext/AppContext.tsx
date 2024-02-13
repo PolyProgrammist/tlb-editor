@@ -1,6 +1,6 @@
 import React, { PropsWithChildren, useState } from 'react';
 
-import { IAppContext } from './types';
+import { IAppContext, SerializedDataType } from './types';
 
 export const AppContext = React.createContext<IAppContext>({} as IAppContext);
 
@@ -12,7 +12,8 @@ export const AppContextProvider: React.FC<PropsWithChildren> = ({
 	const [tlbError, setTlbError] = useState<string>('');
 	const [code, setCode] = useState<string>('');
 	const [isCodeLoading, setIsCodeLoading] = useState<boolean>(false);
-	const [serializedData, setSerializedData] = useState<string>('');
+	const [base64, setBase64] = useState<string>('');
+	const [hex, setHex] = useState<string>('');
 	const [serializedDataError, setSerializedDataError] = useState<string>('');
 	const [isSerializedDataLoading, setIsSerializedDataLoading] =
 		useState<boolean>(false);
@@ -22,6 +23,8 @@ export const AppContextProvider: React.FC<PropsWithChildren> = ({
 	const [types, setTypes] = useState<string[]>([]);
 	const [selectedType, setSelectedType] = useState<string>('');
 	const [module, setModule] = useState<{}>({});
+	const [selectedSerializedDataType, setSelectedSerializedDataType] =
+		useState<SerializedDataType>('base64');
 
 	return (
 		<AppContext.Provider
@@ -32,12 +35,14 @@ export const AppContextProvider: React.FC<PropsWithChildren> = ({
 				setTypes,
 				tlbSchema,
 				setTlbSchema,
+				base64,
+				setBase64,
+				hex,
+				setHex,
 				code,
 				setCode,
 				isCodeLoading,
 				setIsCodeLoading,
-				serializedData,
-				setSerializedData,
 				serializedDataError,
 				setSerializedDataError,
 				isSerializedDataLoading,
@@ -54,6 +59,8 @@ export const AppContextProvider: React.FC<PropsWithChildren> = ({
 				setSelectedType,
 				setModule,
 				module,
+				selectedSerializedDataType,
+				setSelectedSerializedDataType,
 			}}
 		>
 			{children}

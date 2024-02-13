@@ -1,2 +1,2 @@
 export { AppContext, AppContextProvider } from './AppContext';
-export type { DataField } from './types';
+export type { SerializedDataType } from './types';
