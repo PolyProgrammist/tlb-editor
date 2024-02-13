@@ -7,6 +7,7 @@ export const AppContext = React.createContext<IAppContext>({} as IAppContext);
 export const AppContextProvider: React.FC<PropsWithChildren> = ({
 	children,
 }) => {
+	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [tlbSchema, setTlbSchema] = useState<string>('');
 	const [tlbError, setTlbError] = useState<string>('');
 	const [code, setCode] = useState<string>('');
@@ -16,6 +17,8 @@ export const AppContextProvider: React.FC<PropsWithChildren> = ({
 	const [isSerializedDataLoading, setIsSerializedDataLoading] =
 		useState<boolean>(false);
 	const [jsonData, setJsonData] = useState<string>('');
+	const [jsonDataError, setJsonDataError] = useState<string>('');
+	const [isJsonDataLoading, setIsJsonDataLoading] = useState<boolean>(false);
 	const [types, setTypes] = useState<string[]>([]);
 	const [selectedType, setSelectedType] = useState<string>('');
 	const [module, setModule] = useState<{}>({});
@@ -23,6 +26,8 @@ export const AppContextProvider: React.FC<PropsWithChildren> = ({
 	return (
 		<AppContext.Provider
 			value={{
+				isLoading,
+				setIsLoading,
 				types,
 				setTypes,
 				tlbSchema,
@@ -37,8 +42,12 @@ export const AppContextProvider: React.FC<PropsWithChildren> = ({
 				setSerializedDataError,
 				isSerializedDataLoading,
 				setIsSerializedDataLoading,
+				isJsonDataLoading,
+				setIsJsonDataLoading,
 				jsonData,
 				setJsonData,
+				jsonDataError,
+				setJsonDataError,
 				tlbError,
 				setTlbError,
 				selectedType,

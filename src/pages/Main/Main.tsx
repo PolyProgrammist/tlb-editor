@@ -15,6 +15,8 @@ import { Editor } from '@/components/Editor';
 import { TypeMenu } from '@/components/TypeMenu';
 import { AppContext } from '@/context/AppContext';
 
+import { importTonDependencies } from './utils';
+
 let generator: TypescriptGenerator;
 let getGenerator = (tlbCode: any) => {
 	generator = new TypescriptGenerator(tlbCode);
@@ -41,8 +43,12 @@ export const Main: React.FC = () => {
 		setModule,
 		module,
 		isSerializedDataLoading,
+		isJsonDataLoading,
 		setIsSerializedDataLoading,
 		selectedType,
+		setIsJsonDataLoading,
+		jsonDataError,
+		setJsonDataError,
 	} = useContext(AppContext);
 
 	const handleTlbChange: OnChange = useCallback(
@@ -97,31 +103,20 @@ export const Main: React.FC = () => {
 			try {
 				setSerializedData(value);
 
-				const ton = await import('ton');
+				if (value === '') {
+					setJsonData('');
+					return;
+				}
 
-				const {
-					beginCell,
-					Dictionary,
-					Builder,
-					Slice,
-					BitString,
-					Cell,
-					Address,
-				} = ton;
+				const { Cell } = await importTonDependencies();
 
-				(window as any).beginCell = beginCell;
-				(window as any).Dictionary = Dictionary;
-				(window as any).Builder = Builder;
-				(window as any).Slice = Slice;
-				(window as any).BitString = BitString;
-				(window as any).Cell = Cell;
-				(window as any).Address = Address;
-
-				const cs = Cell.fromBase64(value);
-				const slice = cs.beginParse();
 				if (!selectedType) {
 					return;
 				}
+
+				const cs = Cell.fromBase64(value);
+				const slice = cs.beginParse();
+
 				const json = module[`load${selectedType}`](slice);
 				setJsonData(
 					JSON.stringify(
@@ -134,8 +129,53 @@ export const Main: React.FC = () => {
 				setSerializedDataError('');
 			} catch (error) {
 				console.error(error);
-				setJsonData('');
 				setSerializedDataError('Data is invalid');
+			} finally {
+				setIsJsonDataLoading(false);
+			}
+		},
+		[
+			setIsJsonDataLoading,
+			setJsonData,
+			setSerializedData,
+			setSerializedDataError,
+			module,
+			selectedType,
+		]
+	);
+
+	const handleSerializedDataChangeDebounced: OnChange = useCallback(
+		(value, model) => {
+			setIsJsonDataLoading(true);
+
+			debounce(handleSerializedDataChange, 1000)(value, model);
+		},
+		[handleSerializedDataChange, setIsJsonDataLoading]
+	);
+
+	const handleJsonDataChange: OnChange = useCallback(
+		async (value = '') => {
+			try {
+				setJsonData(value);
+				if (!value) {
+					setSerializedData('');
+					return;
+				}
+
+				const { beginCell } = await importTonDependencies();
+
+				if (!selectedType) {
+					return;
+				}
+
+				const builder = beginCell();
+				const data = module[`store${selectedType}`](value)(builder);
+
+				setSerializedData(data);
+				setJsonDataError('');
+			} catch (error) {
+				console.error(error);
+				setJsonDataError('Data is invalid');
 			} finally {
 				setIsSerializedDataLoading(false);
 			}
@@ -143,21 +183,21 @@ export const Main: React.FC = () => {
 		[
 			setJsonData,
 			setSerializedData,
-			setSerializedDataError,
-			module,
+			setJsonDataError,
 			setIsSerializedDataLoading,
+			module,
 			selectedType,
 		]
 	);
 
-	const handleSerializedDataChangeDebounced: OnChange = useCallback(
+	const handleJsonDataChangeDebounced: OnChange = useCallback(
 		(value, model) => {
 			setIsSerializedDataLoading(true);
-			debounce(handleSerializedDataChange, 1000)(value, model);
-		},
-		[handleSerializedDataChange, setIsSerializedDataLoading]
-	);
 
+			debounce(handleJsonDataChange, 1000)(value, model);
+		},
+		[handleJsonDataChange, setIsSerializedDataLoading]
+	);
 	return (
 		<Flex as="main" flexGrow={1} gap={5}>
 			<Flex flexDirection="column" flexGrow={1} gap={5}>
@@ -185,10 +225,11 @@ export const Main: React.FC = () => {
 						</Text>
 					}
 					flexGrow={1}
+					isLoading={isSerializedDataLoading}
 					value={serializedData}
 					options={{
 						minimap: { enabled: false },
-						readOnly: !tlbSchema || Boolean(tlbError),
+						readOnly: !tlbSchema || Boolean(tlbError) || !selectedType,
 					}}
 					errorMessage={serializedDataError}
 					onChange={handleSerializedDataChangeDebounced}
@@ -196,7 +237,7 @@ export const Main: React.FC = () => {
 			</Flex>
 
 			<Editor
-				isLoading={isSerializedDataLoading}
+				isLoading={isJsonDataLoading}
 				header={
 					<Text ml={3} p={3}>
 						JSON
@@ -205,11 +246,12 @@ export const Main: React.FC = () => {
 				flexGrow={1}
 				defaultLanguage="json"
 				value={jsonData}
+				errorMessage={jsonDataError}
 				options={{
 					minimap: { enabled: false },
-					readOnly: !tlbSchema || Boolean(tlbError),
+					readOnly: !tlbSchema || Boolean(tlbError) || !selectedType,
 				}}
-				onChange={(v) => setJsonData(v || '')}
+				onChange={handleJsonDataChangeDebounced}
 			/>
 
 			<Editor

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { BoxProps, Flex, Spinner, Text } from '@chakra-ui/react';
+import { Box, BoxProps, Flex, Spinner, Text } from '@chakra-ui/react';
 import {
 	Editor as MonacoEditor,
 	EditorProps as MonacoEditorProps,
@@ -31,6 +31,7 @@ export const Editor: React.FC<EditorProps> = ({
 		<Flex
 			{...props}
 			flexShrink={0}
+			position={'relative'}
 			flexDirection={'column'}
 			background={'white'}
 			borderRadius={'1.5rem'}
@@ -45,7 +46,7 @@ export const Editor: React.FC<EditorProps> = ({
 		>
 			{header}
 
-			<Flex position={'relative'} flexGrow={1}>
+			<Box position={'relative'} flexGrow={1}>
 				{isLoading && (
 					<Flex
 						position={'absolute'}
@@ -81,11 +82,18 @@ export const Editor: React.FC<EditorProps> = ({
 						}}
 					/>
 				</Flex>
-			</Flex>
+			</Box>
 
 			{footer}
 			{errorMessage && (
-				<Text mt={'-2.5rem'} zIndex={100} bg={'#ef5350'} px={6} color={'white'}>
+				<Text
+					zIndex={100}
+					bg={'#ef5350'}
+					px={6}
+					color={'white'}
+					position={'absolute'}
+					bottom={0}
+				>
 					{errorMessage}
 				</Text>
 			)}
