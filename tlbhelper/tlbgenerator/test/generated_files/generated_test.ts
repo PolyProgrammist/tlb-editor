@@ -6,13 +6,26 @@ let jsonSimple = {
 let jsonTypedArgUser = {
     kind: 'TypedArgUser',
     x: {
-        kind: 'TypedArg',
-        b: {
-            kind: 'Simple',
-            a: 0,
-            b: 0,
-        },
-    },
+    kind: 'TypedArg',
+    b: {
+    kind: 'Simple',
+    a: 0,
+    b: 0,
+},
+},
+}
+let jsonParamAndTypedArgUser = {
+    kind: 'ParamAndTypedArgUser',
+    x: {
+    kind: 'ParamAndTypedArg',
+    n: 0,
+    b: {
+    kind: 'Simple',
+    a: 0,
+    b: 0,
+},
+    c: 0,
+},
 }
 let jsonTwoConstructors = {
     kind: 'TwoConstructors_bool_false',
@@ -27,24 +40,24 @@ let jsonFixedIntParam = {
 let jsonTypedField = {
     kind: 'TypedField',
     y: {
-        kind: 'FixedIntParam',
-        y: 0,
-    },
+    kind: 'FixedIntParam',
+    y: 0,
+},
     c: 0,
 }
 let jsonSharpConstructor = {
     kind: 'SharpConstructor',
     y: {
-        kind: 'FixedIntParam',
-        y: 0,
-    },
+    kind: 'FixedIntParam',
+    y: 0,
+},
     c: 0,
 }
 let jsonTypedParam = {
     kind: 'TypedParam',
     x: {
-        kind: 'Maybe_nothing',
-    },
+    kind: 'Maybe_nothing',
+},
 }
 let jsonBitLenArg = {
     kind: 'BitLenArg',
@@ -54,10 +67,10 @@ let jsonBitLenArg = {
 let jsonBitLenArgUser = {
     kind: 'BitLenArgUser',
     t: {
-        kind: 'BitLenArg',
-        x: 0,
-        value: 0,
-    },
+    kind: 'BitLenArg',
+    x: 0,
+    value: 0,
+},
 }
 let jsonExprArg = {
     kind: 'ExprArg',
@@ -67,32 +80,32 @@ let jsonExprArg = {
 let jsonExprArgUser = {
     kind: 'ExprArgUser',
     t: {
-        kind: 'ExprArg',
-        x: 0,
-        value: 0,
-    },
+    kind: 'ExprArg',
+    x: 0,
+    value: 0,
+},
 }
 let jsonComplexTypedField = {
     kind: 'ComplexTypedField',
     a: {
-        kind: 'ExprArgUser',
-        t: {
-            kind: 'ExprArg',
-            x: 0,
-            value: 0,
-        },
-    },
+    kind: 'ExprArgUser',
+    t: {
+    kind: 'ExprArg',
+    x: 0,
+    value: 0,
+},
+},
 }
 let jsonCellTypedField = {
     kind: 'CellTypedField',
     a: {
-        kind: 'ExprArgUser',
-        t: {
-            kind: 'ExprArg',
-            x: 0,
-            value: 0,
-        },
-    },
+    kind: 'ExprArgUser',
+    t: {
+    kind: 'ExprArg',
+    x: 0,
+    value: 0,
+},
+},
 }
 let jsonCellsSimple = {
     kind: 'CellsSimple',
@@ -107,13 +120,27 @@ let jsonCellsSimple = {
 let jsonIntBitsInside = {
     kind: 'IntBitsInside',
     x: 0,
+    a: {
+    kind: 'IntBits',
+    d: 0,
+    g: 0b0,
+    arg: 1,
+    x: 'te6cckEBAQEAAgAAAEysuc0=',
+},
 }
 let jsonIntBitsOutside = {
     kind: 'IntBitsOutside',
     x: {
-        kind: 'IntBitsInside',
-        x: 0,
-    },
+    kind: 'IntBitsInside',
+    x: 0,
+    a: {
+    kind: 'IntBits',
+    d: 0,
+    g: 0b0,
+    arg: 1,
+    x: 'te6cckEBAQEAAgAAAEysuc0=',
+},
+},
 }
 let jsonIntBitsParametrized = {
     kind: 'IntBitsParametrized',
@@ -129,32 +156,32 @@ let jsonIntBitsParametrizedInside = {
     kind: 'IntBitsParametrizedInside',
     x: 0,
     a: {
-        kind: 'IntBitsParametrized',
-        e: 0,
-        h: 0,
-        f: 0,
-        i: 0b0,
-        j: 0,
-        k: 0,
-        tc: 'te6cckEBAQEAAgAAAEysuc0=',
-    },
+    kind: 'IntBitsParametrized',
+    e: 0,
+    h: 0,
+    f: 0,
+    i: 0b0,
+    j: 0,
+    k: 0,
+    tc: 'te6cckEBAQEAAgAAAEysuc0=',
+},
 }
 let jsonIntBitsParametrizedOutside = {
     kind: 'IntBitsParametrizedOutside',
     x: {
-        kind: 'IntBitsParametrizedInside',
-        x: 0,
-        a: {
-            kind: 'IntBitsParametrized',
-            e: 0,
-            h: 0,
-            f: 0,
-            i: 0b0,
-            j: 0,
-            k: 0,
-            tc: 'te6cckEBAQEAAgAAAEysuc0=',
-        },
-    },
+    kind: 'IntBitsParametrizedInside',
+    x: 0,
+    a: {
+    kind: 'IntBitsParametrized',
+    e: 0,
+    h: 0,
+    f: 0,
+    i: 0b0,
+    j: 0,
+    k: 0,
+    tc: 'te6cckEBAQEAAgAAAEysuc0=',
+},
+},
 }
 let jsonLessThan = {
     kind: 'LessThan',
@@ -179,8 +206,8 @@ let jsonParamDifNamesUser = {
     kind: 'ParamDifNamesUser',
     k: 0,
     x: {
-        kind: 'ParamDifNames_a',
-    },
+    kind: 'ParamDifNames_a',
+},
 }
 let jsonNegationFromImplicit = {
     kind: 'NegationFromImplicit',
@@ -193,20 +220,24 @@ let jsonUnaryUserCheckOrder = {
     l: 0,
     m: 0,
     label: {
-        kind: 'Unary_unary_zero',
-    },
+    kind: 'Unary_unary_zero',
+},
 }
 let jsonCombArgCellRefUser = {
     kind: 'CombArgCellRefUser',
+    x: {
+    kind: 'CombArgCellRef',
+    info: 0,
+},
 }
 let jsonMathExprAsCombArg = {
     kind: 'MathExprAsCombArg',
     n: 0,
     ref: {
-        kind: 'BitLenArg',
-        x: 0,
-        value: 0,
-    },
+    kind: 'BitLenArg',
+    x: 0,
+    value: 0,
+},
 }
 let jsonEmptyTag = {
     kind: 'EmptyTag',
@@ -228,13 +259,13 @@ let jsonHmLabel = {
     m: 0,
     n: 0,
     len: {
-        kind: 'Unary_unary_zero',
-    },
+    kind: 'Unary_unary_zero',
+},
 }
 let jsonHashmapEUser = {
     kind: 'HashmapEUser',
     x: {
-    },
+},
 }
 let jsonConditionalField = {
     kind: 'ConditionalField',
@@ -261,6 +292,9 @@ let jsonParamNamedArgInSecondConstr = {
 }
 let jsonRefCombinatorAny = {
     kind: 'RefCombinatorAny',
+    msg: {
+    kind: 'Maybe_nothing',
+},
 }
 let jsonEqualityExpression = {
     kind: 'EqualityExpression',
@@ -287,10 +321,10 @@ let jsonFalseAnonField = {
 let jsonConstructorOrder = {
     kind: 'ConstructorOrder_b',
     anon0: {
-        kind: 'Simple',
-        a: 0,
-        b: 0,
-    },
+    kind: 'Simple',
+    a: 0,
+    b: 0,
+},
 }
 let jsonCheckCrc32 = {
     kind: 'CheckCrc32_a',
@@ -302,6 +336,13 @@ let jsonCheckKeyword = {
 }
 let jsonRefCombinatorInRef = {
     kind: 'RefCombinatorInRef',
+    msg: {
+    kind: 'RefCombinatorInRefHelper',
+    t: 0,
+    y: {
+    kind: 'Maybe_nothing',
+},
+},
 }
 let jsonBoolUser = {
     kind: 'BoolUser',
@@ -343,48 +384,53 @@ let jsonGramsUser = {
 let jsonHashmapVUIUser = {
     kind: 'HashmapVUIUser',
     x: {
-    },
+},
 }
 let jsonHashmapTPCell = {
     kind: 'HashmapTPCell',
     x: {
-    },
+},
 }
 let jsonHashmapVarKey = {
     kind: 'HashmapVarKey',
     n: 0,
     x: {
-    },
+},
 }
 let jsonHashmapVarKeyUser = {
     kind: 'HashmapVarKeyUser',
     x: {
-        kind: 'HashmapVarKey',
-        n: 0,
-        x: {
-        },
-    },
+    kind: 'HashmapVarKey',
+    n: 0,
+    x: {
+},
+},
 }
 let jsonHashmapExprKey = {
     kind: 'HashmapExprKey',
     n: 0,
     x: {
-    },
+},
 }
 let jsonHashmapExprKeyUser = {
     kind: 'HashmapExprKeyUser',
     x: {
-        kind: 'HashmapExprKey',
-        n: 0,
-        x: {
-        },
-    },
+    kind: 'HashmapExprKey',
+    n: 0,
+    x: {
+},
+},
 }
 let jsonHashmapOneCombUser = {
     kind: 'HashmapOneCombUser',
+    x: {
+    kind: 'HashmapOneComb',
+    x: {
+},
+},
 }
 let jsonHashmapAugEUser = {
     kind: 'HashmapAugEUser',
     x: {
-    },
+},
 }

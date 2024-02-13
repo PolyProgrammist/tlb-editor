@@ -68,6 +68,24 @@ let jsonTypedArgUser = {
         }
     }
 }
+
+a$_ {Arg:Type} {n:#} b:Arg c:(## n) = ParamAndTypedArg n Arg;
+a$_ x:(ParamAndTypedArg 5 Simple) = ParamAndTypedArgUser; 
+
+let jsonParamAndTypedArgUser = {
+    kind: 'ParamAndTypedArgUser',
+    x: {
+        kind: 'ParamAndTypedArg',
+        n: 5,
+        c: 4,
+        b: {
+            kind: 'Simple',
+            a: 5,
+            b: 6
+        }
+    }
+}
+
 */
         for (let i = 0; i < tlbType.constructors.length; i++) {
             let constructor = tlbType.constructors[i];
@@ -166,6 +184,8 @@ let jsonTypedArgUser = {
                         if (tmp) {
                             parameters.push(tmp);
                         }
+                    } else {
+                        parameters.push(tNumericLiteral(1))
                     }
                 })
                 res = this.getTLBTypeNameResult(fieldType.name, ctx, parameters)
