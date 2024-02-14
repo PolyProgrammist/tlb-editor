@@ -6,6 +6,10 @@ a$_ x:(TypedArg Simple) = TypedArgUser;
 a$_ {Arg:Type} {n:#} b:Arg c:(## n) = ParamAndTypedArg n Arg;
 a$_ x:(ParamAndTypedArg 5 Simple) = ParamAndTypedArgUser; 
 
+_ x:Simple y:Simple = TwoSimples;
+
+_ one_maybe:(Maybe Simple) second_maybe:(Maybe Simple) = TwoMaybes;
+
 bool_false$0 a:# b:(## 7) c:# = TwoConstructors;
 bool_true$1 b:# = TwoConstructors; 
 
