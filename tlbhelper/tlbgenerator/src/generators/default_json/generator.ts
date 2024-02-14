@@ -10,59 +10,6 @@ export type JsonContext = {
     constructorsCalculated: Map<String, number>;
 }
 
-/*
-tmpa$_ a:# b:# = Simple;
-a$_ {Arg:Type} b:Arg = TypedArg Arg;
-a$_ x:(TypedArg Simple) = TypedArgUser;
-
-Сейчас:
-let jsonTypedArgUser = {
-    kind: 'TypedArgUser',
-}
-
-Нужно:
-let jsonTypedArgUser = {
-    kind: 'TypedArgUser',
-    x: {
-        kind: 'TypedArg',
-        b: {
-            kind: 'Simple',
-            a: 5,
-            b: 6
-        }
-    }
-}
-
-a$_ {Arg:Type} {n:#} b:Arg c:(## n) = ParamAndTypedArg n Arg;
-a$_ x:(ParamAndTypedArg 5 Simple) = ParamAndTypedArgUser; 
-
-let jsonParamAndTypedArgUser = {
-    kind: 'ParamAndTypedArgUser',
-    x: {
-        kind: 'ParamAndTypedArg',
-        n: 5,
-        c: 4,
-        b: {
-            kind: 'Simple',
-            a: 5,
-            b: 6
-        }
-    }
-}
-
-_ special:(Maybe Simple) split_depth:(Maybe Simple) = StateInit;
-
-let jsonTwoMaybes = {
-    kind: 'StateInit',
-    one_maybe: {
-        kind: 'Maybe_nothing',
-    },
-    second_maybe: {
-        kind: 'Maybe_nothing',
-    },
-}
-*/
-
 export class DefaultJsonGenerator implements CodeGenerator {
     jsCodeDeclarations: GenDeclaration[] = [];
     jsCodeConstructorDeclarations: CommonGenDeclaration[] = []
@@ -214,7 +161,7 @@ export class DefaultJsonGenerator implements CodeGenerator {
                 res = this.getTLBTypeNameResult(fieldType.name, ctx, parameters)
             }
         } else if (fieldType.kind == "TLBCondType") {
-            // TODO
+            
         } else if (fieldType.kind == "TLBMultipleType") {
             // TODO
         } else if (fieldType.kind == "TLBCellInsideType") {

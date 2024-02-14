@@ -4,7 +4,7 @@ import { generateCode } from './src/main'
 
 function genCodeForTest(name: string) {
   const fixturesDir = path.resolve(__dirname, 'test')
-  generateCode(path.resolve(fixturesDir, 'tlb', name + '.tlb'), 'test/generated_files/generated_' + name + '.ts', 'json')
+  generateCode(path.resolve(fixturesDir, 'tlb', name + '.tlb'), 'test/generated_files/json_' + name + '.ts', 'json')
 }
 
 genCodeForTest('block')
