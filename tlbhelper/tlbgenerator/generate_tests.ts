@@ -5,15 +5,6 @@ import { DefaultJsonGenerator } from './src/generators/default_json/generator';
 import fs from 'fs'
 import { TLBCode, TLBType } from './src/ast';
 
-export function getJson(tlbCode: TLBCode, tlbType: TLBType) {
-  let jsonGen = new DefaultJsonGenerator(tlbCode);
-  
-  if (tlbType.constructors[0].parameters.length > 0) {
-    return;
-  }
-  let res = jsonGen.addTlbType(tlbType)
-  return res;
-}
 
 function genCodeForTest(name: string) {
   const fixturesDir = path.resolve(__dirname, 'test')

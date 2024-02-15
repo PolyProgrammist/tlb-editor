@@ -1,13 +1,12 @@
 import { Address } from "ton-core";
-import { TLBCode } from "./src/ast";
+import { TLBCode, TLBType } from "./src/ast";
 import { TypescriptGenerator } from "./src/generators/typescript/generator";
 import { toBase64 } from "./src/generators/x";
 import { fromBase64 } from "./src/generators/y";
 import { generateCodeWithGenerator, getTLBCode } from "./src/main";
-import { loadAddressUser, loadInsideAddressUser, loadParamAndTypedArgUser, loadSimple, loadTwoMaybes, loadTwoSimples, loadTypedArgUser, storeAddressUser, storeInsideAddressUser, storeParamAndTypedArgUser, storeSimple, storeTwoMaybes, storeTwoSimples, storeTypedArgUser } from "./test/generated_files/generated_test";
+import { ALLMETHODS, loadAddressUser, loadInsideAddressUser, loadParamAndTypedArgUser, loadSimple, loadTwoMaybes, loadTwoSimples, loadTypedArgUser, storeAddressUser, storeInsideAddressUser, storeParamAndTypedArgUser, storeSimple, storeTwoMaybes, storeTwoSimples, storeTypedArgUser } from "./test/generated_files/generated_test";
 import path from "path";
-import { getJson } from "./generate_tests";
-
+import { DefaultJsonGenerator } from "./src/generators/default_json/generator";
 
 function convertViceVersa(typeName: string, tlbCode: TLBCode, json: any, storeFunction: any, loadFunction: any) {
     let base64 = toBase64(typeName, tlbCode, json, storeFunction)
@@ -94,6 +93,31 @@ function f() {
     }
 }
 
+function x() {
+    const fixturesDir = path.resolve(__dirname, 'test')
+    let inputPath = path.resolve(fixturesDir, 'tlb', 'test' + '.tlb');
+    let tlbCode = getTLBCode(inputPath);
+
+    let i = 0;
+    let res = ''
+    tlbCode.types.forEach(tlbType => {
+        if (tlbType.constructors[0].parameters.length == 0) {
+            res += `'${tlbType.name}': [store${tlbType.name}, load${tlbType.name}],\n`
+        }
+    })
+    console.log(res);
+}
+
+export function getJson(tlbCode: TLBCode, tlbType: TLBType) {
+    let jsonGen = new DefaultJsonGenerator(tlbCode);
+    
+    if (tlbType.constructors[0].parameters.length > 0) {
+      return;
+    }
+    let res = jsonGen.addTlbType(tlbType)
+    return res;
+  }
+
 function g() {
     const fixturesDir = path.resolve(__dirname, 'test')
     let inputPath = path.resolve(fixturesDir, 'tlb', 'test' + '.tlb');
@@ -101,17 +125,20 @@ function g() {
     
     let i = 0;
     tlbCode.types.forEach(tlbType => {
-        if (i) {
+        if (i > 5) {
             return;
         }
         if (tlbType.constructors[0].parameters.length > 0) {
             return;
         }
         let res = getJson(tlbCode, tlbType)
-        convertViceVersa(res.kind, tlbCode, res, storeSimple, loadSimple);
+        let kindName: string = res.kind;
+        convertViceVersa(res.kind, tlbCode, res, ALLMETHODS[kindName][0], ALLMETHODS[kindName][1]);
         i++;
     })
 }
 
 // f();
-g();
+// x();
+g()
+// eval(`storeSimple`)
