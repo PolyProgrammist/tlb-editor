@@ -3,14 +3,16 @@ import { TLBCode } from "./src/ast";
 import { TypescriptGenerator } from "./src/generators/typescript/generator";
 import { toBase64 } from "./src/generators/x";
 import { fromBase64 } from "./src/generators/y";
-import { generateCodeWithGenerator } from "./src/main";
+import { generateCodeWithGenerator, getTLBCode } from "./src/main";
 import { loadAddressUser, loadInsideAddressUser, loadParamAndTypedArgUser, loadSimple, loadTwoMaybes, loadTwoSimples, loadTypedArgUser, storeAddressUser, storeInsideAddressUser, storeParamAndTypedArgUser, storeSimple, storeTwoMaybes, storeTwoSimples, storeTypedArgUser } from "./test/generated_files/generated_test";
+import path from "path";
+import { getJson } from "./generate_tests";
 
 
 function convertViceVersa(typeName: string, tlbCode: TLBCode, json: any, storeFunction: any, loadFunction: any) {
     let base64 = toBase64(typeName, tlbCode, json, storeFunction)
     let new_json = fromBase64(base64, loadFunction);
-    // console.log(new_json)
+    console.log(new_json)
     return new_json;
 }
 
@@ -92,4 +94,24 @@ function f() {
     }
 }
 
-f();
+function g() {
+    const fixturesDir = path.resolve(__dirname, 'test')
+    let inputPath = path.resolve(fixturesDir, 'tlb', 'test' + '.tlb');
+    let tlbCode = getTLBCode(inputPath);
+    
+    let i = 0;
+    tlbCode.types.forEach(tlbType => {
+        if (i) {
+            return;
+        }
+        if (tlbType.constructors[0].parameters.length > 0) {
+            return;
+        }
+        let res = getJson(tlbCode, tlbType)
+        convertViceVersa(res.kind, tlbCode, res, storeSimple, loadSimple);
+        i++;
+    })
+}
+
+// f();
+g();

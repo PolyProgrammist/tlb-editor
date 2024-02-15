@@ -14,15 +14,29 @@ import { ast } from '@igorivaniuk/tlb-parser'
 import fs from 'fs'
 import { DefaultJsonGenerator } from "./generators/default_json/generator";
 
-
-export function generateCodeByAST(tree: Program, input: string, getGenerator: (tlbCode: TLBCode) => CodeGenerator) {
+export function getTLBCodeByAST(tree: Program, input: string) {
   let oldTlbCode: TLBCodeBuild = { types: new Map<string, TLBTypeBuild>() };
-
   let splittedInput = input.split("\n");
-
   fillConstructors(tree.declarations, oldTlbCode, splittedInput);
   let tlbCode: TLBCode = convertCodeToReadonly(oldTlbCode);
 
+  return tlbCode;
+}
+
+export function getTLBCode(inputPath: string) {
+  const input = fs.readFileSync(
+    inputPath,
+    'utf-8',
+  )
+
+  const tree = ast(input)
+
+  return getTLBCodeByAST(tree, input);
+}
+
+
+export function generateCodeByAST(tree: Program, input: string, getGenerator: (tlbCode: TLBCode) => CodeGenerator) {
+  let tlbCode = getTLBCodeByAST(tree, input)
   let codeGenerator: CodeGenerator = getGenerator(tlbCode);
 
   codeGenerator.addTonCoreClassUsage("Builder");
