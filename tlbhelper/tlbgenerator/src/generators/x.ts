@@ -1,7 +1,9 @@
-import { beginCell } from "ton-core";
+import { Address, beginCell } from "ton-core";
 import { Simple, storeSimple } from "../../test/generated_files/generated_test";
 import { TLBCode, TLBConstructor, TLBField, TLBFieldType, TLBType } from "../ast";
 import { getSubStructName } from "../utils";
+
+let constructorsIndex: Map<string, TLBConstructor> = new Map<string, TLBConstructor>();
 
 export function toBase64(typeName: string, tlbCode: TLBCode, json: any, method: any): String {
     let s = jsonToType(typeName, tlbCode, json);
@@ -11,45 +13,68 @@ export function toBase64(typeName: string, tlbCode: TLBCode, json: any, method: 
     return builder.asCell().toString('base64');
 }
 
-function jsonToType(typeName: string, tlbCode: TLBCode, json: any) {
-    let tlbType = tlbCode.types.get(typeName);
-    if (tlbType) {
-        return getTLBTypeResult(tlbType, json);
+function fillConstructorIndex(tlbCode: TLBCode) {
+    if (constructorsIndex.size == 0) {
+        tlbCode.types.forEach(tlbType => {
+            tlbType.constructors.forEach(constructor => {
+                constructorsIndex.set(getSubStructName(tlbType, constructor), constructor);
+            })
+        })
+    }
+}
+
+function jsonToType(kindName: string, tlbCode: TLBCode, json: any) {
+    fillConstructorIndex(tlbCode);
+
+    let constructor = constructorsIndex.get(kindName);
+    if (constructor) {
+        return getTLBTypeResult(kindName, constructor, tlbCode, json);
     }
 
 }
 
-function getTLBTypeResult(tlbType: TLBType, json: any) {
-    for (let i = 0; i < tlbType.constructors.length; i++) {
-        let constructor = tlbType.constructors[i];
-        let kind_name = getSubStructName(tlbType, constructor);
-        if (kind_name == json.kind) {
-            return getTLBConstructorResult(tlbType, constructor, json);
-        }
-    }  
+function getTLBTypeNameResult(kindName: string, tlbCode: TLBCode, json: any) {
+    let constructor = constructorsIndex.get(kindName);
+    if (constructor) {
+        return getTLBTypeResult(kindName, constructor, tlbCode, json);
+    }
 }
 
-function getTLBConstructorResult(tlbType: TLBType, constructor: TLBConstructor, json: any) {
+function getTLBTypeResult(kindName: string, constructor: TLBConstructor, tlbCode: TLBCode, json: any) {
+    return getTLBConstructorResult(kindName, constructor, tlbCode, json);
+
+    // for (let i = 0; i < tlbType.constructors.length; i++) {
+    //     let constructor = tlbType.constructors[i];
+    //     let kind_name = getSubStructName(tlbType, constructor);
+    //     console.log('getTLBTypeResult', json)
+    //     if (kind_name == json.kind) {
+    //         return getTLBConstructorResult(tlbType, constructor, tlbCode, json);
+    //     }
+    // }  
+}
+
+function getTLBConstructorResult(kindName: string, constructor: TLBConstructor, tlbCode: TLBCode, json: any) {
     let result: any = {};
-    result.kind = getSubStructName(tlbType, constructor);
+    result.kind = kindName;
 
     constructor.variables.forEach(variable => {
         if (variable.type == "#" && !variable.isField) {
-            result[variable.name] = 0;
+            result[variable.name] = json[variable.name];
         }
     })
 
     constructor.fields.forEach((field) => {
-        result[field.name] = handleField(field, json[field.name]);
+        result[field.name] = handleField(field, tlbCode, json[field.name]);
     });
     return result;
 }
 
 function handleField(
     field: TLBField,
+    tlbCode: TLBCode,
     json: any
   ) {
-    return handleType(field, field.fieldType, json);
+    return handleType(field, field.fieldType, tlbCode, json);
     // let result: any = {}
     // if (field.subFields.length > 0) {
     //     field.subFields.forEach((fieldDef) => {
@@ -69,6 +94,7 @@ function handleField(
 function handleType(
     field: TLBField,
     fieldType: TLBFieldType,
+    tlbCode: TLBCode,
     json: any
   ) {
     let res: any = json;
@@ -85,30 +111,36 @@ function handleType(
     //     res = tNumericLiteral(0);
     // } else if (fieldType.kind == "TLBVarIntegerType") {
     //     res = tNumericLiteral(0);
-    // } else if (fieldType.kind == "TLBAddressType") {
-    //     res = tStringLiteral("0:0000000000000000000000000000000000000000000000000000000000000000");
-    // } else if (fieldType.kind == "TLBExprMathType") {
-    //     res = tNumericLiteral(0);
-    // } else if (fieldType.kind == "TLBNegatedType") {
-    //     res = tNumericLiteral(0);
-    // } else if (fieldType.kind == "TLBNamedType") {
-    //     if (y.has(fieldType.name)) {
-    //         res = y.get(fieldType.name)
-    //     } else {
-    //         let parameters: Expression[] = [];
-    //         fieldType.arguments.forEach(argument => {
-    //             if (argument.kind == 'TLBNamedType') {
-    //                 let tmp = this.getTLBTypeNameResult(argument.name, ctx, []);
-    //                 if (tmp) {
-    //                     parameters.push(tmp);
-    //                 }
-    //             } else {
-    //                 parameters.push(tNumericLiteral(1))
-    //             }
-    //         })
-    //         res = this.getTLBTypeNameResult(fieldType.name, ctx, parameters)
-    //     }
-    // } else if (fieldType.kind == "TLBCondType") {
+    // } else 
+    if (fieldType.kind == "TLBAddressType") {
+        res = Address.parse(json);
+    } 
+    else if (fieldType.kind == "TLBExprMathType") {
+        res = json;
+    } else if (fieldType.kind == "TLBNegatedType") {
+        res = json;
+    } else if (fieldType.kind == "TLBNamedType") {
+        let parameters: any[] = [];
+        res = getTLBTypeNameResult(json['kind'], tlbCode, json)
+
+        // if (y.has(fieldType.name)) {
+        //     res = y.get(fieldType.name)
+        // } else {
+        //     let parameters: Expression[] = [];
+        //     fieldType.arguments.forEach(argument => {
+        //         if (argument.kind == 'TLBNamedType') {
+        //             let tmp = this.getTLBTypeNameResult(argument.name, ctx, []);
+        //             if (tmp) {
+        //                 parameters.push(tmp);
+        //             }
+        //         } else {
+        //             parameters.push(tNumericLiteral(1))
+        //         }
+        //     })
+        //     res = this.getTLBTypeNameResult(fieldType.name, ctx, parameters)
+        // }
+    } 
+    //else if (fieldType.kind == "TLBCondType") {
         
     // } else if (fieldType.kind == "TLBMultipleType") {
     //     // TODO

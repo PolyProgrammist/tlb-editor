@@ -7,7 +7,7 @@ let jsonTypedArgUser = {
     kind: 'TypedArgUser',
     x: {
     kind: 'TypedArg',
-    b: {
+    arg: {
     kind: 'Simple',
     a: 0,
     b: 0,
@@ -19,7 +19,7 @@ let jsonParamAndTypedArgUser = {
     x: {
     kind: 'ParamAndTypedArg',
     n: 0,
-    b: {
+    arg: {
     kind: 'Simple',
     a: 0,
     b: 0,
@@ -386,6 +386,13 @@ let jsonExtAddressUser = {
 let jsonAnyAddressUser = {
     kind: 'AnyAddressUser',
     src: '0:0000000000000000000000000000000000000000000000000000000000000000',
+}
+let jsonInsideAddressUser = {
+    kind: 'InsideAddressUser',
+    inside: {
+    kind: 'AddressUser',
+    src: '0:0000000000000000000000000000000000000000000000000000000000000000',
+},
 }
 let jsonBitUser = {
     kind: 'BitUser',

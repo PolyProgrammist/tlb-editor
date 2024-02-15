@@ -2,7 +2,7 @@ import { TLBCode } from "./src/ast";
 import { TypescriptGenerator } from "./src/generators/typescript/generator";
 import { toBase64 } from "./src/generators/x";
 import { generateCodeWithGenerator } from "./src/main";
-import { storeSimple, storeTwoMaybes, storeTwoSimples, storeTypedArgUser } from "./test/generated_files/generated_test";
+import { storeAddressUser, storeInsideAddressUser, storeParamAndTypedArgUser, storeSimple, storeTwoMaybes, storeTwoSimples, storeTypedArgUser } from "./test/generated_files/generated_test";
 
 
 function f() {
@@ -26,7 +26,7 @@ function f() {
                 kind: 'TypedArgUser',
                 x: {
                     kind: 'TypedArg',
-                    b: {
+                    arg: {
                         kind: 'Simple',
                         a: 1,
                         b: 0,
@@ -54,7 +54,31 @@ function f() {
                 second_maybe: {
                     kind: 'Maybe_nothing',
                 },
-            }, storeTwoMaybes)
+            }, storeTwoMaybes),
+            toBase64('ParamAndTypedArgUser', tlbCode, {
+                kind: 'ParamAndTypedArgUser',
+                x: {
+                    kind: 'ParamAndTypedArg',
+                    n: 5,
+                    arg: {
+                        kind: 'Simple',
+                        a: 0,
+                        b: 0,
+                    },
+                    c: 0,
+                },
+            }, storeParamAndTypedArgUser),
+            toBase64('AddressUser', tlbCode, {
+                kind: 'AddressUser',
+                src: '0:0000000000000000000000000000000000000000000000000000000000000000',
+            }, storeAddressUser),
+            toBase64('InsideAddressUser', tlbCode, {
+                kind: 'InsideAddressUser',
+                inside: {
+                    kind: 'AddressUser',
+                    src: '0:0000000000000000000000000000000000000000000000000000000000000000',
+                },
+            }, storeInsideAddressUser),
         ].forEach(y => { console.log(y) });
     }
 }
