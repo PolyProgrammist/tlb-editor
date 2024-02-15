@@ -1,9 +1,18 @@
+import { Address } from "ton-core";
 import { TLBCode } from "./src/ast";
 import { TypescriptGenerator } from "./src/generators/typescript/generator";
 import { toBase64 } from "./src/generators/x";
+import { fromBase64 } from "./src/generators/y";
 import { generateCodeWithGenerator } from "./src/main";
-import { storeAddressUser, storeInsideAddressUser, storeParamAndTypedArgUser, storeSimple, storeTwoMaybes, storeTwoSimples, storeTypedArgUser } from "./test/generated_files/generated_test";
+import { loadAddressUser, loadInsideAddressUser, loadParamAndTypedArgUser, loadSimple, loadTwoMaybes, loadTwoSimples, loadTypedArgUser, storeAddressUser, storeInsideAddressUser, storeParamAndTypedArgUser, storeSimple, storeTwoMaybes, storeTwoSimples, storeTypedArgUser } from "./test/generated_files/generated_test";
 
+
+function convertViceVersa(typeName: string, tlbCode: TLBCode, json: any, storeFunction: any, loadFunction: any) {
+    let base64 = toBase64(typeName, tlbCode, json, storeFunction)
+    let new_json = fromBase64(base64, loadFunction);
+    // console.log(new_json)
+    return new_json;
+}
 
 function f() {
     let x: any = undefined;
@@ -17,12 +26,12 @@ function f() {
     if (x) {
         let tlbCode = x.tlbCode;
         [
-            toBase64('Simple', tlbCode, {
+            convertViceVersa('Simple', tlbCode, {
                 kind: 'Simple',
                 a: 0,
                 b: 0,
-            }, storeSimple),
-            toBase64('TypedArgUser', tlbCode, {
+            }, storeSimple, loadSimple),
+            convertViceVersa('TypedArgUser', tlbCode, {
                 kind: 'TypedArgUser',
                 x: {
                     kind: 'TypedArg',
@@ -32,8 +41,8 @@ function f() {
                         b: 0,
                     },
                 }
-            }, storeTypedArgUser),
-            toBase64('TwoSimples', tlbCode, {
+            }, storeTypedArgUser, loadTypedArgUser),
+            convertViceVersa('TwoSimples', tlbCode, {
                 kind: 'TwoSimples',
                 x: {
                     kind: 'Simple',
@@ -45,8 +54,8 @@ function f() {
                     a: 0,
                     b: 0,
                 }
-            }, storeTwoSimples),
-            toBase64('TwoMaybes', tlbCode, {
+            }, storeTwoSimples, loadTwoSimples),
+            convertViceVersa('TwoMaybes', tlbCode, {
                 kind: 'TwoMaybes',
                 one_maybe: {
                     kind: 'Maybe_nothing',
@@ -54,8 +63,8 @@ function f() {
                 second_maybe: {
                     kind: 'Maybe_nothing',
                 },
-            }, storeTwoMaybes),
-            toBase64('ParamAndTypedArgUser', tlbCode, {
+            }, storeTwoMaybes, loadTwoMaybes),
+            convertViceVersa('ParamAndTypedArgUser', tlbCode, {
                 kind: 'ParamAndTypedArgUser',
                 x: {
                     kind: 'ParamAndTypedArg',
@@ -67,18 +76,18 @@ function f() {
                     },
                     c: 0,
                 },
-            }, storeParamAndTypedArgUser),
-            toBase64('AddressUser', tlbCode, {
+            }, storeParamAndTypedArgUser, loadParamAndTypedArgUser),
+            convertViceVersa('AddressUser', tlbCode, {
                 kind: 'AddressUser',
                 src: '0:0000000000000000000000000000000000000000000000000000000000000000',
-            }, storeAddressUser),
-            toBase64('InsideAddressUser', tlbCode, {
+            }, storeAddressUser, loadAddressUser),
+            convertViceVersa('InsideAddressUser', tlbCode, {
                 kind: 'InsideAddressUser',
                 inside: {
                     kind: 'AddressUser',
                     src: '0:0000000000000000000000000000000000000000000000000000000000000000',
                 },
-            }, storeInsideAddressUser),
+            }, storeInsideAddressUser, loadInsideAddressUser),
         ].forEach(y => { console.log(y) });
     }
 }
