@@ -125,20 +125,30 @@ function g() {
     
     let i = 0;
     tlbCode.types.forEach(tlbType => {
-        if (i > 5) {
+        if (i > 100) {
             return;
         }
         if (tlbType.constructors[0].parameters.length > 0) {
             return;
         }
         let res = getJson(tlbCode, tlbType)
-        let kindName: string = res.kind;
-        convertViceVersa(res.kind, tlbCode, res, ALLMETHODS[kindName][0], ALLMETHODS[kindName][1]);
+        convertViceVersa(res.kind, tlbCode, res, ALLMETHODS[tlbType.name][0], ALLMETHODS[tlbType.name][1]);
         i++;
     })
+}
+
+function onlyone() {
+    const fixturesDir = path.resolve(__dirname, 'test')
+    let inputPath = path.resolve(fixturesDir, 'tlb', 'test' + '.tlb');
+    let tlbCode = getTLBCode(inputPath);
+
+    let tlbType = tlbCode.types.get('CellsSimple')!
+    let res = getJson(tlbCode, tlbType)
+    convertViceVersa(res.kind, tlbCode, res, ALLMETHODS[tlbType.name][0], ALLMETHODS[tlbType.name][1]);
 }
 
 // f();
 // x();
 g()
+// onlyone();
 // eval(`storeSimple`)

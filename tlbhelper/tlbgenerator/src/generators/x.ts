@@ -7,7 +7,7 @@ let constructorsIndex: Map<string, TLBConstructor> = new Map<string, TLBConstruc
 
 export function toBase64(typeName: string, tlbCode: TLBCode, json: any, method: any): String {
     let s = jsonToType(typeName, tlbCode, json);
-    // console.log(s);
+    console.log(s);
     let builder = beginCell();
     method(s)(builder);
     return builder.asCell().toBoc().toString('base64');
@@ -30,7 +30,6 @@ function jsonToType(kindName: string, tlbCode: TLBCode, json: any) {
     if (constructor) {
         return getTLBTypeResult(kindName, constructor, tlbCode, json);
     }
-
 }
 
 function getTLBTypeNameResult(kindName: string, tlbCode: TLBCode, json: any) {
@@ -64,7 +63,8 @@ function getTLBConstructorResult(kindName: string, constructor: TLBConstructor, 
     })
 
     constructor.fields.forEach((field) => {
-        result[field.name] = handleField(field, tlbCode, json[field.name]);
+        let json_to_pass = json[field.name] != undefined ? json[field.name] : json;
+        Object.assign(result, handleField(field, tlbCode, json_to_pass))
     });
     return result;
 }
@@ -74,7 +74,18 @@ function handleField(
     tlbCode: TLBCode,
     json: any
   ) {
-    return handleType(field, field.fieldType, tlbCode, json);
+    if (field.subFields.length == 0) {
+        let res: any = {}
+        res[field.name] = handleType(field, field.fieldType, tlbCode, json)
+        return res
+    } else {
+        let res: any = {}
+        field.subFields.forEach((fieldDef) => {
+            let json_to_pass = json[fieldDef.name] != undefined ? json[fieldDef.name] : json;
+            Object.assign(res, handleField(fieldDef, tlbCode, json_to_pass))
+        });
+        return res;
+    }
     // let result: any = {}
     // if (field.subFields.length > 0) {
     //     field.subFields.forEach((fieldDef) => {

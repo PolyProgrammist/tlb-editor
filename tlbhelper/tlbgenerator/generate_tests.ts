@@ -16,8 +16,8 @@ function genCodeForTest(name: string) {
 
   let result: any[] = [];
   tlbCode.types.forEach(tlbType => {
-    let res = getJson(tlbCode, tlbType)
-    result.push(res);
+    // let res = getJson(tlbCode, tlbType)
+    // result.push(res);
   })
   
   fs.writeFile('test/generated_files/json.json', JSON.stringify(result, null, 4), () => { });

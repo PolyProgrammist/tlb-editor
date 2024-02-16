@@ -1,5 +1,5 @@
 import { beginCell } from "ton";
-import { TLBCode, TLBConstructor, TLBField, TLBFieldType, TLBParameter, TLBType } from "../../ast"
+import { TLBCode, TLBConstructor, TLBField, TLBFieldType, TLBNumberExpr, TLBParameter, TLBType } from "../../ast"
 import { CodeBuilder } from "../CodeBuilder"
 import { CodeGenerator, CommonGenDeclaration } from "../generator"
 import { Expression, GenDeclaration, ObjectExpression, ObjectProperty, TheNode, id, tDeclareVariable, tIdentifier, tNumericLiteral, tObjectExpression, tObjectProperty, tStringLiteral, tTypedIdentifier, toCode } from "../typescript/tsgen"
@@ -65,7 +65,11 @@ export class DefaultJsonGenerator implements CodeGenerator {
         
         constructor.variables.forEach(variable => {
             if (variable.type == "#" && !variable.isField) {
-                x[variable.name] = 0;
+                if (y.has(variable.name)) {
+                    x[variable.name] = y.get(variable.name);
+                } else {
+                    x[variable.name] = 1;
+                }
             }
         })
 
@@ -150,8 +154,14 @@ export class DefaultJsonGenerator implements CodeGenerator {
                         if (tmp) {
                             parameters.push(tmp);
                         }
-                    } else {
-                        parameters.push(1)
+                    } else {//else if (argument.kind == 'TLBNumberType') {
+                        let param: number | undefined = 1;
+                        if (argument.kind == 'TLBExprMathType') {
+                            if (argument.expr instanceof TLBNumberExpr) {
+                                param = argument.expr.n;
+                            }
+                        }
+                        parameters.push(param);
                     }
                 })
                 res = this.getTLBTypeNameResult(fieldType.name, ctx, parameters)
