@@ -145,7 +145,7 @@ function onlyone() {
     let inputPath = path.resolve(fixturesDir, 'tlb', 'test' + '.tlb');
     let tlbCode = getTLBCode(inputPath);
 
-    let tlbType = tlbCode.types.get('IntBitsOutside')!
+    let tlbType = tlbCode.types.get('IntBitsParametrizedOutside')!
     let res = getJson(tlbCode, tlbType)
     console.log(res);
     convertViceVersa(res.kind, tlbCode, res, ALLMETHODS[tlbType.name][0], ALLMETHODS[tlbType.name][1]);

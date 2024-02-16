@@ -67,16 +67,25 @@ export function opCodeSetsEqual(a: string[], b: string[]) {
   return true;
 }
 
-export function evaluateExpression(expr: TLBMathExpr): number | undefined {
+export function evaluateExpression(expr: TLBMathExpr, y: Map<string, TLBMathExpr> = new Map<string, TLBMathExpr>()): number | undefined {
   if (typeof expr == 'number') {
     return expr;
-  }
-  if (expr instanceof TLBNumberExpr) {
+  } else if (expr instanceof TLBNumberExpr) {
     return expr.n;
+  } else if (expr instanceof TLBVarExpr) {
+    let sub = y.get(expr.x);
+    if (sub) {
+      return evaluateExpression(sub);
+    }
   } else if (expr instanceof TLBBinaryOp) {
-    // switch(expr.operation) {
-// TODO
-    // }
+    let left = evaluateExpression(expr.left, y);
+    let right = evaluateExpression(expr.right, y);
+    if (left && right) {
+      switch(expr.operation) {
+        case '+': return left + right;
+        case '*': return left * right;
+      }
+    }
   }
   return undefined;
 }

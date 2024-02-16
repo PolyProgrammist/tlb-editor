@@ -54,7 +54,7 @@ export class DefaultJsonGenerator implements CodeGenerator {
             }
         })
 
-        let y = new Map<String, TLBMathExpr>();
+        let y = new Map<string, TLBMathExpr>();
         if (parameters.length != constructor.parameters.length && hasParams) {
             return undefined;
         }
@@ -103,7 +103,7 @@ export class DefaultJsonGenerator implements CodeGenerator {
         field: TLBField,
         x: any,
         ctx: JsonContext,
-        y: Map<String, TLBMathExpr>
+        y: Map<string, TLBMathExpr>
       ) {
         if (field.subFields.length > 0) {
             field.subFields.forEach((fieldDef) => {
@@ -122,18 +122,17 @@ export class DefaultJsonGenerator implements CodeGenerator {
         field: TLBField,
         fieldType: TLBFieldType,
         ctx: JsonContext,
-        y: Map<String, TLBMathExpr>
+        y: Map<string, TLBMathExpr>
       ) : any | undefined {
         let res: any | undefined = undefined;
 
         if (fieldType.kind == "TLBNumberType") {
             res = 0;
         } else if (fieldType.kind == "TLBBitsType") {
-            let bitsNumber = 1;
-            if (fieldType.bits instanceof TLBNumberExpr) {
-                bitsNumber = fieldType.bits.n;
+            let bitsNumber = evaluateExpression(fieldType.bits, y);
+            if (bitsNumber) {
+                res = "0b" + '0'.repeat(bitsNumber);
             }
-            res = "0b" + '0'.repeat(bitsNumber);
         } else if (fieldType.kind == "TLBCellType") {
             res = beginCell().endCell().toBoc().toString('base64');
         } else if (fieldType.kind == "TLBBoolType") {
