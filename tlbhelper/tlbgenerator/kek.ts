@@ -131,6 +131,7 @@ function g() {
         if (tlbType.constructors[0].parameters.length > 0) {
             return;
         }
+        console.log(tlbType.name)
         let res = getJson(tlbCode, tlbType)
         convertViceVersa(res.kind, tlbCode, res, ALLMETHODS[tlbType.name][0], ALLMETHODS[tlbType.name][1]);
         i++;

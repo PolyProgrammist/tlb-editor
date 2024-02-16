@@ -7,7 +7,7 @@ let constructorsIndex: Map<string, TLBConstructor> = new Map<string, TLBConstruc
 
 export function toBase64(typeName: string, tlbCode: TLBCode, json: any, method: any): String {
     let s = jsonToType(typeName, tlbCode, json);
-    console.log(s);
+    // console.log(s);
     let builder = beginCell();
     method(s)(builder);
     return builder.asCell().toBoc().toString('base64');
