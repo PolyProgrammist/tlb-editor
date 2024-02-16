@@ -143,13 +143,13 @@ function onlyone() {
     let inputPath = path.resolve(fixturesDir, 'tlb', 'test' + '.tlb');
     let tlbCode = getTLBCode(inputPath);
 
-    let tlbType = tlbCode.types.get('CellsSimple')!
+    let tlbType = tlbCode.types.get('IntBitsOutside')!
     let res = getJson(tlbCode, tlbType)
     convertViceVersa(res.kind, tlbCode, res, ALLMETHODS[tlbType.name][0], ALLMETHODS[tlbType.name][1]);
 }
 
 // f();
 // x();
-g()
-// onlyone();
+// g()
+onlyone();
 // eval(`storeSimple`)

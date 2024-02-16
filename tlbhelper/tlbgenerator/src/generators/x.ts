@@ -1,4 +1,4 @@
-import { Address, beginCell } from "ton-core";
+import { Address, Cell, beginCell } from "ton-core";
 import { Simple, storeSimple } from "../../test/generated_files/generated_test";
 import { TLBCode, TLBConstructor, TLBField, TLBFieldType, TLBType } from "../ast";
 import { getSubStructName } from "../utils";
@@ -6,8 +6,9 @@ import { getSubStructName } from "../utils";
 let constructorsIndex: Map<string, TLBConstructor> = new Map<string, TLBConstructor>();
 
 export function toBase64(typeName: string, tlbCode: TLBCode, json: any, method: any): String {
+    console.log(json)
     let s = jsonToType(typeName, tlbCode, json);
-    // console.log(s);
+    console.log(s);
     let builder = beginCell();
     method(s)(builder);
     return builder.asCell().toBoc().toString('base64');
@@ -114,16 +115,17 @@ function handleType(
     //     res = json;
     // } else if (fieldType.kind == "TLBBitsType") {
     //     res = 0b0;
-    // } else if (fieldType.kind == "TLBCellType") {
-    //     res = tStringLiteral(beginCell().endCell().toBoc().toString('base64'));
-    // } else if (fieldType.kind == "TLBBoolType") {
+    // } else 
+    if (fieldType.kind == "TLBCellType") {
+        res = Cell.fromBase64(json.toString()).beginParse();
+    } //else if (fieldType.kind == "TLBBoolType") {
     //     res = id('false');
     // } else if (fieldType.kind == "TLBCoinsType") {
     //     res = tNumericLiteral(0);
     // } else if (fieldType.kind == "TLBVarIntegerType") {
     //     res = tNumericLiteral(0);
     // } else 
-    if (fieldType.kind == "TLBAddressType") {
+    else if (fieldType.kind == "TLBAddressType") {
         res = Address.parse(json);
     } 
     else if (fieldType.kind == "TLBExprMathType") {
@@ -131,8 +133,9 @@ function handleType(
     } else if (fieldType.kind == "TLBNegatedType") {
         res = json;
     } else if (fieldType.kind == "TLBNamedType") {
-        let parameters: any[] = [];
-        res = getTLBTypeNameResult(json['kind'], tlbCode, json)
+        if (json['kind']) {
+            res = getTLBTypeNameResult(json['kind'], tlbCode, json)
+        }
 
         // if (y.has(fieldType.name)) {
         //     res = y.get(fieldType.name)
