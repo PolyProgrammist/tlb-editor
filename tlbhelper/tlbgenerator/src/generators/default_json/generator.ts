@@ -161,15 +161,7 @@ export class DefaultJsonGenerator implements CodeGenerator {
                     } else {//else if (argument.kind == 'TLBNumberType') {
                         let param: number | undefined = 1;
                         if (argument.kind == 'TLBExprMathType') {
-                            if (argument.expr instanceof TLBNumberExpr) {
-                                param = argument.expr.n;
-                            } else if (argument.expr instanceof TLBVarExpr) {
-                                // if ()
-                                let expr = y.get(argument.expr.x);
-                                if (expr) { // TODO
-                                    param = evaluateExpression(expr);
-                                }
-                            }
+                            param = evaluateExpression(argument.expr, y);
                         }
                         // if (argument.kind == 'TLB')
                         parameters.push(param);

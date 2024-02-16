@@ -145,14 +145,14 @@ function onlyone() {
     let inputPath = path.resolve(fixturesDir, 'tlb', 'test' + '.tlb');
     let tlbCode = getTLBCode(inputPath);
 
-    let tlbType = tlbCode.types.get('IntBitsParametrizedOutside')!
+    let tlbType = tlbCode.types.get('ManyComb')!
     let res = getJson(tlbCode, tlbType)
     console.log(res);
-    convertViceVersa(res.kind, tlbCode, res, ALLMETHODS[tlbType.name][0], ALLMETHODS[tlbType.name][1]);
+    // convertViceVersa(res.kind, tlbCode, res, ALLMETHODS[tlbType.name][0], ALLMETHODS[tlbType.name][1]);
 }
 
 // f();
 // x();
-g()
-// onlyone();
+// g()
+onlyone();
 // eval(`storeSimple`)
