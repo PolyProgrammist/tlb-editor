@@ -1,5 +1,5 @@
 import { beginCell } from "ton";
-import { TLBCode, TLBConstructor, TLBField, TLBMathExpr, TLBFieldType, TLBNumberExpr, TLBParameter, TLBType, TLBVarExpr } from "../../ast"
+import { TLBCode, TLBConstructor, TLBField, TLBMathExpr, TLBFieldType, TLBNumberExpr, TLBParameter, TLBType, TLBVarExpr, TLBNamedType } from "../../ast"
 import { CodeBuilder } from "../CodeBuilder"
 import { CodeGenerator, CommonGenDeclaration } from "../generator"
 import { Expression, GenDeclaration, ObjectExpression, ObjectProperty, TheNode, id, tDeclareVariable, tIdentifier, tNumericLiteral, tObjectExpression, tObjectProperty, tStringLiteral, tTypedIdentifier, toCode } from "../typescript/tsgen"
@@ -151,22 +151,7 @@ export class DefaultJsonGenerator implements CodeGenerator {
             if (y.has(fieldType.name)) {
                 res = y.get(fieldType.name)
             } else {
-                let parameters: any[] = [];
-                fieldType.arguments.forEach(argument => {
-                    if (argument.kind == 'TLBNamedType') {
-                        let tmp = this.getTLBTypeNameResult(argument.name, ctx, []);
-                        if (tmp) {
-                            parameters.push(tmp);
-                        }
-                    } else {//else if (argument.kind == 'TLBNumberType') {
-                        let param: number | undefined = 1;
-                        if (argument.kind == 'TLBExprMathType') {
-                            param = evaluateExpression(argument.expr, y);
-                        }
-                        // if (argument.kind == 'TLB')
-                        parameters.push(param);
-                    }
-                })
+                let parameters: any[] = this.getParameters(fieldType, ctx, y);
                 res = this.getTLBTypeNameResult(fieldType.name, ctx, parameters)
             }
         } else if (fieldType.kind == "TLBCondType") {
@@ -180,6 +165,25 @@ export class DefaultJsonGenerator implements CodeGenerator {
         } 
         
         return res;
+    }
+
+    private getParameters(fieldType: TLBNamedType, ctx: JsonContext, y: Map<string, TLBMathExpr>): any[] {
+        let parameters: any[] = [];
+        fieldType.arguments.forEach(argument => {
+            if (argument.kind == 'TLBNamedType') {
+                let tmp = this.getTLBTypeNameResult(argument.name, ctx, []);
+                if (tmp) {
+                    parameters.push(tmp);
+                }
+            } else {
+                let param: number | undefined = 1;
+                if (argument.kind == 'TLBExprMathType') {
+                    param = evaluateExpression(argument.expr, y);
+                }
+                parameters.push(param);
+            }
+        });
+        return parameters;
     }
 
     toCode(node: TheNode, code: CodeBuilder): CodeBuilder {
