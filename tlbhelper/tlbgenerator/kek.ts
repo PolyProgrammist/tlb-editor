@@ -6,6 +6,7 @@ import { fromBase64 } from "./src/generators/y";
 import { generateCodeWithGenerator, getTLBCode } from "./src/main";
 import { ALLMETHODS, loadAddressUser, loadInsideAddressUser, loadParamAndTypedArgUser, loadSimple, loadTwoMaybes, loadTwoSimples, loadTypedArgUser, storeAddressUser, storeInsideAddressUser, storeParamAndTypedArgUser, storeSimple, storeTwoMaybes, storeTwoSimples, storeTypedArgUser } from "./test/generated_files/generated_test";
 import path from "path";
+import util from "util";
 import { DefaultJsonGenerator } from "./src/generators/default_json/generator";
 
 function convertViceVersa(typeName: string, tlbCode: TLBCode, json: any, storeFunction: any, loadFunction: any) {
@@ -133,6 +134,7 @@ function g() {
         }
         console.log(tlbType.name)
         let res = getJson(tlbCode, tlbType)
+        console.log(res);
         convertViceVersa(res.kind, tlbCode, res, ALLMETHODS[tlbType.name][0], ALLMETHODS[tlbType.name][1]);
         i++;
     })
@@ -145,11 +147,12 @@ function onlyone() {
 
     let tlbType = tlbCode.types.get('IntBitsOutside')!
     let res = getJson(tlbCode, tlbType)
+    console.log(res);
     convertViceVersa(res.kind, tlbCode, res, ALLMETHODS[tlbType.name][0], ALLMETHODS[tlbType.name][1]);
 }
 
 // f();
 // x();
-// g()
-onlyone();
+g()
+// onlyone();
 // eval(`storeSimple`)

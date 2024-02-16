@@ -1,9 +1,10 @@
 import { beginCell } from "ton";
-import { TLBCode, TLBConstructor, TLBField, TLBFieldType, TLBNumberExpr, TLBParameter, TLBType } from "../../ast"
+import { TLBCode, TLBConstructor, TLBField, TLBMathExpr, TLBFieldType, TLBNumberExpr, TLBParameter, TLBType, TLBVarExpr } from "../../ast"
 import { CodeBuilder } from "../CodeBuilder"
 import { CodeGenerator, CommonGenDeclaration } from "../generator"
 import { Expression, GenDeclaration, ObjectExpression, ObjectProperty, TheNode, id, tDeclareVariable, tIdentifier, tNumericLiteral, tObjectExpression, tObjectProperty, tStringLiteral, tTypedIdentifier, toCode } from "../typescript/tsgen"
 import { getSubStructName } from "../../utils";
+import { evaluateExpression } from "../../astbuilder/utils";
 
 export type JsonContext = {
     constructorsReached: Set<String>;
@@ -128,7 +129,11 @@ export class DefaultJsonGenerator implements CodeGenerator {
         if (fieldType.kind == "TLBNumberType") {
             res = 0;
         } else if (fieldType.kind == "TLBBitsType") {
-            res = 0b0;
+            let bitsNumber = 1;
+            if (fieldType.bits instanceof TLBNumberExpr) {
+                bitsNumber = fieldType.bits.n;
+            }
+            res = "0b" + '0'.repeat(bitsNumber);
         } else if (fieldType.kind == "TLBCellType") {
             res = beginCell().endCell().toBoc().toString('base64');
         } else if (fieldType.kind == "TLBBoolType") {
@@ -159,8 +164,15 @@ export class DefaultJsonGenerator implements CodeGenerator {
                         if (argument.kind == 'TLBExprMathType') {
                             if (argument.expr instanceof TLBNumberExpr) {
                                 param = argument.expr.n;
+                            } else if (argument.expr instanceof TLBVarExpr) {
+                                // if ()
+                                let expr = y.get(argument.expr.x);
+                                if (expr) { // TODO
+                                    param = evaluateExpression(expr);
+                                }
                             }
                         }
+                        // if (argument.kind == 'TLB')
                         parameters.push(param);
                     }
                 })

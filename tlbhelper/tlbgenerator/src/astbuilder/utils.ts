@@ -15,6 +15,7 @@ import {
   TLBVarExpr,
   TLBVariableType,
 } from "../ast";
+import { Expression } from "../generators/typescript/tsgen";
 
 
 export type TLBVariableBuild = {
@@ -65,6 +66,21 @@ export function opCodeSetsEqual(a: string[], b: string[]) {
   }
   return true;
 }
+
+export function evaluateExpression(expr: Expression): number | undefined {
+  if (typeof expr == 'number') {
+    return expr;
+  }
+  if (expr instanceof TLBNumberExpr) {
+    return expr.n;
+  } else if (expr instanceof TLBBinaryOp) {
+    // switch(expr.operation) {
+// TODO
+    // }
+  }
+  return undefined;
+}
+
 export function calculateVariable(
   variable: TLBVariableBuild,
   constructor: TLBConstructorBuild

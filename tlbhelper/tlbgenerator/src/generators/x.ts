@@ -1,4 +1,4 @@
-import { Address, Cell, beginCell } from "ton-core";
+import { Address, BitString, Cell, beginCell } from "ton-core";
 import { Simple, storeSimple } from "../../test/generated_files/generated_test";
 import { TLBCode, TLBConstructor, TLBField, TLBFieldType, TLBType } from "../ast";
 import { getSubStructName } from "../utils";
@@ -6,9 +6,7 @@ import { getSubStructName } from "../utils";
 let constructorsIndex: Map<string, TLBConstructor> = new Map<string, TLBConstructor>();
 
 export function toBase64(typeName: string, tlbCode: TLBCode, json: any, method: any): String {
-    console.log(json)
     let s = jsonToType(typeName, tlbCode, json);
-    console.log(s);
     let builder = beginCell();
     method(s)(builder);
     return builder.asCell().toBoc().toString('base64');
@@ -113,10 +111,15 @@ function handleType(
 
     // if (fieldType.kind == "TLBNumberType") {
     //     res = json;
-    // } else if (fieldType.kind == "TLBBitsType") {
-    //     res = 0b0;
     // } else 
-    if (fieldType.kind == "TLBCellType") {
+    if (fieldType.kind == "TLBBitsType") {
+        let builder = beginCell();
+        for (let i = 2; i < json.length; i++) {
+            let bit = parseInt(json[i]);
+            builder.storeBit(bit);
+        }
+        res = builder.endCell().beginParse().loadBits(json.length - 2)
+    } else if (fieldType.kind == "TLBCellType") {
         res = Cell.fromBase64(json.toString()).beginParse();
     } //else if (fieldType.kind == "TLBBoolType") {
     //     res = id('false');
