@@ -144,6 +144,13 @@ export interface Either_right<X, Y> {
     readonly value: Y;
 }
 
+// _ x:(Either Simple FixedIntParam) = EitherUser;
+
+export interface EitherUser {
+    readonly kind: 'EitherUser';
+    readonly x: Either<Simple, FixedIntParam>;
+}
+
 // a$_ {x:#} value:(## x) = BitLenArg x;
 
 export interface BitLenArg {
@@ -1210,6 +1217,24 @@ export function storeEither<X, Y>(either: Either<X, Y>, storeX: (x: X) => (build
 
     }
     throw new Error('Expected one of "Either_left", "Either_right" in loading "Either", but data does not satisfy any constructor');
+}
+
+// _ x:(Either Simple FixedIntParam) = EitherUser;
+
+export function loadEitherUser(slice: Slice): EitherUser {
+    let x: Either<Simple, FixedIntParam> = loadEither<Simple, FixedIntParam>(slice, loadSimple, loadFixedIntParam);
+    return {
+        kind: 'EitherUser',
+        x: x,
+    }
+
+}
+
+export function storeEitherUser(eitherUser: EitherUser): (builder: Builder) => void {
+    return ((builder: Builder) => {
+        storeEither<Simple, FixedIntParam>(eitherUser.x, storeSimple, storeFixedIntParam)(builder);
+    })
+
 }
 
 // a$_ {x:#} value:(## x) = BitLenArg x;
@@ -3508,8 +3533,10 @@ export function storeHashmapAugEUser(hashmapAugEUser: HashmapAugEUser): (builder
 
 }
 
+
 export let ALLMETHODS: any = {
     'Simple': [storeSimple, loadSimple],
+    'EitherUser': [storeEitherUser, loadEitherUser],
 'TypedArgUser': [storeTypedArgUser, loadTypedArgUser],
 'ParamAndTypedArgUser': [storeParamAndTypedArgUser, loadParamAndTypedArgUser],
 'TwoSimples': [storeTwoSimples, loadTwoSimples],

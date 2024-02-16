@@ -12,7 +12,6 @@ import { DefaultJsonGenerator } from "./src/generators/default_json/generator";
 function convertViceVersa(typeName: string, tlbCode: TLBCode, json: any, storeFunction: any, loadFunction: any) {
     let base64 = toBase64(typeName, tlbCode, json, storeFunction)
     let new_json = fromBase64(base64, loadFunction);
-    console.log(new_json)
     return new_json;
 }
 
@@ -133,9 +132,11 @@ function g() {
             return;
         }
         console.log(tlbType.name)
-        let res = getJson(tlbCode, tlbType)
-        console.log(res);
-        convertViceVersa(res.kind, tlbCode, res, ALLMETHODS[tlbType.name][0], ALLMETHODS[tlbType.name][1]);
+        let before = getJson(tlbCode, tlbType)
+        console.log(util.inspect(before, false, null, true));
+        let after = convertViceVersa(before.kind, tlbCode, before, ALLMETHODS[tlbType.name][0], ALLMETHODS[tlbType.name][1]);
+        console.log(util.inspect(after, false, null, true));
+
         i++;
     })
 }
@@ -145,14 +146,15 @@ function onlyone() {
     let inputPath = path.resolve(fixturesDir, 'tlb', 'test' + '.tlb');
     let tlbCode = getTLBCode(inputPath);
 
-    let tlbType = tlbCode.types.get('ManyComb')!
-    let res = getJson(tlbCode, tlbType)
-    console.log(res);
-    // convertViceVersa(res.kind, tlbCode, res, ALLMETHODS[tlbType.name][0], ALLMETHODS[tlbType.name][1]);
+    let tlbType = tlbCode.types.get('CombArgCellRefUser')!
+    let before = getJson(tlbCode, tlbType)
+    console.log(util.inspect(before, false, null, true));
+    let after = convertViceVersa(before.kind, tlbCode, before, ALLMETHODS[tlbType.name][0], ALLMETHODS[tlbType.name][1]);
+    console.log(util.inspect(after, false, null, true));
 }
 
 // f();
 // x();
-// g()
-onlyone();
+g()
+// onlyone();
 // eval(`storeSimple`)

@@ -151,7 +151,7 @@ export class DefaultJsonGenerator implements CodeGenerator {
             if (y.has(fieldType.name)) {
                 res = y.get(fieldType.name)
             } else {
-                let parameters: any[] = this.getParameters(fieldType, ctx, y);
+                let parameters: any[] = this.getParameters(fieldType.arguments, ctx, y);
                 res = this.getTLBTypeNameResult(fieldType.name, ctx, parameters)
             }
         } else if (fieldType.kind == "TLBCondType") {
@@ -167,13 +167,21 @@ export class DefaultJsonGenerator implements CodeGenerator {
         return res;
     }
 
-    private getParameters(fieldType: TLBNamedType, ctx: JsonContext, y: Map<string, TLBMathExpr>): any[] {
+    private getParameters(args: TLBFieldType[], ctx: JsonContext, y: Map<string, TLBMathExpr>): any[] {
         let parameters: any[] = [];
-        fieldType.arguments.forEach(argument => {
+        args.forEach(argument => {
             if (argument.kind == 'TLBNamedType') {
-                let tmp = this.getTLBTypeNameResult(argument.name, ctx, []);
+                let currentParameters = this.getParameters(argument.arguments, ctx, y);
+                let tmp = this.getTLBTypeNameResult(argument.name, ctx, currentParameters);
                 if (tmp) {
                     parameters.push(tmp);
+                } else {
+                    let t = y.get(argument.name)
+                    if (t) {
+                        parameters.push(t);
+                    } else {
+                        throw "wrong";
+                    }
                 }
             } else {
                 let param: number | undefined = 1;
