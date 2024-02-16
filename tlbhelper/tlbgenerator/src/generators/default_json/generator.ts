@@ -157,7 +157,14 @@ export class DefaultJsonGenerator implements CodeGenerator {
         } else if (fieldType.kind == "TLBCondType") {
             
         } else if (fieldType.kind == "TLBMultipleType") {
-            // TODO
+            let x = this.handleType(field, fieldType.value, ctx, y);
+            res = []
+            let t = evaluateExpression(fieldType.times, y);
+            if (t) {
+                for (let i = 0; i < t; i++) {
+                    res.push(x);
+                }
+            }
         } else if (fieldType.kind == "TLBCellInsideType") {
             // TODO
         } else if (fieldType.kind == "TLBHashmapType") {
