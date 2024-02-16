@@ -3485,6 +3485,7 @@ export function storeHashmapAugNode<X, Y>(hashmapAugNode: HashmapAugNode<X, Y>, 
             builder.storeRef(cell2);
             storeY(hashmapAugNode.extra)(builder);
         })
+        let res: Dictionary<number, number> = Dictionary.empty();
 
     }
     throw new Error('Expected one of "HashmapAugNode_ahmn_leaf", "HashmapAugNode_ahmn_fork" in loading "HashmapAugNode", but data does not satisfy any constructor');

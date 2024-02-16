@@ -1,7 +1,8 @@
-import { Address, BitString, Cell, beginCell } from "ton-core";
+import { Address, BitString, Cell, Dictionary, beginCell } from "ton-core";
 import { Simple, storeSimple } from "../../test/generated_files/generated_test";
 import { TLBCode, TLBConstructor, TLBField, TLBFieldType, TLBType } from "../ast";
 import { getSubStructName } from "../utils";
+import { evaluateExpression } from "../astbuilder/utils";
 
 let constructorsIndex: Map<string, TLBConstructor> = new Map<string, TLBConstructor>();
 
@@ -156,16 +157,30 @@ function handleType(
         //     })
         //     res = this.getTLBTypeNameResult(fieldType.name, ctx, parameters)
         // }
-    } 
+    // } 
     //else if (fieldType.kind == "TLBCondType") {
         
-    // } else if (fieldType.kind == "TLBMultipleType") {
+    } else if (fieldType.kind == "TLBMultipleType") {
+        let x = handleType(field, fieldType.value, tlbCode, json[0])
+        res = []
+        let t = evaluateExpression(fieldType.times);
+            if (t) {
+                for (let i = 0; i < t; i++) {
+                    res.push(x);
+                }
+        }
+    // else if (fieldType.kind == "TLBCellInsideType") {
     //     // TODO
-    // } else if (fieldType.kind == "TLBCellInsideType") {
-    //     // TODO
-    // } else if (fieldType.kind == "TLBHashmapType") {
-    //   res = tObjectExpression([])
-    // } 
+    } else if (fieldType.kind == "TLBHashmapType") {
+        let x: Dictionary<number, number> = Dictionary.empty()
+        
+        // Object.entries(json).forEach(([key, value], index) => {
+        //     x.set(key, value);
+        // })
+
+        res = x;
+
+    } 
     
     return res;
 }

@@ -22,6 +22,11 @@ function typeToJson(obj: any) {
         }
     } else if (obj instanceof Slice) {
         result = obj.asCell().toBoc().toString('base64')
+    } else if (Object.prototype.toString.call(obj) === '[object Array]') {
+        result = []
+        obj.forEach((element: any) => {
+            result.push(typeToJson(element))
+        });
     } else {
         Object.keys(obj).forEach(function(key) {
             result[key] = typeToJson(obj[key]);
