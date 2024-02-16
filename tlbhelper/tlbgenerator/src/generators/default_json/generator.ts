@@ -36,14 +36,14 @@ export class DefaultJsonGenerator implements CodeGenerator {
         return x;
     }
 
-    getTLBTypeNameResult(tlbTypeName: string, ctx: JsonContext, parameters: Expression[]): ObjectExpression | undefined {
+    getTLBTypeNameResult(tlbTypeName: string, ctx: JsonContext, parameters: TLBMathExpr[]): ObjectExpression | undefined {
         let tlbType = this.tlbCode.types.get(tlbTypeName);
         if (tlbType) {
             return this.getTLBTypeResult(tlbType, ctx, parameters);
         }
     }
 
-    getTLBConstructorResult(tlbType: TLBType, constructor: TLBConstructor, ctx: JsonContext, parameters: Expression[], constructorIdx: number): ObjectExpression | undefined {
+    getTLBConstructorResult(tlbType: TLBType, constructor: TLBConstructor, ctx: JsonContext, parameters: TLBMathExpr[], constructorIdx: number): ObjectExpression | undefined {
         ctx.constructorsReached.add(tlbType.name);
         let x: any = {};
 
@@ -54,7 +54,7 @@ export class DefaultJsonGenerator implements CodeGenerator {
             }
         })
 
-        let y: Map<String, Expression> = new Map<String, Expression>();
+        let y = new Map<String, TLBMathExpr>();
         if (parameters.length != constructor.parameters.length && hasParams) {
             return undefined;
         }
@@ -81,7 +81,7 @@ export class DefaultJsonGenerator implements CodeGenerator {
         return x;
     }
 
-    getTLBTypeResult(tlbType: TLBType, ctx: JsonContext, parameters: Expression[]): any | undefined {
+    getTLBTypeResult(tlbType: TLBType, ctx: JsonContext, parameters: TLBMathExpr[]): any | undefined {
         if (ctx.constructorsReached.has(tlbType.name)) {
             let i = ctx.constructorsCalculated.get(tlbType.name)
             if (i != undefined) {
@@ -103,7 +103,7 @@ export class DefaultJsonGenerator implements CodeGenerator {
         field: TLBField,
         x: any,
         ctx: JsonContext,
-        y: Map<String, Expression>
+        y: Map<String, TLBMathExpr>
       ) {
         if (field.subFields.length > 0) {
             field.subFields.forEach((fieldDef) => {
@@ -122,7 +122,7 @@ export class DefaultJsonGenerator implements CodeGenerator {
         field: TLBField,
         fieldType: TLBFieldType,
         ctx: JsonContext,
-        y: Map<String, Expression>
+        y: Map<String, TLBMathExpr>
       ) : any | undefined {
         let res: any | undefined = undefined;
 

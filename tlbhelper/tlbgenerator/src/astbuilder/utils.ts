@@ -67,7 +67,7 @@ export function opCodeSetsEqual(a: string[], b: string[]) {
   return true;
 }
 
-export function evaluateExpression(expr: Expression): number | undefined {
+export function evaluateExpression(expr: TLBMathExpr): number | undefined {
   if (typeof expr == 'number') {
     return expr;
   }
