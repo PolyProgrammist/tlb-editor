@@ -15,9 +15,7 @@ import './index.css';
 ReactDOM.createRoot(document.getElementById('root')!).render(
 	<React.StrictMode>
 		<ChakraProvider>
-			<AppContextProvider>
-				<RouterProvider router={router} />
-			</AppContextProvider>
+			<RouterProvider router={router} />
 		</ChakraProvider>
 	</React.StrictMode>
 );

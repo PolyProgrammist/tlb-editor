@@ -1,6 +1,8 @@
-import React, { useCallback, useContext } from 'react';
+import React, { useCallback, useContext, useEffect } from 'react';
 
 import { debounce } from 'lodash';
+import LZString from 'lz-string';
+import { useSearchParams } from 'react-router-dom';
 import * as ts from 'typescript';
 import { Flex, Text } from '@chakra-ui/react';
 import { ast } from '@igorivaniuk/tlb-parser';
@@ -66,8 +68,18 @@ export const Main: React.FC = () => {
 				setIsCodeLoading(true);
 				const tree = ast(value);
 				const newCode = generateCodeByAST(tree, value, getGenerator);
-
-				setTypes([...generator.tlbCode.types.keys()]);
+				console.log(
+					generator.tlbCode.types.get('Unit').constructors[0].parameters.length
+				);
+				setTypes(
+					[...generator.tlbCode.types.keys()]
+						.filter(
+							(type: string) =>
+								generator.tlbCode.types.get(type).constructors[0]?.parameters
+									.length === 0
+						)
+						.sort()
+				);
 				setCode(newCode);
 
 				const jsCode = ts
@@ -101,6 +113,27 @@ export const Main: React.FC = () => {
 		},
 		[handleTlbChange, setIsCodeLoading]
 	);
+
+	const [searchParams] = useSearchParams();
+
+	useEffect(() => {
+		console.log(searchParams.get('state'));
+		const tlbState = LZString.decompressFromEncodedURIComponent(
+			searchParams.get('state') || ''
+		);
+
+		const dummyEvent = {
+			changes: [],
+			eol: '\n',
+			versionId: 0,
+			isUndoing: false,
+			isRedoing: false,
+			isFlush: false,
+			isEolChange: false,
+		};
+
+		handleTlbChangeDebounced(tlbState, dummyEvent);
+	}, [searchParams, handleTlbChangeDebounced]);
 
 	const handleSerializedDataChange: OnChange = useCallback(
 		async (value = '') => {

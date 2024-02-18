@@ -1,11 +1,15 @@
-import React from 'react';
+import React, { useContext } from 'react';
 
+import LZString from 'lz-string';
 import { Link, useLocation } from 'react-router-dom';
-import { Flex, Tab, TabList, Tabs } from '@chakra-ui/react';
+import { Button, Flex, Tab, TabList, Tabs } from '@chakra-ui/react';
 
+import { AppContext } from '@/context/AppContext';
 import { paths } from '@/router';
 
 export const Header: React.FC = () => {
+	const { tlbSchema } = useContext(AppContext);
+
 	const location = useLocation();
 
 	const pathToTabIndex = {
@@ -15,24 +19,24 @@ export const Header: React.FC = () => {
 
 	const currentTabIndex = pathToTabIndex[location.pathname] || 0;
 
-	// const handleShareClick: React.MouseEventHandler<HTMLButtonElement> = () => {
-	// 	const queryParams = `state='; // Customize this
+	const handleShareClick: React.MouseEventHandler<HTMLButtonElement> = () => {
+		const queryParams = `state=${LZString.compressToEncodedURIComponent(
+			tlbSchema
+		)}`;
 
-	// 	// Construct the new URL with query parameters
-	// 	const newUrl = `${currentUrl}?${queryParams}`;
+		// Construct the new URL with query parameters
+		const newUrl = `${window.location.host}/#/main?${queryParams}`;
 
-	// 	// Copy the new URL to the clipboard
-	// 	navigator.clipboard
-	// 		.writeText(newUrl)
-	// 		.then(() => {
-	// 			console.log('URL copied to clipboard!');
-	// 			// Optionally, display a message to the user indicating success
-	// 		})
-	// 		.catch((err) => {
-	// 			console.error('Failed to copy URL: ', err);
-	// 			// Handle any errors (for example, Clipboard API might not be available)
-	// 		});
-	// };
+		// Copy the new URL to the clipboard
+		navigator.clipboard
+			.writeText(newUrl)
+			.then(() => {
+				console.log(console.log(newUrl));
+			})
+			.catch((err) => {
+				console.error('Failed to copy URL: ', err);
+			});
+	};
 
 	return (
 		<Flex
@@ -55,7 +59,7 @@ export const Header: React.FC = () => {
 				</TabList>
 			</Tabs>
 
-			{/* <Button onClick={}> Share</Button> */}
+			<Button onClick={handleShareClick}> Share</Button>
 		</Flex>
 	);
 };
