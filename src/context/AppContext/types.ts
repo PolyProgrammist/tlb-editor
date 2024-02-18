@@ -33,6 +33,9 @@ export interface IAppContext {
 	setSelectedSerializedDataType: React.Dispatch<
 		React.SetStateAction<SerializedDataType>
 	>;
+	lastEdited: FieldType;
+	setLastEdited: React.Dispatch<React.SetStateAction<FieldType>>;
 }
 
 export type SerializedDataType = 'base64' | 'hex';
+export type FieldType = 'serialized' | 'json';

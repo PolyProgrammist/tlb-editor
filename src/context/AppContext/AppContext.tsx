@@ -1,6 +1,6 @@
 import React, { PropsWithChildren, useState } from 'react';
 
-import { IAppContext, SerializedDataType } from './types';
+import { FieldType, IAppContext, SerializedDataType } from './types';
 
 export const AppContext = React.createContext<IAppContext>({} as IAppContext);
 
@@ -25,6 +25,7 @@ export const AppContextProvider: React.FC<PropsWithChildren> = ({
 	const [module, setModule] = useState<{}>({});
 	const [selectedSerializedDataType, setSelectedSerializedDataType] =
 		useState<SerializedDataType>('base64');
+	const [lastEdited, setLastEdited] = useState<FieldType>('serialized');
 
 	return (
 		<AppContext.Provider
@@ -61,6 +62,8 @@ export const AppContextProvider: React.FC<PropsWithChildren> = ({
 				module,
 				selectedSerializedDataType,
 				setSelectedSerializedDataType,
+				lastEdited,
+				setLastEdited,
 			}}
 		>
 			{children}
