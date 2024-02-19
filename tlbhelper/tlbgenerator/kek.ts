@@ -8,6 +8,7 @@ import { ALLMETHODS, loadAddressUser, loadInsideAddressUser, loadParamAndTypedAr
 import path from "path";
 import util from "util";
 import { DefaultJsonGenerator } from "./src/generators/default_json/generator";
+import { ALLMETHODS_BLOCK } from "./test/generated_files/generated_block";
 
 function convertViceVersa(typeName: string, tlbCode: TLBCode, json: any, storeFunction: any, loadFunction: any) {
     let base64 = toBase64(typeName, tlbCode, json, storeFunction)
@@ -95,7 +96,7 @@ function f() {
 
 function x() {
     const fixturesDir = path.resolve(__dirname, 'test')
-    let inputPath = path.resolve(fixturesDir, 'tlb', 'test' + '.tlb');
+    let inputPath = path.resolve(fixturesDir, 'tlb', 'block' + '.tlb');
     let tlbCode = getTLBCode(inputPath);
 
     let i = 0;
@@ -120,7 +121,7 @@ export function getJson(tlbCode: TLBCode, tlbType: TLBType) {
 
 function g() {
     const fixturesDir = path.resolve(__dirname, 'test')
-    let inputPath = path.resolve(fixturesDir, 'tlb', 'test' + '.tlb');
+    let inputPath = path.resolve(fixturesDir, 'tlb', 'block' + '.tlb');
     let tlbCode = getTLBCode(inputPath);
     
     let i = 0;
@@ -128,14 +129,14 @@ function g() {
         if (tlbType.constructors[0].parameters.length > 0) {
             return;
         }
-        if (["EqualityExpression"].includes(tlbType.name)) {
+        if (["EqualityExpression", "Anycast", "ExtAddressUser"].includes(tlbType.name)) {
             console.log('skip', tlbType.name)
             return;
         }
         console.log(tlbType.name)
         let before = getJson(tlbCode, tlbType)
         console.log(util.inspect(before, false, null, true));
-        let after = convertViceVersa(before.kind, tlbCode, before, ALLMETHODS[tlbType.name][0], ALLMETHODS[tlbType.name][1]);
+        let after = convertViceVersa(before.kind, tlbCode, before, ALLMETHODS_BLOCK[tlbType.name][0], ALLMETHODS_BLOCK[tlbType.name][1]);
         console.log(util.inspect(after, false, null, true));
 
         i++;
