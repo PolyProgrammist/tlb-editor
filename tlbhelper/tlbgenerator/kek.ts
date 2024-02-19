@@ -125,10 +125,11 @@ function g() {
     
     let i = 0;
     tlbCode.types.forEach(tlbType => {
-        if (i > 100) {
+        if (tlbType.constructors[0].parameters.length > 0) {
             return;
         }
-        if (tlbType.constructors[0].parameters.length > 0) {
+        if (["EqualityExpression"].includes(tlbType.name)) {
+            console.log('skip', tlbType.name)
             return;
         }
         console.log(tlbType.name)
@@ -146,7 +147,7 @@ function onlyone() {
     let inputPath = path.resolve(fixturesDir, 'tlb', 'test' + '.tlb');
     let tlbCode = getTLBCode(inputPath);
 
-    let tlbType = tlbCode.types.get('ConditionalField')!
+    let tlbType = tlbCode.types.get('EqualityExpression')!
     let before = getJson(tlbCode, tlbType)
     console.log(util.inspect(before, false, null, true));
     let after = convertViceVersa(before.kind, tlbCode, before, ALLMETHODS[tlbType.name][0], ALLMETHODS[tlbType.name][1]);

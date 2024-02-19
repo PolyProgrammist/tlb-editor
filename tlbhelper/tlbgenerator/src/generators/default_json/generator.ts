@@ -134,6 +134,8 @@ export class DefaultJsonGenerator implements CodeGenerator {
             let bitsNumber = evaluateExpression(fieldType.bits, y);
             if (bitsNumber) {
                 res = "0b" + '0'.repeat(bitsNumber);
+            } else {
+                throw new Error(`Number of bits should be known and not zero in field ${field.name}`)
             }
         } else if (fieldType.kind == "TLBCellType") {
             res = beginCell().endCell().toBoc().toString('base64');
