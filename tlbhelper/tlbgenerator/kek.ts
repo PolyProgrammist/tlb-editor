@@ -129,16 +129,23 @@ function g() {
         if (tlbType.constructors[0].parameters.length > 0) {
             return;
         }
-        if (["EqualityExpression", "Anycast", "ExtAddressUser"].includes(tlbType.name)) {
-            console.log('skip', tlbType.name)
-            return;
-        }
         console.log(tlbType.name)
-        let before = getJson(tlbCode, tlbType)
-        console.log(util.inspect(before, false, null, true));
-        let after = convertViceVersa(before.kind, tlbCode, before, ALLMETHODS_BLOCK[tlbType.name][0], ALLMETHODS_BLOCK[tlbType.name][1]);
-        console.log(util.inspect(after, false, null, true));
-
+        let before: any;
+        try {
+            before = getJson(tlbCode, tlbType)
+            console.log(util.inspect(before, false, null, true));
+            let after = convertViceVersa(before.kind, tlbCode, before, ALLMETHODS_BLOCK[tlbType.name][0], ALLMETHODS_BLOCK[tlbType.name][1]);
+            console.log(util.inspect(after, false, null, true));
+        } catch (error: any) {
+            if (error.message.includes('Number of bits should be known and not zero in field')) {
+                return;
+            } else if (error.message.includes('is not satisfied while')) {
+                return;
+            } else {
+                console.log(error.message);
+                throw error;
+            }
+        }
         i++;
     })
 }

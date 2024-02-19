@@ -14649,7 +14649,7 @@ export function storeChanData(chanData: ChanData): (builder: Builder) => void {
 }
 
 export let ALLMETHODS_BLOCK: any = {
-'Unit': [storeUnit, loadUnit],
+    'Unit': [storeUnit, loadUnit],
 'True': [storeTrue, loadTrue],
 'BoolFalse': [storeBoolFalse, loadBoolFalse],
 'BoolTrue': [storeBoolTrue, loadBoolTrue],

@@ -146,7 +146,11 @@ export class DefaultJsonGenerator implements CodeGenerator {
         } else if (fieldType.kind == "TLBVarIntegerType") {
             res = 0;
         } else if (fieldType.kind == "TLBAddressType") {
-            res = "0:0000000000000000000000000000000000000000000000000000000000000000";
+            if (fieldType.addrType == 'Internal') {
+                res = "0:0000000000000000000000000000000000000000000000000000000000000000";
+            } else {
+                res = null;
+            }
         } else if (fieldType.kind == "TLBExprMathType") {
             res = 0;
         } else if (fieldType.kind == "TLBNegatedType") {

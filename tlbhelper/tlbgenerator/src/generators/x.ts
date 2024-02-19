@@ -64,7 +64,7 @@ function getTLBConstructorResult(kindName: string, constructor: TLBConstructor, 
     })
 
     constructor.fields.forEach((field) => {
-        let json_to_pass = json[field.name] != undefined ? json[field.name] : json;
+        let json_to_pass = json.hasOwnProperty(field.name) ? json[field.name] : json;
         Object.assign(result, handleField(field, tlbCode, json_to_pass))
     });
     return result;
@@ -131,7 +131,14 @@ function handleType(
     //     res = tNumericLiteral(0);
     // } else 
     else if (fieldType.kind == "TLBAddressType") {
-        res = Address.parse(json);
+        console.log('hey,', json)
+        if (json == null) {
+            // console.log(json)
+            res = null;
+        } else {
+            // console.log('hey', json)
+            res = Address.parse(json);
+        }
     } 
     else if (fieldType.kind == "TLBExprMathType") {
         res = json;
@@ -159,7 +166,7 @@ function handleType(
         //     res = this.getTLBTypeNameResult(fieldType.name, ctx, parameters)
         // }
     } else if (fieldType.kind == "TLBCondType") {
-        if (json[field.name] == null) {
+        if (json == null) {
             res = null;
         } else {
             res = handleType(field, fieldType.value, tlbCode, json[field.name]);
