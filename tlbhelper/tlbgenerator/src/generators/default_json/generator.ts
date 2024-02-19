@@ -198,8 +198,10 @@ export class DefaultJsonGenerator implements CodeGenerator {
                         throw "wrong";
                     }
                 }
+            } else if (argument.kind == 'TLBCellType') {
+                parameters.push(beginCell().endCell().toBoc().toString('base64'))
             } else {
-                let param: number | undefined = 1;
+                let param: number | undefined = 2;
                 if (argument.kind == 'TLBExprMathType') {
                     param = evaluateExpression(argument.expr, y);
                 }

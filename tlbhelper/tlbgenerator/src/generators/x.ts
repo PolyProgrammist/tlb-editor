@@ -2,13 +2,14 @@ import { Address, BitString, Cell, Dictionary, beginCell } from "ton-core";
 import { Simple, storeSimple } from "../../test/generated_files/generated_test";
 import { TLBCode, TLBConstructor, TLBField, TLBFieldType, TLBType } from "../ast";
 import { getSubStructName } from "../utils";
+import util from 'util';
 import { evaluateExpression } from "../astbuilder/utils";
 
 let constructorsIndex: Map<string, TLBConstructor> = new Map<string, TLBConstructor>();
 
 export function toBase64(typeName: string, tlbCode: TLBCode, json: any, method: any): String {
     let s = jsonToType(typeName, tlbCode, json);
-    console.log(s);
+    console.log(util.inspect(s, false, null, true))
     let builder = beginCell();
     method(s)(builder);
     return builder.asCell().toBoc().toString('base64');
@@ -29,19 +30,19 @@ function jsonToType(kindName: string, tlbCode: TLBCode, json: any) {
 
     let constructor = constructorsIndex.get(kindName);
     if (constructor) {
-        return getTLBTypeResult(kindName, constructor, tlbCode, json);
+        return getTLBTypeResult(kindName, constructor, tlbCode, json, []);
     }
 }
 
-function getTLBTypeNameResult(kindName: string, tlbCode: TLBCode, json: any) {
+function getTLBTypeNameResult(kindName: string, tlbCode: TLBCode, json: any, parameters: TLBFieldType[]) {
     let constructor = constructorsIndex.get(kindName);
     if (constructor) {
-        return getTLBTypeResult(kindName, constructor, tlbCode, json);
+        return getTLBTypeResult(kindName, constructor, tlbCode, json, parameters);
     }
 }
 
-function getTLBTypeResult(kindName: string, constructor: TLBConstructor, tlbCode: TLBCode, json: any) {
-    return getTLBConstructorResult(kindName, constructor, tlbCode, json);
+function getTLBTypeResult(kindName: string, constructor: TLBConstructor, tlbCode: TLBCode, json: any, parameters: TLBFieldType[]) {
+    return getTLBConstructorResult(kindName, constructor, tlbCode, json, parameters);
 
     // for (let i = 0; i < tlbType.constructors.length; i++) {
     //     let constructor = tlbType.constructors[i];
@@ -53,7 +54,7 @@ function getTLBTypeResult(kindName: string, constructor: TLBConstructor, tlbCode
     // }  
 }
 
-function getTLBConstructorResult(kindName: string, constructor: TLBConstructor, tlbCode: TLBCode, json: any) {
+function getTLBConstructorResult(kindName: string, constructor: TLBConstructor, tlbCode: TLBCode, json: any, parameters: TLBFieldType[]) {
     let result: any = {};
     result.kind = kindName;
 
@@ -63,9 +64,14 @@ function getTLBConstructorResult(kindName: string, constructor: TLBConstructor, 
         }
     })
 
+    let y = new Map<string, TLBFieldType>();
+    for (let i = 0; i < parameters.length; i++) {
+        y.set(constructor.parameters[i].variable.name, parameters[i]);
+    }
+
     constructor.fields.forEach((field) => {
         let json_to_pass = json.hasOwnProperty(field.name) ? json[field.name] : json;
-        Object.assign(result, handleField(field, tlbCode, json_to_pass))
+        Object.assign(result, handleField(field, tlbCode, json_to_pass, y))
     });
     return result;
 }
@@ -73,17 +79,18 @@ function getTLBConstructorResult(kindName: string, constructor: TLBConstructor, 
 function handleField(
     field: TLBField,
     tlbCode: TLBCode,
-    json: any
+    json: any,
+    y: Map<string, TLBFieldType>
   ) {
     if (field.subFields.length == 0) {
         let res: any = {}
-        res[field.name] = handleType(field, field.fieldType, tlbCode, json)
+        res[field.name] = handleType(field, field.fieldType, tlbCode, json, y)
         return res
     } else {
         let res: any = {}
         field.subFields.forEach((fieldDef) => {
             let json_to_pass = json[fieldDef.name] != undefined ? json[fieldDef.name] : json;
-            Object.assign(res, handleField(fieldDef, tlbCode, json_to_pass))
+            Object.assign(res, handleField(fieldDef, tlbCode, json_to_pass, y))
         });
         return res;
     }
@@ -103,11 +110,24 @@ function handleField(
     // return result;
 }
 
+function get_parameters(args: TLBFieldType[], y: Map<string, TLBFieldType>) {
+    let res: TLBFieldType[] = []
+    args.forEach(arg => {
+        if (arg.kind == 'TLBNamedType' && y.has(arg.name)) {
+            res.push(y.get(arg.name)!)
+        } else {
+            res.push(arg)
+        }
+    })
+    return res;
+}
+
 function handleType(
     field: TLBField,
     fieldType: TLBFieldType,
     tlbCode: TLBCode,
-    json: any
+    json: any,
+    y: Map<string, TLBFieldType>
   ) {
     let res: any = json;
 
@@ -131,7 +151,6 @@ function handleType(
     //     res = tNumericLiteral(0);
     // } else 
     else if (fieldType.kind == "TLBAddressType") {
-        console.log('hey,', json)
         if (json == null) {
             // console.log(json)
             res = null;
@@ -145,8 +164,12 @@ function handleType(
     } else if (fieldType.kind == "TLBNegatedType") {
         res = json;
     } else if (fieldType.kind == "TLBNamedType") {
-        if (json['kind']) {
-            res = getTLBTypeNameResult(json['kind'], tlbCode, json)
+        if (y.has(fieldType.name)) {
+            let paramType = y.get(fieldType.name)!
+            res = handleType(field, paramType, tlbCode, json, y);
+        } else if (json['kind']) {
+            let parameters = get_parameters(fieldType.arguments, y);
+                res = getTLBTypeNameResult(json['kind'], tlbCode, json, parameters)
         }
 
         // if (y.has(fieldType.name)) {
@@ -169,10 +192,10 @@ function handleType(
         if (json == null) {
             res = null;
         } else {
-            res = handleType(field, fieldType.value, tlbCode, json[field.name]);
+            res = handleType(field, fieldType.value, tlbCode, json[field.name], y);
         }
     } else if (fieldType.kind == "TLBMultipleType") {
-        let x = handleType(field, fieldType.value, tlbCode, json[0])
+        let x = handleType(field, fieldType.value, tlbCode, json[0], y)
         res = []
         let t = evaluateExpression(fieldType.times);
             if (t) {

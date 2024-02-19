@@ -144,13 +144,6 @@ export interface Either_right<X, Y> {
     readonly value: Y;
 }
 
-// _ x:(Either Simple FixedIntParam) = EitherUser;
-
-export interface EitherUser {
-    readonly kind: 'EitherUser';
-    readonly x: Either<Simple, FixedIntParam>;
-}
-
 // a$_ {x:#} value:(## x) = BitLenArg x;
 
 export interface BitLenArg {
@@ -867,6 +860,20 @@ export interface HashmapAugEUser {
     readonly x: Dictionary<number, {value: bigint, extra: FixedIntParam}>;
 }
 
+// message$_ {X:Type} body:(Either X ^X) = Message X;
+
+export interface Message<X> {
+    readonly kind: 'Message';
+    readonly body: Either<X, X>;
+}
+
+// _ (Message Any) = MessageAny;
+
+export interface MessageAny {
+    readonly kind: 'MessageAny';
+    readonly anon0: Message<Slice>;
+}
+
 // tmpa$_ a:# b:# = Simple;
 
 export function loadSimple(slice: Slice): Simple {
@@ -1217,24 +1224,6 @@ export function storeEither<X, Y>(either: Either<X, Y>, storeX: (x: X) => (build
 
     }
     throw new Error('Expected one of "Either_left", "Either_right" in loading "Either", but data does not satisfy any constructor');
-}
-
-// _ x:(Either Simple FixedIntParam) = EitherUser;
-
-export function loadEitherUser(slice: Slice): EitherUser {
-    let x: Either<Simple, FixedIntParam> = loadEither<Simple, FixedIntParam>(slice, loadSimple, loadFixedIntParam);
-    return {
-        kind: 'EitherUser',
-        x: x,
-    }
-
-}
-
-export function storeEitherUser(eitherUser: EitherUser): (builder: Builder) => void {
-    return ((builder: Builder) => {
-        storeEither<Simple, FixedIntParam>(eitherUser.x, storeSimple, storeFixedIntParam)(builder);
-    })
-
 }
 
 // a$_ {x:#} value:(## x) = BitLenArg x;
@@ -3485,7 +3474,6 @@ export function storeHashmapAugNode<X, Y>(hashmapAugNode: HashmapAugNode<X, Y>, 
             builder.storeRef(cell2);
             storeY(hashmapAugNode.extra)(builder);
         })
-        let res: Dictionary<number, number> = Dictionary.empty();
 
     }
     throw new Error('Expected one of "HashmapAugNode_ahmn_leaf", "HashmapAugNode_ahmn_fork" in loading "HashmapAugNode", but data does not satisfy any constructor');
@@ -3534,10 +3522,66 @@ export function storeHashmapAugEUser(hashmapAugEUser: HashmapAugEUser): (builder
 
 }
 
+// message$_ {X:Type} body:(Either X ^X) = Message X;
+
+export function loadMessage<X>(slice: Slice, loadX: (slice: Slice) => X): Message<X> {
+    let body: Either<X, X> = loadEither<X, X>(slice, loadX, ((slice: Slice) => {
+        let slice1 = slice.loadRef().beginParse();
+        return loadX(slice1)
+
+    }));
+    return {
+        kind: 'Message',
+        body: body,
+    }
+
+}
+
+export function storeMessage<X>(message: Message<X>, storeX: (x: X) => (builder: Builder) => void): (builder: Builder) => void {
+    return ((builder: Builder) => {
+        storeEither<X, X>(message.body, storeX, ((arg: X) => {
+            return ((builder: Builder) => {
+                let cell1 = beginCell();
+                storeX(arg)(cell1);
+                builder.storeRef(cell1);
+
+            })
+
+        }))(builder);
+    })
+
+}
+
+// _ (Message Any) = MessageAny;
+
+export function loadMessageAny(slice: Slice): MessageAny {
+    let anon0: Message<Slice> = loadMessage<Slice>(slice, ((slice: Slice) => {
+        return slice
+
+    }));
+    return {
+        kind: 'MessageAny',
+        anon0: anon0,
+    }
+
+}
+
+export function storeMessageAny(messageAny: MessageAny): (builder: Builder) => void {
+    return ((builder: Builder) => {
+        storeMessage<Slice>(messageAny.anon0, ((arg: Slice) => {
+            return ((builder: Builder) => {
+                builder.storeSlice(arg);
+            })
+
+        }))(builder);
+    })
+
+}
+
+
 
 export let ALLMETHODS: any = {
     'Simple': [storeSimple, loadSimple],
-    'EitherUser': [storeEitherUser, loadEitherUser],
 'TypedArgUser': [storeTypedArgUser, loadTypedArgUser],
 'ParamAndTypedArgUser': [storeParamAndTypedArgUser, loadParamAndTypedArgUser],
 'TwoSimples': [storeTwoSimples, loadTwoSimples],
@@ -3594,4 +3638,5 @@ export let ALLMETHODS: any = {
 'HashmapExprKeyUser': [storeHashmapExprKeyUser, loadHashmapExprKeyUser],
 'HashmapOneCombUser': [storeHashmapOneCombUser, loadHashmapOneCombUser],
 'HashmapAugEUser': [storeHashmapAugEUser, loadHashmapAugEUser],
+'MessageAny': [storeMessageAny, loadMessageAny]
 }

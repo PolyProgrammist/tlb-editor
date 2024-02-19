@@ -119,9 +119,12 @@ export function getJson(tlbCode: TLBCode, tlbType: TLBType) {
     return res;
   }
 
+let testkey = 'block'
+let methods = testkey == 'test' ? ALLMETHODS : ALLMETHODS_BLOCK;
+
 function g() {
     const fixturesDir = path.resolve(__dirname, 'test')
-    let inputPath = path.resolve(fixturesDir, 'tlb', 'block' + '.tlb');
+    let inputPath = path.resolve(fixturesDir, 'tlb', testkey + '.tlb');
     let tlbCode = getTLBCode(inputPath);
     
     let i = 0;
@@ -134,7 +137,7 @@ function g() {
         try {
             before = getJson(tlbCode, tlbType)
             console.log(util.inspect(before, false, null, true));
-            let after = convertViceVersa(before.kind, tlbCode, before, ALLMETHODS_BLOCK[tlbType.name][0], ALLMETHODS_BLOCK[tlbType.name][1]);
+            let after = convertViceVersa(before.kind, tlbCode, before, methods[tlbType.name][0], methods[tlbType.name][1]);
             console.log(util.inspect(after, false, null, true));
         } catch (error: any) {
             if (error.message.includes('Number of bits should be known and not zero in field')) {
@@ -152,13 +155,13 @@ function g() {
 
 function onlyone() {
     const fixturesDir = path.resolve(__dirname, 'test')
-    let inputPath = path.resolve(fixturesDir, 'tlb', 'test' + '.tlb');
+    let inputPath = path.resolve(fixturesDir, 'tlb', testkey + '.tlb');
     let tlbCode = getTLBCode(inputPath);
 
-    let tlbType = tlbCode.types.get('EqualityExpression')!
+    let tlbType = tlbCode.types.get('MessageAny')!
     let before = getJson(tlbCode, tlbType)
     console.log(util.inspect(before, false, null, true));
-    let after = convertViceVersa(before.kind, tlbCode, before, ALLMETHODS[tlbType.name][0], ALLMETHODS[tlbType.name][1]);
+    let after = convertViceVersa(before.kind, tlbCode, before, methods[tlbType.name][0], methods[tlbType.name][1]);
     console.log(util.inspect(after, false, null, true));
 }
 
