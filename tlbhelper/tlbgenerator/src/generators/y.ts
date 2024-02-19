@@ -8,6 +8,9 @@ export function fromBase64(base64: String, loadFunction: any) {
 
 function typeToJson(obj: any) {
     let result: any = {}
+    if (obj == undefined) {
+        return null;
+    }
     if (obj.kind) {
         result['kind'] = obj.kind;
     }

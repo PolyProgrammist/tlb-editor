@@ -8,6 +8,7 @@ let constructorsIndex: Map<string, TLBConstructor> = new Map<string, TLBConstruc
 
 export function toBase64(typeName: string, tlbCode: TLBCode, json: any, method: any): String {
     let s = jsonToType(typeName, tlbCode, json);
+    console.log(s);
     let builder = beginCell();
     method(s)(builder);
     return builder.asCell().toBoc().toString('base64');
@@ -157,9 +158,12 @@ function handleType(
         //     })
         //     res = this.getTLBTypeNameResult(fieldType.name, ctx, parameters)
         // }
-    // } 
-    //else if (fieldType.kind == "TLBCondType") {
-        
+    } else if (fieldType.kind == "TLBCondType") {
+        if (json[field.name] == null) {
+            res = null;
+        } else {
+            res = handleType(field, fieldType.value, tlbCode, json[field.name]);
+        }
     } else if (fieldType.kind == "TLBMultipleType") {
         let x = handleType(field, fieldType.value, tlbCode, json[0])
         res = []

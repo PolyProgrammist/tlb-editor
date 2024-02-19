@@ -146,9 +146,8 @@ function onlyone() {
     let inputPath = path.resolve(fixturesDir, 'tlb', 'test' + '.tlb');
     let tlbCode = getTLBCode(inputPath);
 
-    let tlbType = tlbCode.types.get('HashmapEUser')!
+    let tlbType = tlbCode.types.get('ConditionalField')!
     let before = getJson(tlbCode, tlbType)
-    before.x = {5: 6, 8:3}
     console.log(util.inspect(before, false, null, true));
     let after = convertViceVersa(before.kind, tlbCode, before, ALLMETHODS[tlbType.name][0], ALLMETHODS[tlbType.name][1]);
     console.log(util.inspect(after, false, null, true));

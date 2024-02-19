@@ -114,6 +114,8 @@ export class DefaultJsonGenerator implements CodeGenerator {
             let res = this.handleType(field, field.fieldType, ctx, y);
             if (res != undefined) {
                 x[field.name] = res;
+            } else {
+                x[field.name] = null;
             }
         }
     }
@@ -155,7 +157,7 @@ export class DefaultJsonGenerator implements CodeGenerator {
                 res = this.getTLBTypeNameResult(fieldType.name, ctx, parameters)
             }
         } else if (fieldType.kind == "TLBCondType") {
-            
+            res = null;
         } else if (fieldType.kind == "TLBMultipleType") {
             let x = this.handleType(field, fieldType.value, ctx, y);
             res = []
