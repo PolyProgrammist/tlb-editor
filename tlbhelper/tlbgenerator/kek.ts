@@ -132,6 +132,9 @@ function g() {
         if (tlbType.constructors[0].parameters.length > 0) {
             return;
         }
+        if (["AccountBlock", "LibDescr"].includes(tlbType.name)) {
+            return;
+        }
         console.log(tlbType.name)
         let before: any;
         try {
@@ -167,6 +170,6 @@ function onlyone() {
 
 // f();
 // x();
-// g()
-onlyone();
+g()
+// onlyone();
 // eval(`storeSimple`)
