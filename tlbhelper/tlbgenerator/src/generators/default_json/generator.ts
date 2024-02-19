@@ -200,6 +200,9 @@ export class DefaultJsonGenerator implements CodeGenerator {
                 }
             } else if (argument.kind == 'TLBCellType') {
                 parameters.push(beginCell().endCell().toBoc().toString('base64'))
+            } else if (argument.kind == 'TLBCellInsideType') {
+                let currentParameters = this.getParameters([argument.value], ctx, y);
+                parameters = parameters.concat(currentParameters)
             } else {
                 let param: number | undefined = 2;
                 if (argument.kind == 'TLBExprMathType') {
