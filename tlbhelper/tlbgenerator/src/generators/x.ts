@@ -203,8 +203,8 @@ function handleType(
                     res.push(x);
                 }
         }
-    // else if (fieldType.kind == "TLBCellInsideType") {
-    //     // TODO
+    } else if (fieldType.kind == "TLBCellInsideType") {
+        res = handleType(field, fieldType.value, tlbCode, json, y);
     } else if (fieldType.kind == "TLBHashmapType") {
         let x: Dictionary<number, number> = Dictionary.empty()
         
