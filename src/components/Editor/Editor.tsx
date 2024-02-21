@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 
 import { Box, BoxProps, Button, Flex, Spinner, Text } from '@chakra-ui/react';
 import {
@@ -14,6 +14,7 @@ type EditorProps = Omit<BoxProps, 'onChange'> &
 		header?: React.ReactElement;
 		footer?: React.ReactElement;
 		isLoading?: boolean;
+		fileName: string;
 	};
 
 export const Editor: React.FC<EditorProps> = ({
@@ -25,8 +26,10 @@ export const Editor: React.FC<EditorProps> = ({
 	errorMessage,
 	footer,
 	isLoading = false,
+	fileName,
 	...props
 }) => {
+	const hiddenLinkRef = useRef<HTMLAnchorElement>(null);
 	const handleCopy = () => {
 		navigator.clipboard
 			.writeText(value || '')
@@ -36,6 +39,25 @@ export const Editor: React.FC<EditorProps> = ({
 			.catch((err) => {
 				console.error('Failed to copy text: ', err);
 			});
+	};
+
+	const handleDownload = () => {
+		// Create a Blob from the input content
+		const blob = new Blob([value || ''], { type: 'text/plain' });
+		// Create a URL for the Blob
+		const fileUrl = URL.createObjectURL(blob);
+		// Use a hidden link element to download the file
+		const link = hiddenLinkRef.current;
+
+		if (!link) {
+			return;
+		}
+
+		link.href = fileUrl;
+		link.download = fileName;
+		link.click();
+		// Clean up the URL object
+		URL.revokeObjectURL(fileUrl);
 	};
 
 	return (
@@ -61,10 +83,13 @@ export const Editor: React.FC<EditorProps> = ({
 				mx={3}
 				alignItems={'center'}
 			>
-				{header}{' '}
+				{header}
 				<Box>
-					<Button onClick={handleCopy} isDisabled={!Boolean(value)}>
+					<Button onClick={handleCopy} isDisabled={!Boolean(value)} mr={3}>
 						Copy
+					</Button>
+					<Button onClick={handleDownload} isDisabled={!Boolean(value)}>
+						Download
 					</Button>
 				</Box>
 			</Flex>
@@ -120,6 +145,9 @@ export const Editor: React.FC<EditorProps> = ({
 					{errorMessage}
 				</Text>
 			)}
+			<a ref={hiddenLinkRef} style={{ display: 'none' }}>
+				Download Link
+			</a>
 		</Flex>
 	);
 };

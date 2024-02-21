@@ -307,6 +307,7 @@ export const Main: React.FC = () => {
 					}}
 					footer={<TypeMenu />}
 					errorMessage={tlbError}
+					fileName={'scheme.tlb'}
 				/>
 
 				<Editor
@@ -320,6 +321,7 @@ export const Main: React.FC = () => {
 					}}
 					errorMessage={serializedDataError}
 					onChange={handleSerializedDataChangeDebounced}
+					fileName={'serialized.txt'}
 				/>
 			</Flex>
 
@@ -335,6 +337,7 @@ export const Main: React.FC = () => {
 					readOnly: !tlbSchema || Boolean(tlbError) || !selectedType,
 				}}
 				onChange={handleJsonDataChangeDebounced}
+				fileName={'deserialized.json'}
 			/>
 
 			<Editor
@@ -347,6 +350,7 @@ export const Main: React.FC = () => {
 					minimap: { enabled: false },
 					readOnly: true,
 				}}
+				fileName={'code.ts'}
 			/>
 		</Flex>
 	);
