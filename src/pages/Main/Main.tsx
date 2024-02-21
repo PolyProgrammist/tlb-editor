@@ -297,11 +297,7 @@ export const Main: React.FC = () => {
 		<Flex as="main" flexGrow={1} gap={5}>
 			<Flex flexDirection="column" flexGrow={1} gap={5}>
 				<Editor
-					header={
-						<Text ml={3} p={3}>
-							TLB Schema
-						</Text>
-					}
+					header={<Text>TLB Schema</Text>}
 					flexGrow={2}
 					defaultLanguage="javascript"
 					value={tlbSchema}
@@ -329,11 +325,7 @@ export const Main: React.FC = () => {
 
 			<Editor
 				isLoading={isJsonDataLoading}
-				header={
-					<Text ml={3} p={3}>
-						JSON
-					</Text>
-				}
+				header={<Text>JSON</Text>}
 				flexGrow={1}
 				defaultLanguage="json"
 				value={jsonData}
@@ -347,11 +339,7 @@ export const Main: React.FC = () => {
 
 			<Editor
 				isLoading={isCodeLoading}
-				header={
-					<Text ml={3} p={3}>
-						Code
-					</Text>
-				}
+				header={<Text>Code</Text>}
 				flexGrow={1}
 				defaultLanguage="typescript"
 				value={code}

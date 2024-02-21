@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Box, BoxProps, Flex, Spinner, Text } from '@chakra-ui/react';
+import { Box, BoxProps, Button, Flex, Spinner, Text } from '@chakra-ui/react';
 import {
 	Editor as MonacoEditor,
 	EditorProps as MonacoEditorProps,
@@ -27,6 +27,17 @@ export const Editor: React.FC<EditorProps> = ({
 	isLoading = false,
 	...props
 }) => {
+	const handleCopy = () => {
+		navigator.clipboard
+			.writeText(value || '')
+			.then(() => {
+				console.log('Text copied to clipboard');
+			})
+			.catch((err) => {
+				console.error('Failed to copy text: ', err);
+			});
+	};
+
 	return (
 		<Flex
 			{...props}
@@ -44,7 +55,19 @@ export const Editor: React.FC<EditorProps> = ({
 			}
 			boxSizing={'border-box'}
 		>
-			{header}
+			<Flex
+				padding={1}
+				justifyContent={'space-between'}
+				mx={3}
+				alignItems={'center'}
+			>
+				{header}{' '}
+				<Box>
+					<Button onClick={handleCopy} isDisabled={!Boolean(value)}>
+						Copy
+					</Button>
+				</Box>
+			</Flex>
 
 			<Box position={'relative'} flexGrow={1}>
 				{isLoading && (
