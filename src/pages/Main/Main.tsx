@@ -26,6 +26,16 @@ let getGenerator = (tlbCode: any) => {
 	return generator;
 };
 
+const dummyEvent = {
+	changes: [],
+	eol: '\n',
+	versionId: 0,
+	isUndoing: false,
+	isRedoing: false,
+	isFlush: false,
+	isEolChange: false,
+};
+
 export const Main: React.FC = () => {
 	const {
 		tlbSchema,
@@ -47,6 +57,7 @@ export const Main: React.FC = () => {
 		isJsonDataLoading,
 		setIsSerializedDataLoading,
 		selectedType,
+		setSelectedType,
 		selectedSerializedDataType,
 		setIsJsonDataLoading,
 		jsonDataError,
@@ -61,236 +72,245 @@ export const Main: React.FC = () => {
 
 	const [searchParams] = useSearchParams();
 
-	const handleSerializedDataChange: OnChange = useCallback(
-		async (value = '') => {
-			try {
-				if (selectedSerializedDataType === 'base64') {
-					setBase64(value);
-					const newHex = base64ToHex(value);
-					setHex(newHex);
-				} else {
-					setHex(value);
-					const newBase64 = hexToBase64(value);
-					setBase64(newBase64);
+	const serializedDataHandler = async (
+		value = '',
+		type = '',
+		newModule?: {}
+	) => {
+		try {
+			if (selectedSerializedDataType === 'base64') {
+				setBase64(value);
+				const newHex = base64ToHex(value);
+				setHex(newHex);
+			} else {
+				setHex(value);
+				const newBase64 = hexToBase64(value);
+				setBase64(newBase64);
 
-					value = newBase64;
-				}
-
-				if (value === '') {
-					console.log('empty');
-					setJsonData('');
-					return;
-				}
-
-				const { Cell } = await importTonDependencies();
-
-				if (!selectedType) {
-					return;
-				}
-
-				const cs = Cell.fromBase64(value);
-				const slice = cs.beginParse();
-
-				const json = module[`load${selectedType}`](slice);
-				setJsonData(
-					JSON.stringify(
-						json,
-						(_, value) =>
-							typeof value === 'bigint' ? value.toString() : value,
-						'\t'
-					)
-				);
-				setSerializedDataError('');
-				setLastEdited('serialized');
-			} catch (error) {
-				console.error(error);
-				setSerializedDataError('Data is invalid');
-			} finally {
-				setIsJsonDataLoading(false);
+				value = newBase64;
 			}
-		},
-		[
-			setIsJsonDataLoading,
-			setJsonData,
-			setSerializedDataError,
-			module,
-			selectedType,
-			selectedSerializedDataType,
-			setBase64,
-			setHex,
-			setLastEdited,
-		]
-	);
+
+			if (value === '') {
+				console.log('empty');
+				setJsonData('');
+				setIsJsonDataLoading(false);
+				return;
+			}
+
+			const { Cell } = await importTonDependencies();
+
+			type = type || selectedType;
+			if (!type) {
+				return;
+			}
+
+			const cs = Cell.fromBase64(value);
+			const slice = cs.beginParse();
+
+			const currentModule: {} = Object.keys(module).length
+				? module
+				: newModule || {};
+			//@ts-ignore
+			const json = currentModule[`load${type}`](slice);
+			setJsonData(
+				JSON.stringify(
+					json,
+					(_, value) => (typeof value === 'bigint' ? value.toString() : value),
+					'\t'
+				)
+			);
+			setSerializedDataError('');
+			setLastEdited('serialized');
+		} catch (error) {
+			console.error(error);
+			setSerializedDataError('Data is invalid');
+		} finally {
+			setIsJsonDataLoading(false);
+		}
+	};
 
 	const handleSerializedDataChangeDebounced: OnChange = useCallback(
-		debounce((value, model) => {
+		debounce((value) => serializedDataHandler(value), 1000),
+		[serializedDataHandler]
+	);
+
+	const handleSerializedDataChange: OnChange = useCallback(
+		(value, model) => {
 			setIsJsonDataLoading(true);
 
-			handleSerializedDataChange(value, model);
-		}, 1000),
-		[handleSerializedDataChange, setIsJsonDataLoading]
+			handleSerializedDataChangeDebounced(value, model);
+		},
+		[handleSerializedDataChangeDebounced, setIsJsonDataLoading]
+	);
+
+	const jsonHandler = async (value = '', type = '', newModule?: {}) => {
+		try {
+			console.log('json change');
+			setJsonData(value);
+
+			if (!value) {
+				setHex('');
+				setBase64('');
+				return;
+			}
+
+			const { beginCell } = await importTonDependencies();
+
+			type = type || selectedType;
+			if (!type) {
+				return;
+			}
+
+			const builder = beginCell();
+
+			console.log(JSON.parse(value));
+
+			const currentModule = module || newModule;
+			let data =
+				currentModule[`store${type}`](JSON.parse(value))(builder) || '';
+
+			data = builder.endCell().toBoc().toString('base64');
+			// { "kind": "BitSelection", "a": 5,
+			// "b": 5 }
+
+			setBase64(data);
+			setHex(base64ToHex(data));
+
+			setJsonDataError('');
+			setLastEdited('json');
+		} catch (error) {
+			console.error(error);
+			setJsonDataError('Data is invalid');
+		} finally {
+			setIsSerializedDataLoading(false);
+		}
+	};
+
+	const handleJsonDataChangeDebounced: OnChange = useCallback(
+		debounce((value) => jsonHandler(value), 1000),
+		[jsonHandler]
 	);
 
 	const handleJsonDataChange: OnChange = useCallback(
-		async (value = '') => {
-			try {
-				console.log('json change');
-				setJsonData(value);
-
-				if (!value) {
-					setHex('');
-					setBase64('');
-					return;
-				}
-
-				const { beginCell } = await importTonDependencies();
-
-				if (!selectedType) {
-					return;
-				}
-
-				const builder = beginCell();
-
-				console.log(JSON.parse(value));
-
-				let data =
-					module[`store${selectedType}`](JSON.parse(value))(builder) || '';
-
-				data = builder.endCell().toBoc().toString('base64');
-				// { "kind": "BitSelection", "a": 5,
-				// "b": 5 }
-
-				setBase64(data);
-				setHex(base64ToHex(data));
-
-				setJsonDataError('');
-				setLastEdited('json');
-			} catch (error) {
-				console.error(error);
-				setJsonDataError('Data is invalid');
-			} finally {
-				setIsSerializedDataLoading(false);
-			}
-		},
-		[
-			setJsonData,
-			setBase64,
-			setHex,
-			setJsonDataError,
-			setIsSerializedDataLoading,
-			module,
-			selectedType,
-			setLastEdited,
-		]
-	);
-
-	const handleJsonDataChangeDebounced: OnChange = useCallback(
-		debounce((value, model) => {
+		(value, model) => {
 			setIsSerializedDataLoading(true);
 
-			handleJsonDataChange(value, model);
-		}, 1000),
-		[handleJsonDataChange, setIsSerializedDataLoading]
+			handleJsonDataChangeDebounced(value, model);
+		},
+		[handleJsonDataChangeDebounced, setIsSerializedDataLoading]
+	);
+
+	const tlbHandler = async (value = '') => {
+		console.log('change tlb change');
+		try {
+			setTlbSchema(value);
+			if (!value) {
+				setCode('');
+				return;
+			}
+			setIsCodeLoading(true);
+			const tree = ast(value);
+			const newCode = generateCodeByAST(tree, value, getGenerator);
+
+			setTypes(
+				[...generator.tlbCode.types.keys()]
+					.filter(
+						(type: string) =>
+							generator.tlbCode.types.get(type).constructors[0]?.parameters
+								.length === 0
+					)
+					.sort()
+			);
+			setCode(newCode);
+
+			const jsCode = ts
+				.transpile(newCode, { target: 2 })
+				.replace(/import { ([^}]+) } from 'ton';/g, '');
+			const blob = new Blob([jsCode], {
+				type: 'application/javascript; charset=utf-8',
+			});
+
+			const scriptURL = URL.createObjectURL(blob);
+
+			const newModule = await import(scriptURL);
+			setModule(newModule);
+
+			setTlbError('');
+
+			setIsCodeLoading(false);
+
+			if (lastEdited === 'serialized') {
+				console.log('start regenerate srialized');
+				if (
+					(selectedSerializedDataType === 'base64' && !base64) ||
+					(selectedSerializedDataType === 'hex' && !hex)
+				) {
+					return newModule;
+				}
+				handleSerializedDataChange(
+					selectedSerializedDataType === 'base64' ? base64 || '' : hex || '',
+					dummyEvent
+				);
+			} else {
+				handleJsonDataChange(jsonData, dummyEvent);
+			}
+
+			return newModule;
+		} catch (error) {
+			console.error(error);
+			setCode('');
+			setTlbError('Scheme is incorrect');
+		} finally {
+			setIsCodeLoading(false);
+		}
+	};
+
+	const handleTlbChangeDebounced: OnChange = useCallback(
+		debounce(tlbHandler, 1000),
+		[tlbHandler]
 	);
 
 	const handleTlbChange: OnChange = useCallback(
-		async (value = '', ev) => {
-			console.log('change tlb change');
-			try {
-				setTlbSchema(value);
-				if (!value) {
-					setCode('');
-					return;
-				}
-				setIsCodeLoading(true);
-				const tree = ast(value);
-				const newCode = generateCodeByAST(tree, value, getGenerator);
-
-				setTypes(
-					[...generator.tlbCode.types.keys()]
-						.filter(
-							(type: string) =>
-								generator.tlbCode.types.get(type).constructors[0]?.parameters
-									.length === 0
-						)
-						.sort()
-				);
-				setCode(newCode);
-
-				const jsCode = ts
-					.transpile(newCode, { target: 2 })
-					.replace(/import { ([^}]+) } from 'ton';/g, '');
-				const blob = new Blob([jsCode], {
-					type: 'application/javascript; charset=utf-8',
-				});
-
-				const scriptURL = URL.createObjectURL(blob);
-
-				const newModule = await import(scriptURL);
-				setModule(newModule);
-
-				setTlbError('');
-
-				setIsCodeLoading(false);
-
-				if (lastEdited === 'serialized') {
-					console.log('start regenerate srialized');
-					handleSerializedDataChangeDebounced(
-						selectedSerializedDataType === 'base64' ? base64 : hex,
-						ev
-					);
-				} else {
-					handleJsonDataChangeDebounced(jsonData, ev);
-				}
-			} catch (error) {
-				console.error(error);
-				setCode('');
-				setTlbError('Scheme is incorrect');
-			} finally {
-				setIsCodeLoading(false);
-			}
-		},
-		[
-			setCode,
-			setTlbError,
-			setTlbSchema,
-			setTypes,
-			setModule,
-			setIsCodeLoading,
-			jsonData,
-			base64,
-			hex,
-			lastEdited,
-			handleJsonDataChangeDebounced,
-			selectedSerializedDataType,
-			handleSerializedDataChangeDebounced,
-		]
-	);
-
-	const handleTlbChangeDebounced: OnChange = useCallback(
-		debounce((value, model) => {
+		async (value, model) => {
 			setIsCodeLoading(true);
-			handleTlbChange(value, model);
-		}, 1000),
-		[handleTlbChange, setIsCodeLoading]
+
+			await handleTlbChangeDebounced(value, model);
+		},
+		[handleTlbChangeDebounced, setIsCodeLoading]
 	);
 
 	useEffect(() => {
-		const tlbState = LZString.decompressFromEncodedURIComponent(
-			searchParams.get('state') || ''
-		);
+		const parseState = async () => {
+			const tlbState = LZString.decompressFromEncodedURIComponent(
+				searchParams.get('tlb') || ''
+			);
+			const jsonState = LZString.decompressFromEncodedURIComponent(
+				searchParams.get('json') || ''
+			);
+			const base64State = LZString.decompressFromEncodedURIComponent(
+				searchParams.get('base64') || ''
+			);
+			const typeState = LZString.decompressFromEncodedURIComponent(
+				searchParams.get('type') || ''
+			);
+			setTlbSchema(tlbState);
+			setIsCodeLoading(true);
+			const module = await tlbHandler(tlbState);
 
-		const dummyEvent = {
-			changes: [],
-			eol: '\n',
-			versionId: 0,
-			isUndoing: false,
-			isRedoing: false,
-			isFlush: false,
-			isEolChange: false,
+			console.log('module', module);
+
+			setSelectedType(typeState);
+			setBase64(base64State);
+
+			if (base64State) {
+				await serializedDataHandler(base64State, typeState, module);
+			} else if (jsonState) {
+				await jsonHandler(jsonState, typeState, module);
+			}
 		};
 
-		handleTlbChangeDebounced(tlbState, dummyEvent);
+		parseState();
+
 		//eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [searchParams]);
 	return (
@@ -301,7 +321,7 @@ export const Main: React.FC = () => {
 					flexGrow={2}
 					defaultLanguage="javascript"
 					value={tlbSchema}
-					onChange={handleTlbChangeDebounced}
+					onChange={handleTlbChange}
 					options={{
 						minimap: { enabled: false },
 					}}
@@ -320,7 +340,7 @@ export const Main: React.FC = () => {
 						readOnly: !tlbSchema || Boolean(tlbError) || !selectedType,
 					}}
 					errorMessage={serializedDataError}
-					onChange={handleSerializedDataChangeDebounced}
+					onChange={handleSerializedDataChange}
 					fileName={'serialized.txt'}
 				/>
 			</Flex>
@@ -336,7 +356,7 @@ export const Main: React.FC = () => {
 					minimap: { enabled: false },
 					readOnly: !tlbSchema || Boolean(tlbError) || !selectedType,
 				}}
-				onChange={handleJsonDataChangeDebounced}
+				onChange={handleJsonDataChange}
 				fileName={'deserialized.json'}
 			/>
 

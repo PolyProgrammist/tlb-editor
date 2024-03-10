@@ -8,7 +8,7 @@ import { AppContext } from '@/context/AppContext';
 import { paths } from '@/router';
 
 export const Header: React.FC = () => {
-	const { tlbSchema } = useContext(AppContext);
+	const { tlbSchema, base64, jsonData, selectedType } = useContext(AppContext);
 
 	const location = useLocation();
 
@@ -20,9 +20,13 @@ export const Header: React.FC = () => {
 	const currentTabIndex = pathToTabIndex[location.pathname] || 0;
 
 	const handleShareClick: React.MouseEventHandler<HTMLButtonElement> = () => {
-		const queryParams = `state=${LZString.compressToEncodedURIComponent(
+		const queryParams = `tlb=${LZString.compressToEncodedURIComponent(
 			tlbSchema
-		)}`;
+		)}&type=${LZString.compressToEncodedURIComponent(
+			selectedType
+		)}&base64=${LZString.compressToEncodedURIComponent(
+			base64
+		)}&json=${LZString.compressToEncodedURIComponent(jsonData)}`;
 
 		// Construct the new URL with query parameters
 		const newUrl = `${window.location.host}/#/main?${queryParams}`;
