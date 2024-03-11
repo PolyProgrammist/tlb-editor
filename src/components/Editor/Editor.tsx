@@ -125,6 +125,7 @@ export const Editor: React.FC<EditorProps> = ({
 						value={value}
 						onChange={onChange}
 						options={{
+							showUnused: false,
 							minimap: { enabled: false },
 							...options,
 						}}

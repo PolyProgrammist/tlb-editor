@@ -319,7 +319,7 @@ export const Main: React.FC = () => {
 				<Editor
 					header={<Text>TLB Schema</Text>}
 					flexGrow={2}
-					defaultLanguage="javascript"
+					defaultLanguage="tlb"
 					value={tlbSchema}
 					onChange={handleTlbChange}
 					options={{

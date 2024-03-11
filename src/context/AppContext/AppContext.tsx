@@ -1,5 +1,7 @@
 import React, { PropsWithChildren, useState } from 'react';
 
+import { useMonacoSetup } from '@/hooks/useMonacoSetup';
+
 import { FieldType, IAppContext, SerializedDataType } from './types';
 
 export const AppContext = React.createContext<IAppContext>({} as IAppContext);
@@ -26,6 +28,8 @@ export const AppContextProvider: React.FC<PropsWithChildren> = ({
 	const [selectedSerializedDataType, setSelectedSerializedDataType] =
 		useState<SerializedDataType>('base64');
 	const [lastEdited, setLastEdited] = useState<FieldType>('serialized');
+
+	useMonacoSetup();
 
 	return (
 		<AppContext.Provider
