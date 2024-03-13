@@ -874,6 +874,13 @@ export interface MessageAny {
     readonly anon0: Message<Slice>;
 }
 
+// _ FixedIntParam = ShardState;
+
+export interface ShardState {
+    readonly kind: 'ShardState';
+    readonly anon0: FixedIntParam;
+}
+
 // a$_ {X:Type} a:^X = InsideCell X;
 
 export interface InsideCell<X> {
@@ -881,11 +888,11 @@ export interface InsideCell<X> {
     readonly a: X;
 }
 
-// a$_ inside_cell:^(InsideCell FixedIntParam) = InsideCellUser;
+// a$_ inside_cell:^(InsideCell ShardState) = InsideCellUser;
 
 export interface InsideCellUser {
     readonly kind: 'InsideCellUser';
-    readonly inside_cell: InsideCell<FixedIntParam>;
+    readonly inside_cell: InsideCell<ShardState>;
 }
 
 // tmpa$_ a:# b:# = Simple;
@@ -3592,6 +3599,24 @@ export function storeMessageAny(messageAny: MessageAny): (builder: Builder) => v
 
 }
 
+// _ FixedIntParam = ShardState;
+
+export function loadShardState(slice: Slice): ShardState {
+    let anon0: FixedIntParam = loadFixedIntParam(slice);
+    return {
+        kind: 'ShardState',
+        anon0: anon0,
+    }
+
+}
+
+export function storeShardState(shardState: ShardState): (builder: Builder) => void {
+    return ((builder: Builder) => {
+        storeFixedIntParam(shardState.anon0)(builder);
+    })
+
+}
+
 // a$_ {X:Type} a:^X = InsideCell X;
 
 export function loadInsideCell<X>(slice: Slice, loadX: (slice: Slice) => X): InsideCell<X> {
@@ -3613,11 +3638,11 @@ export function storeInsideCell<X>(insideCell: InsideCell<X>, storeX: (x: X) => 
 
 }
 
-// a$_ inside_cell:^(InsideCell FixedIntParam) = InsideCellUser;
+// a$_ inside_cell:^(InsideCell ShardState) = InsideCellUser;
 
 export function loadInsideCellUser(slice: Slice): InsideCellUser {
     let slice1 = slice.loadRef().beginParse();
-    let inside_cell: InsideCell<FixedIntParam> = loadInsideCell<FixedIntParam>(slice1, loadFixedIntParam);
+    let inside_cell: InsideCell<ShardState> = loadInsideCell<ShardState>(slice1, loadShardState);
     return {
         kind: 'InsideCellUser',
         inside_cell: inside_cell,
@@ -3628,7 +3653,7 @@ export function loadInsideCellUser(slice: Slice): InsideCellUser {
 export function storeInsideCellUser(insideCellUser: InsideCellUser): (builder: Builder) => void {
     return ((builder: Builder) => {
         let cell1 = beginCell();
-        storeInsideCell<FixedIntParam>(insideCellUser.inside_cell, storeFixedIntParam)(cell1);
+        storeInsideCell<ShardState>(insideCellUser.inside_cell, storeShardState)(cell1);
         builder.storeRef(cell1);
     })
 
@@ -3696,4 +3721,5 @@ export let ALLMETHODS: any = {
 'HashmapAugEUser': [storeHashmapAugEUser, loadHashmapAugEUser],
 'MessageAny': [storeMessageAny, loadMessageAny],
 'InsideCellUser': [storeInsideCellUser, loadInsideCellUser],
+'ShardState': [storeShardState, loadShardState],
 }

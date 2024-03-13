@@ -199,5 +199,6 @@ message$_ {X:Type} body:(Either X ^X) = Message X;
   
 _ (Message Any) = MessageAny;
 
+_ FixedIntParam = ShardState;
 a$_ {X:Type} a:^X = InsideCell X;
-a$_ inside_cell:^(InsideCell FixedIntParam) = InsideCellUser;
+a$_ inside_cell:^(InsideCell ShardState) = InsideCellUser;
