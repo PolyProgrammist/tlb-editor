@@ -214,7 +214,9 @@ function handleType(
 
         res = x;
 
-    } 
+    } else if (fieldType.kind == "TLBExoticType") {
+        res = Cell.fromBase64(json.toString());
+    }
     
     return res;
 }

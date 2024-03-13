@@ -119,7 +119,7 @@ export function getJson(tlbCode: TLBCode, tlbType: TLBType) {
     return res;
   }
 
-let testkey = 'test'
+let testkey = 'block'
 let methods = testkey == 'test' ? ALLMETHODS : ALLMETHODS_BLOCK;
 
 function g() {
@@ -162,7 +162,7 @@ function onlyone() {
     let inputPath = path.resolve(fixturesDir, 'tlb', testkey + '.tlb');
     let tlbCode = getTLBCode(inputPath);
 
-    let tlbType = tlbCode.types.get('AccountBlock')!
+    let tlbType = tlbCode.types.get('Block')!
     let before = getJson(tlbCode, tlbType)
     console.log(util.inspect(before, false, null, true));
     let after = convertViceVersa(before.kind, tlbCode, before, methods[tlbType.name][0], methods[tlbType.name][1]);
@@ -171,6 +171,6 @@ function onlyone() {
 
 // f();
 // x();
-g()
-// onlyone();
+// g()
+onlyone();
 // eval(`storeSimple`)

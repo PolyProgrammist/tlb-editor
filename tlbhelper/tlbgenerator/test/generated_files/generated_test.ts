@@ -874,11 +874,11 @@ export interface MessageAny {
     readonly anon0: Message<Slice>;
 }
 
-// _ FixedIntParam = ShardState;
+// _ x:^FixedIntParam = ShardState;
 
 export interface ShardState {
     readonly kind: 'ShardState';
-    readonly anon0: FixedIntParam;
+    readonly x: FixedIntParam;
 }
 
 // a$_ {X:Type} a:^X = InsideCell X;
@@ -3599,20 +3599,23 @@ export function storeMessageAny(messageAny: MessageAny): (builder: Builder) => v
 
 }
 
-// _ FixedIntParam = ShardState;
+// _ x:^FixedIntParam = ShardState;
 
 export function loadShardState(slice: Slice): ShardState {
-    let anon0: FixedIntParam = loadFixedIntParam(slice);
+    let slice1 = slice.loadRef().beginParse();
+    let x: FixedIntParam = loadFixedIntParam(slice1);
     return {
         kind: 'ShardState',
-        anon0: anon0,
+        x: x,
     }
 
 }
 
 export function storeShardState(shardState: ShardState): (builder: Builder) => void {
     return ((builder: Builder) => {
-        storeFixedIntParam(shardState.anon0)(builder);
+        let cell1 = beginCell();
+        storeFixedIntParam(shardState.x)(cell1);
+        builder.storeRef(cell1);
     })
 
 }

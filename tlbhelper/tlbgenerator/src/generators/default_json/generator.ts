@@ -149,7 +149,7 @@ export class DefaultJsonGenerator implements CodeGenerator {
             if (fieldType.addrType == 'Internal') {
                 res = "0:0000000000000000000000000000000000000000000000000000000000000000";
             } else {
-                res = null;
+                res = "address not internal"//null;
             }
         } else if (fieldType.kind == "TLBExprMathType") {
             res = 0;
@@ -175,9 +175,12 @@ export class DefaultJsonGenerator implements CodeGenerator {
             }
         } else if (fieldType.kind == "TLBCellInsideType") {
             // TODO
+            res = "tlbcellsinsidetype"
         } else if (fieldType.kind == "TLBHashmapType") {
           res = {}
-        } 
+        } else if (fieldType.kind == "TLBExoticType") {
+            res = beginCell().endCell().toBoc().toString('base64');
+        }
         
         return res;
     }
