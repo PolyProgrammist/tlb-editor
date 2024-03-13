@@ -119,7 +119,7 @@ export function getJson(tlbCode: TLBCode, tlbType: TLBType) {
     return res;
   }
 
-let testkey = 'block'
+let testkey = 'test'
 let methods = testkey == 'test' ? ALLMETHODS : ALLMETHODS_BLOCK;
 
 function g() {
@@ -142,6 +142,7 @@ function g() {
             console.log(util.inspect(before, false, null, true));
             let after = convertViceVersa(before.kind, tlbCode, before, methods[tlbType.name][0], methods[tlbType.name][1]);
             console.log(util.inspect(after, false, null, true));
+            console.log('--------------------------------------------------------')
         } catch (error: any) {
             if (error.message.includes('Number of bits should be known and not zero in field')) {
                 return;

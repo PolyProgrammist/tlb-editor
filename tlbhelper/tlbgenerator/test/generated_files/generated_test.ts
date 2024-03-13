@@ -874,6 +874,20 @@ export interface MessageAny {
     readonly anon0: Message<Slice>;
 }
 
+// a$_ {X:Type} a:^X = InsideCell X;
+
+export interface InsideCell<X> {
+    readonly kind: 'InsideCell';
+    readonly a: X;
+}
+
+// a$_ inside_cell:^(InsideCell FixedIntParam) = InsideCellUser;
+
+export interface InsideCellUser {
+    readonly kind: 'InsideCellUser';
+    readonly inside_cell: InsideCell<FixedIntParam>;
+}
+
 // tmpa$_ a:# b:# = Simple;
 
 export function loadSimple(slice: Slice): Simple {
@@ -3578,6 +3592,48 @@ export function storeMessageAny(messageAny: MessageAny): (builder: Builder) => v
 
 }
 
+// a$_ {X:Type} a:^X = InsideCell X;
+
+export function loadInsideCell<X>(slice: Slice, loadX: (slice: Slice) => X): InsideCell<X> {
+    let slice1 = slice.loadRef().beginParse();
+    let a: X = loadX(slice1);
+    return {
+        kind: 'InsideCell',
+        a: a,
+    }
+
+}
+
+export function storeInsideCell<X>(insideCell: InsideCell<X>, storeX: (x: X) => (builder: Builder) => void): (builder: Builder) => void {
+    return ((builder: Builder) => {
+        let cell1 = beginCell();
+        storeX(insideCell.a)(cell1);
+        builder.storeRef(cell1);
+    })
+
+}
+
+// a$_ inside_cell:^(InsideCell FixedIntParam) = InsideCellUser;
+
+export function loadInsideCellUser(slice: Slice): InsideCellUser {
+    let slice1 = slice.loadRef().beginParse();
+    let inside_cell: InsideCell<FixedIntParam> = loadInsideCell<FixedIntParam>(slice1, loadFixedIntParam);
+    return {
+        kind: 'InsideCellUser',
+        inside_cell: inside_cell,
+    }
+
+}
+
+export function storeInsideCellUser(insideCellUser: InsideCellUser): (builder: Builder) => void {
+    return ((builder: Builder) => {
+        let cell1 = beginCell();
+        storeInsideCell<FixedIntParam>(insideCellUser.inside_cell, storeFixedIntParam)(cell1);
+        builder.storeRef(cell1);
+    })
+
+}
+
 
 
 export let ALLMETHODS: any = {
@@ -3638,5 +3694,6 @@ export let ALLMETHODS: any = {
 'HashmapExprKeyUser': [storeHashmapExprKeyUser, loadHashmapExprKeyUser],
 'HashmapOneCombUser': [storeHashmapOneCombUser, loadHashmapOneCombUser],
 'HashmapAugEUser': [storeHashmapAugEUser, loadHashmapAugEUser],
-'MessageAny': [storeMessageAny, loadMessageAny]
+'MessageAny': [storeMessageAny, loadMessageAny],
+'InsideCellUser': [storeInsideCellUser, loadInsideCellUser],
 }
