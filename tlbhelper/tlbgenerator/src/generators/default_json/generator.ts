@@ -174,12 +174,15 @@ export class DefaultJsonGenerator implements CodeGenerator {
                 }
             }
         } else if (fieldType.kind == "TLBCellInsideType") {
+            throw `Not implemented TLBCellInsideType`
             // TODO
             res = "tlbcellsinsidetype"
         } else if (fieldType.kind == "TLBHashmapType") {
           res = {}
         } else if (fieldType.kind == "TLBExoticType") {
             res = beginCell().endCell().toBoc().toString('base64');
+        } else {
+            throw `No such kind`;
         }
         
         return res;

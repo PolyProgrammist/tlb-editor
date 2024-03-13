@@ -131,10 +131,9 @@ function handleType(
   ) {
     let res: any = json;
 
-    // if (fieldType.kind == "TLBNumberType") {
-    //     res = json;
-    // } else 
-    if (fieldType.kind == "TLBBitsType") {
+    if (fieldType.kind == "TLBNumberType") {
+        res = json;
+    } else if (fieldType.kind == "TLBBitsType") {
         let builder = beginCell();
         for (let i = 2; i < json.length; i++) {
             let bit = parseInt(json[i]);
@@ -143,14 +142,14 @@ function handleType(
         res = builder.endCell().beginParse().loadBits(json.length - 2)
     } else if (fieldType.kind == "TLBCellType") {
         res = Cell.fromBase64(json.toString()).beginParse();
-    } //else if (fieldType.kind == "TLBBoolType") {
-    //     res = id('false');
-    // } else if (fieldType.kind == "TLBCoinsType") {
-    //     res = tNumericLiteral(0);
-    // } else if (fieldType.kind == "TLBVarIntegerType") {
-    //     res = tNumericLiteral(0);
-    // } else 
-    else if (fieldType.kind == "TLBAddressType") {
+    } else if (fieldType.kind == "TLBBoolType") {
+        res = json;
+    } else if (fieldType.kind == "TLBCoinsType") {
+        res = json;
+    } 
+    else if (fieldType.kind == "TLBVarIntegerType") {
+        res = json;
+    } else if (fieldType.kind == "TLBAddressType") {
         if (json == null) {
             // console.log(json)
             res = null;
@@ -216,7 +215,7 @@ function handleType(
 
     } else if (fieldType.kind == "TLBExoticType") {
         res = Cell.fromBase64(json.toString());
-    }
+    } 
     
     return res;
 }
