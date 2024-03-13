@@ -171,6 +171,6 @@ function onlyone() {
 
 // f();
 // x();
-// g()
-onlyone();
+g()
+// onlyone();
 // eval(`storeSimple`)
