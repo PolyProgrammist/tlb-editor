@@ -132,7 +132,7 @@ function g() {
         if (tlbType.constructors[0].parameters.length > 0) {
             return;
         }
-        if (["AccountBlock", "LibDescr"].includes(tlbType.name)) {
+        if (["AccountBlock", "LibDescr", "ConfigParams"].includes(tlbType.name)) {
             return;
         }
         console.log(tlbType.name)

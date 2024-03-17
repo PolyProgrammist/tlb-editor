@@ -82,7 +82,10 @@ export class DefaultJsonGenerator implements CodeGenerator {
         constructor.variables.forEach(variable => {
             if (variable.type == "#" && !variable.isField) {
                 if (y.has(variable.name)) {
-                    x[variable.name] = y.get(variable.name);
+                    let t = y.get(variable.name)
+                    if (t) {
+                        x[variable.name] = evaluateExpression(t, y);
+                    }
                 } else {
                     x[variable.name] = 1;
                 }
@@ -140,7 +143,7 @@ export class DefaultJsonGenerator implements CodeGenerator {
       ) : any | undefined {
         let res: any | undefined = undefined;
 
-        console.log(util.inspect(field, false, null, true /* enable colors */))
+        // console.log(util.inspect(field, false, null, true /* enable colors */))
         if (fieldType.kind == "TLBNumberType") {
             res = 0;
         } else if (fieldType.kind == "TLBBitsType") {
@@ -180,17 +183,18 @@ export class DefaultJsonGenerator implements CodeGenerator {
                     let constructor = this.tlbCode.types.get(fieldType.name)!.constructors[i];
                     for (let i = 0; i < constructor.parameters.length; i++) {
                         if (constructor.parameters[i].variable.isConst) {
-                            let theExpr = constructor.parameters[i].variable.deriveExpr;
+                            let theExpr = constructor.parameters[i].variable.initialExpr;
                             if (theExpr) {
-                                console.log(field.name, constructor.name, i, theExpr)
+                                // console.log(field.name, constructor.name, i, theExpr)
                                 // let expr = evaluateExpression(theExpr, y)
                                 // if (expr) {
                                 let argument = fieldType.arguments[i];
+                                // console.log(argument)
                                 if (argument.kind == "TLBExprMathType") {
-                                    console.log(argument)
-                                    if (argument.expr instanceof TLBVarExpr) {
-                                        y.set(argument.expr.x, theExpr);
-                                        console.log('it happens right now', argument.expr.x)
+                                    // console.log(argument)
+                                    if (argument.initialExpr instanceof TLBVarExpr) {
+                                        y.set(argument.initialExpr.x, theExpr);
+                                        // console.log('it happens right now', argument.initialExpr.x)
                                     }
                                 }
                                 // y.set(fieldType.arguments[i]., theExpr);
