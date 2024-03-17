@@ -188,7 +188,7 @@ function handleType(
         //     res = this.getTLBTypeNameResult(fieldType.name, ctx, parameters)
         // }
     } else if (fieldType.kind == "TLBCondType") {
-        if (json == null) {
+        if (json == null || json[field.name] == null) {
             res = null;
         } else {
             res = handleType(field, fieldType.value, tlbCode, json[field.name], y);
