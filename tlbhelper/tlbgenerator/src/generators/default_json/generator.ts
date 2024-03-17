@@ -89,13 +89,13 @@ export class DefaultJsonGenerator implements CodeGenerator {
         }
 
         constructor.variables.forEach(variable => {
-            if (variable.type == "#" && !variable.isField) {
+            if (variable.type == "#") {
                 if (y.has(variable.name)) {
                     let t = y.get(variable.name)
                     if (t) {
                         x[variable.name] = evaluateExpression(t, y);
                     }
-                } else {
+                } else if (!variable.isField) {
                     x[variable.name] = 1;
                 }
             }
