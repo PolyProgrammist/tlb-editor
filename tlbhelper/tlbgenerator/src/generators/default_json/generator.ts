@@ -5,6 +5,7 @@ import { CodeGenerator, CommonGenDeclaration } from "../generator"
 import { Expression, GenDeclaration, ObjectExpression, ObjectProperty, TheNode, id, tDeclareVariable, tIdentifier, tNumericLiteral, tObjectExpression, tObjectProperty, tStringLiteral, tTypedIdentifier, toCode } from "../typescript/tsgen"
 import { getSubStructName } from "../../utils";
 import { evaluateExpression } from "../../astbuilder/utils";
+import util from 'util'
 
 export type JsonContext = {
     constructorsReached: Set<String>;
@@ -28,7 +29,7 @@ export class DefaultJsonGenerator implements CodeGenerator {
 
         let ctx :JsonContext = {
             constructorsReached: new Set<String>(),
-            constructorsCalculated: new Map<String, number>()
+            constructorsCalculated: new Map<String, number>(),
         }
 
         let x = this.getTLBTypeNameResult(tlbType.name, ctx, []);
@@ -77,6 +78,17 @@ export class DefaultJsonGenerator implements CodeGenerator {
         constructor.fields.forEach((field) => {
             this.handleField(field, x, ctx, y);
         });
+
+        constructor.variables.forEach(variable => {
+            if (variable.type == "#" && !variable.isField) {
+                if (y.has(variable.name)) {
+                    x[variable.name] = y.get(variable.name);
+                } else {
+                    x[variable.name] = 1;
+                }
+            }
+        })
+        
         ctx.constructorsCalculated.set(tlbType.name, constructorIdx);
         return x;
     }
@@ -128,6 +140,7 @@ export class DefaultJsonGenerator implements CodeGenerator {
       ) : any | undefined {
         let res: any | undefined = undefined;
 
+        console.log(util.inspect(field, false, null, true /* enable colors */))
         if (fieldType.kind == "TLBNumberType") {
             res = 0;
         } else if (fieldType.kind == "TLBBitsType") {
@@ -161,6 +174,32 @@ export class DefaultJsonGenerator implements CodeGenerator {
             } else {
                 let parameters: any[] = this.getParameters(fieldType.arguments, ctx, y);
                 res = this.getTLBTypeNameResult(fieldType.name, ctx, parameters)
+
+                let i = ctx.constructorsCalculated.get(fieldType.name)
+                if (i != undefined) {
+                    let constructor = this.tlbCode.types.get(fieldType.name)!.constructors[i];
+                    for (let i = 0; i < constructor.parameters.length; i++) {
+                        if (constructor.parameters[i].variable.isConst) {
+                            let theExpr = constructor.parameters[i].variable.deriveExpr;
+                            if (theExpr) {
+                                console.log(field.name, constructor.name, i, theExpr)
+                                // let expr = evaluateExpression(theExpr, y)
+                                // if (expr) {
+                                let argument = fieldType.arguments[i];
+                                if (argument.kind == "TLBExprMathType") {
+                                    console.log(argument)
+                                    if (argument.expr instanceof TLBVarExpr) {
+                                        y.set(argument.expr.x, theExpr);
+                                        console.log('it happens right now', argument.expr.x)
+                                    }
+                                }
+                                // y.set(fieldType.arguments[i]., theExpr);
+                                // console.log('it happens right now', fieldType.arguments[i].kind)
+                                // }
+                            }
+                        }
+                    }
+                }
             }
         } else if (fieldType.kind == "TLBCondType") {
             res = null;

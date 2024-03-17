@@ -168,7 +168,7 @@ function handleType(
             res = handleType(field, paramType, tlbCode, json, y);
         } else if (json['kind']) {
             let parameters = get_parameters(fieldType.arguments, y);
-                res = getTLBTypeNameResult(json['kind'], tlbCode, json, parameters)
+            res = getTLBTypeNameResult(json['kind'], tlbCode, json, parameters)
         }
 
         // if (y.has(fieldType.name)) {
