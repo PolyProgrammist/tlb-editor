@@ -164,8 +164,10 @@ function onlyone() {
 
     let tlbType = tlbCode.types.get('WorkchainDescr')!
     let before = getJson(tlbCode, tlbType)
-    console.log(util.inspect(before, false, null, true));
+    before = JSON.parse(JSON.stringify(before));
+    // console.log(util.inspect(before, false, null, true));
     let after = convertViceVersa(before.kind, tlbCode, before, methods[tlbType.name][0], methods[tlbType.name][1]);
+    after = JSON.parse(JSON.stringify(after));
     console.log(util.inspect(after, false, null, true));
 }
 
