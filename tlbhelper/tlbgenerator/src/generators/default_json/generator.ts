@@ -75,9 +75,18 @@ export class DefaultJsonGenerator implements CodeGenerator {
             }
         })
 
+        let ok = true;
+
         constructor.fields.forEach((field) => {
-            this.handleField(field, x, ctx, y);
+            let handleFieldResult = this.handleField(field, x, ctx, y);
+            if (!handleFieldResult) {
+                ok = false;
+            }
         });
+
+        if (!ok) {
+            return undefined;
+        }
 
         constructor.variables.forEach(variable => {
             if (variable.type == "#" && !variable.isField) {
@@ -112,6 +121,7 @@ export class DefaultJsonGenerator implements CodeGenerator {
                 return expr;
             }
         }  
+        return undefined;
     }
 
     handleField(
@@ -119,20 +129,26 @@ export class DefaultJsonGenerator implements CodeGenerator {
         x: any,
         ctx: JsonContext,
         y: Map<string, TLBMathExpr>
-      ) {
+      ): boolean {
         if (field.subFields.length > 0) {
+            let ok = true;
             field.subFields.forEach((fieldDef) => {
-                this.handleField(fieldDef, x, ctx, y);
+                let fieldResult = this.handleField(fieldDef, x, ctx, y);
+                if (!fieldResult) {
+                    ok = false;
+                }
             });
+            return ok;
         }
         if (field.subFields.length == 0) { 
             let res = this.handleType(field, field.fieldType, ctx, y);
-            if (res != undefined) {
+            if (res !== undefined) {
                 x[field.name] = res;
             } else {
-                x[field.name] = null;
+                return false;
             }
         }
+        return true;
     }
 
     handleType(
@@ -165,6 +181,8 @@ export class DefaultJsonGenerator implements CodeGenerator {
             if (fieldType.addrType == "Internal") {
                 res = "0:0000000000000000000000000000000000000000000000000000000000000000";
             } else if (fieldType.addrType == "External") {
+                res = null;
+            } else if (fieldType.addrType == "Any") {
                 res = null;
             }
         } else if (fieldType.kind == "TLBExprMathType") {
