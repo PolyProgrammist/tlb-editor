@@ -17,7 +17,7 @@ import { Editor } from '@/components/Editor';
 import { SerializedDataTypeTab } from '@/components/SerializedDataTypeTab';
 import { TypeMenu } from '@/components/TypeMenu';
 import { AppContext } from '@/context/AppContext';
-import { fromBase64, getTLBCodeByAST, toBase64 } from '@/tlbutils';
+import { base64ToHumanJson, getTLBCodeByAST, humanJsonToBase64 } from '@/tlbutils';
 
 import { base64ToHex, hexToBase64 } from './utils';
 
@@ -103,20 +103,13 @@ export const Main: React.FC = () => {
 				return;
 			}
 
-			// const cs = Cell.fromBase64(value);
-			// const slice = cs.beginParse();
-
 			const currentModule: {} = Object.keys(module).length
 				? module
 				: newModule || {};
 			//@ts-ignore
 			let ft = currentModule[`load${type}`];
-			
-			// console.log('hueta')
 
-			// console.log(value, ft)
-
-			const json = await fromBase64(value, ft)//(slice);
+			const json = await base64ToHumanJson(value, ft);
 			console.log('hehey', json)
 			setJsonData(
 				JSON.stringify(
@@ -167,18 +160,11 @@ export const Main: React.FC = () => {
 
 			console.log("logging value", JSON.parse(value));
 
-			// export async function toBase64(typeName: string, tlbCode: TLBCode, json: any, method: any) {
-
-
 			const currentModule = module || newModule;
-			// let data =
-			// 	currentModule[`store${type}`](JSON.parse(value))(builder) || '';
 
 			const tree = ast(tlbSchema);
 			let tlbCode = getTLBCodeByAST(tree, tlbSchema);
-			let data = await toBase64(type, tlbCode, JSON.parse(value), currentModule[`store${type}`]);
-			
-			// data = builder.endCell().toBoc().toString('base64');
+			let data = await humanJsonToBase64(type, tlbCode, JSON.parse(value), currentModule[`store${type}`]);
 			// { "kind": "BitSelection", "a": 5,
 			// "b": 5 }
 

@@ -6,6 +6,6 @@ export {
 	// @ts-ignore
 } from "@polyprogrammist_test/tlb-codegen/build";
 
-export { getJson } from './default_json';
-export { toBase64 } from "./x";
-export { fromBase64 } from "./y";
+export { getDefaulHumanJson } from './default_json';
+export { humanJsonToBase64 } from "./json_to_base64";
+export { base64ToHumanJson } from "./base64_to_json";

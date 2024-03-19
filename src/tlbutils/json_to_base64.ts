@@ -7,7 +7,7 @@ import util from 'util';
 
 let constructorsIndex: Map<string, TLBConstructor> = new Map<string, TLBConstructor>();
 
-export async function toBase64(typeName: string, tlbCode: TLBCode, json: any, method: any) {
+export async function humanJsonToBase64(typeName: string, tlbCode: TLBCode, json: any, method: any) {
     let s = new X();
     const { Address, Cell, Dictionary, beginCell } = await importTonDependencies();
     s.Address = Address;
@@ -57,15 +57,6 @@ class X {
     
     getTLBTypeResult(kindName: string, constructor: TLBConstructor, tlbCode: TLBCode, json: any, parameters: TLBFieldType[]) {
         return this.getTLBConstructorResult(kindName, constructor, tlbCode, json, parameters);
-    
-        // for (let i = 0; i < tlbType.constructors.length; i++) {
-        //     let constructor = tlbType.constructors[i];
-        //     let kind_name = getSubStructName(tlbType, constructor);
-        //     console.log('getTLBTypeResult', json)
-        //     if (kind_name == json.kind) {
-        //         return getTLBConstructorResult(tlbType, constructor, tlbCode, json);
-        //     }
-        // }  
     }
     
     getTLBConstructorResult(kindName: string, constructor: TLBConstructor, tlbCode: TLBCode, json: any, parameters: TLBFieldType[]) {
@@ -108,20 +99,6 @@ class X {
             });
             return res;
         }
-        // let result: any = {}
-        // if (field.subFields.length > 0) {
-        //     field.subFields.forEach((fieldDef) => {
-        //         handleField(fieldDef, json);
-        //     });
-        // }
-        // if (field.subFields.length == 0) { 
-        //     let res = handleType(field, field.fieldType, json);
-        //     if (res) {
-        //         result[field.name] = res;
-        //     }
-        // }
-        // console.log(result);
-        // return result;
     }
     
     get_parameters(args: TLBFieldType[], y: Map<string, TLBFieldType>) {
@@ -165,10 +142,8 @@ class X {
             res = json;
         } else if (fieldType.kind == "TLBAddressType") {
             if (json == null) {
-                // console.log(json)
                 res = null;
             } else {
-                // console.log('hey', json)
                 res = this.Address.parse(json);
             }
         } 
@@ -184,23 +159,6 @@ class X {
                 let parameters = this.get_parameters(fieldType.arguments, y);
                 res = this.getTLBTypeNameResult(json['kind'], tlbCode, json, parameters)
             }
-    
-            // if (y.has(fieldType.name)) {
-            //     res = y.get(fieldType.name)
-            // } else {
-            //     let parameters: Expression[] = [];
-            //     fieldType.arguments.forEach(argument => {
-            //         if (argument.kind == 'TLBNamedType') {
-            //             let tmp = this.getTLBTypeNameResult(argument.name, ctx, []);
-            //             if (tmp) {
-            //                 parameters.push(tmp);
-            //             }
-            //         } else {
-            //             parameters.push(tNumericLiteral(1))
-            //         }
-            //     })
-            //     res = this.getTLBTypeNameResult(fieldType.name, ctx, parameters)
-            // }
         } else if (fieldType.kind == "TLBCondType") {
             if (json == null || json[field.name] == null) {
                 res = null;
@@ -219,12 +177,6 @@ class X {
         } else if (fieldType.kind == "TLBCellInsideType") {
             res = this.handleType(field, fieldType.value, tlbCode, json, y);
         } else if (fieldType.kind == "TLBHashmapType") {
-            // let x: this.Dictionary<number, number> = this.Dictionary.empty()
-            
-            // Object.entries(json).forEach(([key, value], index) => {
-            //     x.set(key, value);
-            // })
-    
             res = this.Dictionary.empty();
     
         } else if (fieldType.kind == "TLBExoticType") {
@@ -236,31 +188,3 @@ class X {
     
     
 }
-
-
-/* 
-    jsonToType('Simple', tlbCode, '{
-        kind: 'Simple',
-        a: 0,
-        b: 0,
-    }')
-    = 
-    x: Simple = { kind: 'Simple', a: 827, b: 387 }
-
-
-    let jsonAddressUser = {
-        kind: 'AddressUser',
-        src: '0:0000000000000000000000000000000000000000000000000000000000000000',
-    }
-
-    x: AddressUser = { kind: 'AddressUser', src: Address.parseFriendly('EQBmzW4wYlFW0tiBgj5sP1CgSlLdYs-VpjPWM7oPYPYWQEdT').address }
-*/
-
-
-/*
-    let kind = json.kind
-    let type = get_type_from(kind)
-    for each field:
-        if (field.type == )
-
-*/

@@ -1,16 +1,16 @@
 import { importTonDependencies } from '../pages/Main/utils';
 
-export async function fromBase64(base64: String, loadFunction: any) {
+export async function base64ToHumanJson(base64: String, loadFunction: any) {
     console.log(base64, loadFunction)
     const { Cell } = await importTonDependencies();;
 
     let cell = Cell.fromBase64(base64.toString())
     let loadedType = loadFunction(cell.beginParse());
     console.log(loadedType)
-    return await typeToJson(loadedType);
+    return await typeToHumanJson(loadedType);
 }
 
-async function typeToJson(obj: any) {
+async function typeToHumanJson(obj: any) {
     const { Address, BitString, Slice, Dictionary, Cell } = await importTonDependencies();;
 
     let result: any = {}
@@ -36,7 +36,7 @@ async function typeToJson(obj: any) {
     } else if (Object.prototype.toString.call(obj) === '[object Array]') {
         result = []
         for (let i = 0; i < obj.length; i++) {
-            result.push(await typeToJson(obj[i]))
+            result.push(await typeToHumanJson(obj[i]))
         }
     } else if (obj instanceof Dictionary) {
         result = {}
@@ -44,12 +44,12 @@ async function typeToJson(obj: any) {
         let keys = obj.keys();
 
         for (let i = 0; i < keys.length; i++) {
-            result[keys[i]] = await typeToJson(obj.get(keys[i]))
+            result[keys[i]] = await typeToHumanJson(obj.get(keys[i]))
         }
     } else {
         let keys = Object.keys(obj);
         for (let i = 0; i < keys.length; i++) {
-            result[keys[i]] = await typeToJson(obj[keys[i]])
+            result[keys[i]] = await typeToHumanJson(obj[keys[i]])
         }
     }
     return result;

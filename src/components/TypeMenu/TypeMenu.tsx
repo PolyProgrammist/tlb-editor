@@ -5,7 +5,7 @@ import { Button, Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react';
 import { AppContext } from '@/context/AppContext';
 // import { debounce } from 'lodash';
 
-import { getJson } from '@/tlbutils';
+import { getDefaulHumanJson } from '@/tlbutils';
 import { getTLBCodeByAST } from '@/tlbutils';
 import { ast } from '@ton-community/tlb-parser';
 
@@ -19,7 +19,7 @@ export const TypeMenu: React.FC = () => {
 		setSelectedType(value)
 		const tree = ast(tlbSchema);
 		let tlbCode = getTLBCodeByAST(tree, tlbSchema);
-		let humanReadableJson = await getJson(tlbCode, tlbCode.types.get(value)!);
+		let humanReadableJson = await getDefaulHumanJson(tlbCode, tlbCode.types.get(value)!);
 		setJsonData(
 			JSON.stringify(
 				humanReadableJson,

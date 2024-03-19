@@ -4,7 +4,7 @@ import { TLBCode, TLBConstructor, TLBField, TLBMathExpr, TLBFieldType, TLBType, 
 import { evaluateExpression, getSubStructName } from "./utils";
 import { importTonDependencies } from '../pages/Main/utils';
 
-export async function getJson(tlbCode: TLBCode, tlbType: TLBType) {
+export async function getDefaulHumanJson(tlbCode: TLBCode, tlbType: TLBType) {
     let jsonGen = new DefaultJsonGenerator(tlbCode);
     const { beginCell } = await importTonDependencies();
     jsonGen.beginCell = beginCell;
@@ -165,7 +165,6 @@ export class DefaultJsonGenerator {
       ) : any | undefined {
         let res: any | undefined = undefined;
 
-        // console.log(util.inspect(field, false, null, true /* enable colors */))
         if (fieldType.kind == "TLBNumberType") {
             res = 0;
         } else if (fieldType.kind == "TLBBitsType") {
@@ -209,21 +208,12 @@ export class DefaultJsonGenerator {
                         if (constructor.parameters[i].variable.isConst) {
                             let theExpr = constructor.parameters[i].variable.initialExpr;
                             if (theExpr) {
-                                // console.log(field.name, constructor.name, i, theExpr)
-                                // let expr = evaluateExpression(theExpr, y)
-                                // if (expr) {
                                 let argument = fieldType.arguments[i];
-                                // console.log(argument)
                                 if (argument.kind == "TLBExprMathType") {
-                                    // console.log(argument)
                                     if (argument.initialExpr instanceof TLBVarExpr) {
                                         y.set(argument.initialExpr.x, theExpr);
-                                        // console.log('it happens right now', argument.initialExpr.x)
                                     }
                                 }
-                                // y.set(fieldType.arguments[i]., theExpr);
-                                // console.log('it happens right now', fieldType.arguments[i].kind)
-                                // }
                             }
                         }
                     }
