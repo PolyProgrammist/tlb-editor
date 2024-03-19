@@ -6,6 +6,4 @@ export {
 
 // export { getJson } from "./kek";
 // export { toBase64 } from "./x";
-// export { fromBase64 } from "./y";
-
-export { fromBase64 } from "./lol";
+export { fromBase64 } from "./y";

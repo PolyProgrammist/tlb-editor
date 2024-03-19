@@ -1,12 +1,16 @@
-import { Address, BitString, Cell, Slice } from "@ton/core";
+import { importTonDependencies } from '../pages/Main/utils';
 
-export function fromBase64(base64: String, loadFunction: any) {
+export async function fromBase64(base64: String, loadFunction: any) {
+    const { Cell } = await importTonDependencies();;
+
     let cell = Cell.fromBase64(base64.toString())
     let loadedType = loadFunction(cell.beginParse());
     return typeToJson(loadedType);
 }
 
-function typeToJson(obj: any) {
+async function typeToJson(obj: any) {
+    const { Address, BitString, Slice } = await importTonDependencies();;
+
     let result: any = {}
     if (obj == undefined) {
         return null;
