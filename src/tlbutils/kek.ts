@@ -28,7 +28,7 @@ export function getJson(tlbCode: TLBCode, tlbType: TLBType) {
 let testkey = 'block'
 let methods = testkey == 'test' ? ALLMETHODS : ALLMETHODS_BLOCK;
 
-function g() {
+export function g() {
     const fixturesDir = path.resolve(__dirname, 'test')
     let inputPath = path.resolve(fixturesDir, 'tlb', testkey + '.tlb');
     let tlbCode = getTLBCode(inputPath);
@@ -63,22 +63,22 @@ function g() {
     })
 }
 
-// function onlyone() {
-//     const fixturesDir = path.resolve(__dirname, 'test')
-//     let inputPath = path.resolve(fixturesDir, 'tlb', testkey + '.tlb');
-//     let tlbCode = getTLBCode(inputPath);
+export function onlyone() {
+    const fixturesDir = path.resolve(__dirname, 'test')
+    let inputPath = path.resolve(fixturesDir, 'tlb', testkey + '.tlb');
+    let tlbCode = getTLBCode(inputPath);
 
-//     let tlbType = tlbCode.types.get('WorkchainDescr')!
-//     let before = getJson(tlbCode, tlbType)
-//     before = JSON.parse(JSON.stringify(before));
-//     // console.log(util.inspect(before, false, null, true));
-//     let after = convertViceVersa(before.kind, tlbCode, before, methods[tlbType.name][0], methods[tlbType.name][1]);
-//     after = JSON.parse(JSON.stringify(after));
-//     console.log(util.inspect(after, false, null, true));
-// }
+    let tlbType = tlbCode.types.get('WorkchainDescr')!
+    let before = getJson(tlbCode, tlbType)
+    before = JSON.parse(JSON.stringify(before));
+    // console.log(util.inspect(before, false, null, true));
+    let after = convertViceVersa(before.kind, tlbCode, before, methods[tlbType.name][0], methods[tlbType.name][1]);
+    after = JSON.parse(JSON.stringify(after));
+    console.log(util.inspect(after, false, null, true));
+}
 
 // f();
 // x();
-g()
+// g()
 // onlyone();
 // eval(`storeSimple`)

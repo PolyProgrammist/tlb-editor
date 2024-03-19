@@ -22,9 +22,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.0",
-    "ton": "^13.9.0",
-    "ton-core": "^0.53.0",
-    "ton-crypto": "^3.2.0"
+    "@ton/core": "^0.53.0"
   },
   "devDependencies": {
     "@rollup/plugin-inject": "^5.0.5",

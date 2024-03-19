@@ -11,7 +11,7 @@ import {
 	generateCodeByAST,
 	TypescriptGenerator,
 	// @ts-ignore
-} from '@polyprogrammist_test/tlb-codegen/build';
+} from '@/tlbutils';
 
 import { Editor } from '@/components/Editor';
 import { SerializedDataTypeTab } from '@/components/SerializedDataTypeTab';
