@@ -6,8 +6,8 @@ import { importTonDependencies } from '../pages/Main/utils';
 
 export async function getJson(tlbCode: TLBCode, tlbType: TLBType) {
     let jsonGen = new DefaultJsonGenerator(tlbCode);
-    const { Cell } = await importTonDependencies();
-    jsonGen.beginCell = Cell;
+    const { beginCell } = await importTonDependencies();
+    jsonGen.beginCell = beginCell;
 
     if (tlbType.constructors[0].parameters.length > 0) {
       return;

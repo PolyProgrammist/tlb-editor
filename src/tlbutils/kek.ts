@@ -9,9 +9,9 @@ import util from "util";
 import { getJson } from "./default_json";
 import { ALLMETHODS_BLOCK } from "./generated_block";
 
-function convertViceVersa(typeName: string, tlbCode: TLBCode, json: any, storeFunction: any, loadFunction: any) {
-    let base64 = toBase64(typeName, tlbCode, json, storeFunction)
-    let new_json = fromBase64(base64, loadFunction);
+async function convertViceVersa(typeName: string, tlbCode: TLBCode, json: any, storeFunction: any, loadFunction: any) {
+    let base64 = await toBase64(typeName, tlbCode, json, storeFunction)
+    let new_json = await fromBase64(base64, loadFunction);
     return new_json;
 }
 
@@ -36,7 +36,7 @@ export async function g() {
         try {
             before = await getJson(tlbCode, tlbType)
             console.log(util.inspect(before, false, null, true));
-            let after = convertViceVersa(before.kind, tlbCode, before, methods[tlbType.name][0], methods[tlbType.name][1]);
+            let after = await convertViceVersa(before.kind, tlbCode, before, methods[tlbType.name][0], methods[tlbType.name][1]);
             console.log(util.inspect(after, false, null, true));
             console.log('--------------------------------------------------------')
         } catch (error: any) {

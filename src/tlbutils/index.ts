@@ -1,6 +1,8 @@
 export {
 	generateCodeByAST,
 	TypescriptGenerator,
+	getTLBCode,
+	getTLBCodeByAST,
 	// @ts-ignore
 } from "@polyprogrammist_test/tlb-codegen/build";
 
