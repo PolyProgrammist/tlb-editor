@@ -19,7 +19,7 @@ import { TypeMenu } from '@/components/TypeMenu';
 import { AppContext } from '@/context/AppContext';
 import { fromBase64, getTLBCodeByAST, toBase64 } from '@/tlbutils';
 
-import { base64ToHex, hexToBase64, importTonDependencies } from './utils';
+import { base64ToHex, hexToBase64 } from './utils';
 
 let generator: TypescriptGenerator;
 let getGenerator = (tlbCode: any) => {
@@ -160,14 +160,10 @@ export const Main: React.FC = () => {
 				return;
 			}
 
-			const { beginCell } = await importTonDependencies();
-
 			type = type || selectedType;
 			if (!type) {
 				return;
 			}
-
-			const builder = beginCell();
 
 			console.log("logging value", JSON.parse(value));
 
