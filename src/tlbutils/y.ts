@@ -1,15 +1,17 @@
 import { importTonDependencies } from '../pages/Main/utils';
 
 export async function fromBase64(base64: String, loadFunction: any) {
+    console.log(base64, loadFunction)
     const { Cell } = await importTonDependencies();;
 
     let cell = Cell.fromBase64(base64.toString())
     let loadedType = loadFunction(cell.beginParse());
-    return typeToJson(loadedType);
+    console.log(loadedType)
+    return await typeToJson(loadedType);
 }
 
 async function typeToJson(obj: any) {
-    const { Address, BitString, Slice } = await importTonDependencies();;
+    const { Address, BitString, Slice, Dictionary } = await importTonDependencies();;
 
     let result: any = {}
     if (obj == undefined) {
@@ -31,13 +33,21 @@ async function typeToJson(obj: any) {
         result = obj.asCell().toBoc().toString('base64')
     } else if (Object.prototype.toString.call(obj) === '[object Array]') {
         result = []
-        obj.forEach((element: any) => {
-            result.push(typeToJson(element))
+        obj.forEach(async (element: any) => {
+            result.push(await typeToJson(element))
+        });
+    } else if (obj instanceof Dictionary) {
+        result = {}
+        obj.keys().forEach(async (key: any) => {
+            result[key] = await typeToJson(obj.get(key))
         });
     } else {
-        Object.keys(obj).forEach(function(key) {
-            result[key] = typeToJson(obj[key]);
+        // console.log(typeof obj);
+        Object.keys(obj).forEach(async function(key) {
+            result[key] = await typeToJson(obj[key]);
+            // console.log(key, result[key])
         });
     }
+    // console.log(result);
     return result;
 }

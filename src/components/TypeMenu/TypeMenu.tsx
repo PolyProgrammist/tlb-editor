@@ -1,10 +1,30 @@
-import React, { useContext } from 'react';
+import React, { useCallback, useContext } from 'react';
 
 import { Button, Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react';
 
 import { AppContext } from '@/context/AppContext';
+import { debounce } from 'lodash';
+
 
 export const TypeMenu: React.FC = () => {
+	const typeHandler = async (value = '') => {
+		setSelectedType(type)
+		console.log(value);
+	};
+
+	const handleTypeChangeDebounced = useCallback(
+		debounce(typeHandler, 1000),
+		[typeHandler]
+	);
+
+	const handleTlbChange = useCallback(
+		async (value, model) => {
+			await handleTypeChangeDebounced(value, model);
+		},
+		[handleTypeChangeDebounced]
+	);
+
+
 	const { types, tlbSchema, tlbError, selectedType, setSelectedType } =
 		useContext(AppContext);
 	return (

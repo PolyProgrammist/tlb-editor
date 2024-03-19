@@ -17,6 +17,7 @@ import { Editor } from '@/components/Editor';
 import { SerializedDataTypeTab } from '@/components/SerializedDataTypeTab';
 import { TypeMenu } from '@/components/TypeMenu';
 import { AppContext } from '@/context/AppContext';
+import { fromBase64 } from '@/tlbutils';
 
 import { base64ToHex, hexToBase64, importTonDependencies } from './utils';
 
@@ -97,21 +98,26 @@ export const Main: React.FC = () => {
 				return;
 			}
 
-			const { Cell } = await importTonDependencies();
-
 			type = type || selectedType;
 			if (!type) {
 				return;
 			}
 
-			const cs = Cell.fromBase64(value);
-			const slice = cs.beginParse();
+			// const cs = Cell.fromBase64(value);
+			// const slice = cs.beginParse();
 
 			const currentModule: {} = Object.keys(module).length
 				? module
 				: newModule || {};
 			//@ts-ignore
-			const json = currentModule[`load${type}`](slice);
+			let ft = currentModule[`load${type}`];
+			
+			// console.log('hueta')
+
+			// console.log(value, ft)
+
+			const json = await fromBase64(value, ft)//(slice);
+			console.log('hehey', json)
 			setJsonData(
 				JSON.stringify(
 					json,
@@ -302,9 +308,15 @@ export const Main: React.FC = () => {
 			setSelectedType(typeState);
 			setBase64(base64State);
 
+			if (typeState) {
+				console.log("typestate is: ", typeState)
+			}
+
 			if (base64State) {
+				console.log(base64State)
 				await serializedDataHandler(base64State, typeState, module);
 			} else if (jsonState) {
+				console.log(jsonState)
 				await jsonHandler(jsonState, typeState, module);
 			}
 		};
