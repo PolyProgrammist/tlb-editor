@@ -5,13 +5,13 @@ import LZString from 'lz-string';
 import { useSearchParams } from 'react-router-dom';
 import * as ts from 'typescript';
 import { Flex, Text } from '@chakra-ui/react';
-import { ast } from '@igorivaniuk/tlb-parser';
+import { ast } from '@ton-community/tlb-parser';
 import { OnChange } from '@monaco-editor/react';
 import {
 	generateCodeByAST,
 	TypescriptGenerator,
 	// @ts-ignore
-} from '@polyprogrammist_test/tlbgen/build';
+} from '@ton-community/tlb-codegen/build';
 
 import { Editor } from '@/components/Editor';
 import { SerializedDataTypeTab } from '@/components/SerializedDataTypeTab';
@@ -225,7 +225,7 @@ export const Main: React.FC = () => {
 
 			const jsCode = ts
 				.transpile(newCode, { target: 2 })
-				.replace(/import { ([^}]+) } from 'ton';/g, '');
+				.replace(/import { ([^}]+) } from '@ton\/core';/g, '');
 			const blob = new Blob([jsCode], {
 				type: 'application/javascript; charset=utf-8',
 			});

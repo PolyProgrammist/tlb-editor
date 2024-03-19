@@ -8,4 +8,6 @@ export {
 	generateCodeWithGenerator,
 } from './src/main';
 
-console.log('hello');
+export { getJson as getDefaultJson } from './kek';
+export { toBase64 as jsonToBase64 } from './src/generators/x';
+export { fromBase64 as base64ToJson } from './src/generators/y';

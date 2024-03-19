@@ -173,6 +173,6 @@ function onlyone() {
 
 // f();
 // x();
-g()
+// g()
 // onlyone();
 // eval(`storeSimple`)

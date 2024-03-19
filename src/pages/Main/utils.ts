@@ -1,7 +1,7 @@
 import { Buffer } from 'buffer';
 
 export const importTonDependencies = async () => {
-	const ton = await import('ton');
+	const ton = await import('@ton/core');
 
 	const { beginCell, Dictionary, Builder, Slice, BitString, Cell, Address } =
 		ton;
