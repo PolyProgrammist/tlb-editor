@@ -3,10 +3,7 @@ import React, { useContext } from 'react';
 import { Button, Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react';
 
 import { AppContext } from '@/context/AppContext';
-// import { debounce } from 'lodash';
-
-import { getDefaulHumanJson } from '@/tlbutils';
-import { getTLBCodeByAST } from '@/tlbutils';
+import { getDefaulHumanJson, getTLBCodeByAST } from '@/tlbutils';
 import { ast } from '@ton-community/tlb-parser';
 
 

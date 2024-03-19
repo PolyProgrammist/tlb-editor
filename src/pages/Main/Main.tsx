@@ -10,6 +10,9 @@ import { OnChange } from '@monaco-editor/react';
 import {
 	generateCodeByAST,
 	TypescriptGenerator,
+	base64ToHumanJson, 
+	getTLBCodeByAST, 
+	humanJsonToBase64
 	// @ts-ignore
 } from '@/tlbutils';
 
@@ -17,7 +20,6 @@ import { Editor } from '@/components/Editor';
 import { SerializedDataTypeTab } from '@/components/SerializedDataTypeTab';
 import { TypeMenu } from '@/components/TypeMenu';
 import { AppContext } from '@/context/AppContext';
-import { base64ToHumanJson, getTLBCodeByAST, humanJsonToBase64 } from '@/tlbutils';
 
 import { base64ToHex, hexToBase64 } from './utils';
 
