@@ -112,7 +112,7 @@ export const Main: React.FC = () => {
 			let ft = currentModule[`load${type}`];
 
 			const json = await base64ToHumanJson(value, ft);
-			console.log('hehey', json)
+
 			setJsonData(
 				JSON.stringify(
 					json,
@@ -299,15 +299,9 @@ export const Main: React.FC = () => {
 			setSelectedType(typeState);
 			setBase64(base64State);
 
-			if (typeState) {
-				console.log("typestate is: ", typeState)
-			}
-
 			if (base64State) {
-				console.log(base64State)
 				await serializedDataHandler(base64State, typeState, module);
 			} else if (jsonState) {
-				console.log(jsonState)
 				await jsonHandler(jsonState, typeState, module);
 			}
 		};
