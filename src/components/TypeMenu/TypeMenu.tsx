@@ -17,18 +17,16 @@ export const TypeMenu: React.FC = () => {
 
 	const handleTlbChange = async (value = '')  => {
 		setSelectedType(value)
-		console.log('type changed', value)
 		const tree = ast(tlbSchema);
 		let tlbCode = getTLBCodeByAST(tree, tlbSchema);
-		let x = await getJson(tlbCode, tlbCode.types.get(value)!);
+		let humanReadableJson = await getJson(tlbCode, tlbCode.types.get(value)!);
 		setJsonData(
 			JSON.stringify(
-				x,
+				humanReadableJson,
 				(_, value) => (typeof value === 'bigint' ? value.toString() : value),
 				'\t'
 			)
 		);
-		console.log("hello", x);
 	};
 
 	return (

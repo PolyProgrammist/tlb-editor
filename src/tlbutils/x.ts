@@ -14,7 +14,7 @@ export async function toBase64(typeName: string, tlbCode: TLBCode, json: any, me
     s.Cell = Cell;
     s.Dictionary = Dictionary;
     s.beginCell = beginCell;
-    s.jsonToType(typeName, tlbCode, json);
+    s = s.jsonToType(typeName, tlbCode, json);
     console.log(util.inspect(s, false, null, true))
     let builder = beginCell();
     method(s)(builder);

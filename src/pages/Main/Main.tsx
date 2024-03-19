@@ -17,7 +17,7 @@ import { Editor } from '@/components/Editor';
 import { SerializedDataTypeTab } from '@/components/SerializedDataTypeTab';
 import { TypeMenu } from '@/components/TypeMenu';
 import { AppContext } from '@/context/AppContext';
-import { fromBase64 } from '@/tlbutils';
+import { fromBase64, getTLBCodeByAST, toBase64 } from '@/tlbutils';
 
 import { base64ToHex, hexToBase64, importTonDependencies } from './utils';
 
@@ -169,13 +169,20 @@ export const Main: React.FC = () => {
 
 			const builder = beginCell();
 
-			console.log(JSON.parse(value));
+			console.log("logging value", JSON.parse(value));
+
+			// export async function toBase64(typeName: string, tlbCode: TLBCode, json: any, method: any) {
+
 
 			const currentModule = module || newModule;
-			let data =
-				currentModule[`store${type}`](JSON.parse(value))(builder) || '';
+			// let data =
+			// 	currentModule[`store${type}`](JSON.parse(value))(builder) || '';
 
-			data = builder.endCell().toBoc().toString('base64');
+			const tree = ast(tlbSchema);
+			let tlbCode = getTLBCodeByAST(tree, tlbSchema);
+			let data = await toBase64(type, tlbCode, JSON.parse(value), currentModule[`store${type}`]);
+			
+			// data = builder.endCell().toBoc().toString('base64');
 			// { "kind": "BitSelection", "a": 5,
 			// "b": 5 }
 
