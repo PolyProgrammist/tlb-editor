@@ -1,16 +1,29 @@
-import { beginCell } from "@ton/core";
 import { TLBCode, TLBConstructor, TLBField, TLBMathExpr, TLBFieldType, TLBType, TLBVarExpr, TLBParameter, TLBVariable 
     	// @ts-ignore
 } from "@polyprogrammist_test/tlb-codegen/build"
 import { evaluateExpression, getSubStructName } from "./utils";
+import { importTonDependencies } from '../pages/Main/utils';
+
+export async function getJson(tlbCode: TLBCode, tlbType: TLBType) {
+    let jsonGen = new DefaultJsonGenerator(tlbCode);
+    const { Cell } = await importTonDependencies();
+    jsonGen.beginCell = Cell;
+
+    if (tlbType.constructors[0].parameters.length > 0) {
+      return;
+    }
+    let res = jsonGen.addTlbType(tlbType)
+    return res;
+  }
+
 
 export type JsonContext = {
     constructorsReached: Set<String>;
     constructorsCalculated: Map<String, number>;
 }
-
 export class DefaultJsonGenerator {
     tlbCode: TLBCode;
+    beginCell: any;
 
     constructor(tlbCode: TLBCode) {
         this.tlbCode = tlbCode;
@@ -163,7 +176,7 @@ export class DefaultJsonGenerator {
                 throw new Error(`Number of bits should be known and not zero in field ${field.name}`)
             }
         } else if (fieldType.kind == "TLBCellType") {
-            res = beginCell().endCell().toBoc().toString('base64');
+            res = this.beginCell().endCell().toBoc().toString('base64');
         } else if (fieldType.kind == "TLBBoolType") {
             res = false;
         } else if (fieldType.kind == "TLBCoinsType") {
@@ -234,7 +247,7 @@ export class DefaultJsonGenerator {
         } else if (fieldType.kind == "TLBHashmapType") {
           res = {}
         } else if (fieldType.kind == "TLBExoticType") {
-            res = beginCell().endCell().toBoc().toString('base64');
+            res = this.beginCell().endCell().toBoc().toString('base64');
         } else {
             throw `No such kind`;
         }
@@ -259,7 +272,7 @@ export class DefaultJsonGenerator {
                     }
                 }
             } else if (argument.kind == 'TLBCellType') {
-                parameters.push(beginCell().endCell().toBoc().toString('base64'))
+                parameters.push(this.beginCell().endCell().toBoc().toString('base64'))
             } else if (argument.kind == 'TLBCellInsideType') {
                 let currentParameters = this.getParameters([argument.value], ctx, y);
                 parameters = parameters.concat(currentParameters)

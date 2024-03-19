@@ -6,7 +6,7 @@ import { fromBase64 } from "./y";
 import { ALLMETHODS, } from "./generated_test";
 import path from "path";
 import util from "util";
-import { DefaultJsonGenerator } from "./default_json";
+import { getJson } from "./default_json";
 import { ALLMETHODS_BLOCK } from "./generated_block";
 
 function convertViceVersa(typeName: string, tlbCode: TLBCode, json: any, storeFunction: any, loadFunction: any) {
@@ -15,26 +15,16 @@ function convertViceVersa(typeName: string, tlbCode: TLBCode, json: any, storeFu
     return new_json;
 }
 
-export function getJson(tlbCode: TLBCode, tlbType: TLBType) {
-    let jsonGen = new DefaultJsonGenerator(tlbCode);
-    
-    if (tlbType.constructors[0].parameters.length > 0) {
-      return;
-    }
-    let res = jsonGen.addTlbType(tlbType)
-    return res;
-  }
-
 let testkey = 'block'
 let methods = testkey == 'test' ? ALLMETHODS : ALLMETHODS_BLOCK;
 
-export function g() {
+export async function g() {
     const fixturesDir = path.resolve(__dirname, 'test')
     let inputPath = path.resolve(fixturesDir, 'tlb', testkey + '.tlb');
     let tlbCode = getTLBCode(inputPath);
     
     let i = 0;
-    tlbCode.types.forEach((tlbType: TLBType) => {
+    tlbCode.types.forEach(async (tlbType: TLBType) => {
         if (tlbType.constructors[0].parameters.length > 0) {
             return;
         }
@@ -44,7 +34,7 @@ export function g() {
         console.log(tlbType.name)
         let before: any;
         try {
-            before = getJson(tlbCode, tlbType)
+            before = await getJson(tlbCode, tlbType)
             console.log(util.inspect(before, false, null, true));
             let after = convertViceVersa(before.kind, tlbCode, before, methods[tlbType.name][0], methods[tlbType.name][1]);
             console.log(util.inspect(after, false, null, true));
@@ -63,13 +53,13 @@ export function g() {
     })
 }
 
-export function onlyone() {
+export async function onlyone() {
     const fixturesDir = path.resolve(__dirname, 'test')
     let inputPath = path.resolve(fixturesDir, 'tlb', testkey + '.tlb');
     let tlbCode = getTLBCode(inputPath);
 
     let tlbType = tlbCode.types.get('WorkchainDescr')!
-    let before = getJson(tlbCode, tlbType)
+    let before = await getJson(tlbCode, tlbType)
     before = JSON.parse(JSON.stringify(before));
     // console.log(util.inspect(before, false, null, true));
     let after = convertViceVersa(before.kind, tlbCode, before, methods[tlbType.name][0], methods[tlbType.name][1]);
