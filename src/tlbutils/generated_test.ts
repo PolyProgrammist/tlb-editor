@@ -1,14 +1,13 @@
-import { Builder } from 'ton'
-import { Slice } from 'ton'
-import { beginCell } from 'ton'
-import { BitString } from 'ton'
-import { Cell } from 'ton'
-import { Address } from 'ton'
-import { ExternalAddress } from 'ton'
-import { Dictionary } from 'ton'
-import { DictionaryValue } from 'ton'
+import { Builder } from '@ton/core'
+import { Slice } from '@ton/core'
+import { beginCell } from '@ton/core'
+import { BitString } from '@ton/core'
+import { Cell } from '@ton/core'
+import { Address } from '@ton/core'
+import { ExternalAddress } from '@ton/core'
+import { Dictionary } from '@ton/core'
 export function bitLen(n: number) {
-    return n.toString(2).length;;
+    return n.toString(2).length;
 }
 
 // tmpa$_ a:# b:# = Simple;
@@ -208,7 +207,7 @@ export interface IntBits<Arg> {
     readonly d: number;
     readonly g: BitString;
     readonly arg: Arg;
-    readonly x: Slice;
+    readonly x: Cell;
 }
 
 // a$_ {x:#} a:(IntBits (int (1 + x))) = IntBitsInside (x * 2);
@@ -236,7 +235,7 @@ export interface IntBitsParametrized {
     readonly i: BitString;
     readonly j: number;
     readonly k: bigint;
-    readonly tc: Slice;
+    readonly tc: Cell;
 }
 
 // a$_ {x:#} a:(IntBitsParametrized x) = IntBitsParametrizedInside x;
@@ -587,7 +586,7 @@ export interface ParamNamedArgInSecondConstr_b {
 
 export interface RefCombinatorAny {
     readonly kind: 'RefCombinatorAny';
-    readonly msg: Maybe<Slice>;
+    readonly msg: Maybe<Cell>;
 }
 
 // a$_ n:# { 5 + n = 7 } = EqualityExpression;
@@ -680,7 +679,7 @@ export interface RefCombinatorInRefHelper<X> {
 
 export interface RefCombinatorInRef {
     readonly kind: 'RefCombinatorInRef';
-    readonly msg: RefCombinatorInRefHelper<Slice>;
+    readonly msg: RefCombinatorInRefHelper<Cell>;
 }
 
 // _ a:Bool = BoolUser;
@@ -858,6 +857,41 @@ export interface HashmapAugNode_ahmn_fork<X, Y> {
 export interface HashmapAugEUser {
     readonly kind: 'HashmapAugEUser';
     readonly x: Dictionary<number, {value: bigint, extra: FixedIntParam}>;
+}
+
+// message$_ {X:Type} body:(Either X ^X) = Message X;
+
+export interface Message<X> {
+    readonly kind: 'Message';
+    readonly body: Either<X, X>;
+}
+
+// _ (Message Any) = MessageAny;
+
+export interface MessageAny {
+    readonly kind: 'MessageAny';
+    readonly anon0: Message<Cell>;
+}
+
+// _ x:^FixedIntParam = ShardState;
+
+export interface ShardState {
+    readonly kind: 'ShardState';
+    readonly x: FixedIntParam;
+}
+
+// a$_ {X:Type} a:^X = InsideCell X;
+
+export interface InsideCell<X> {
+    readonly kind: 'InsideCell';
+    readonly a: X;
+}
+
+// a$_ inside_cell:^(InsideCell ShardState) = InsideCellUser;
+
+export interface InsideCellUser {
+    readonly kind: 'InsideCellUser';
+    readonly inside_cell: InsideCell<ShardState>;
 }
 
 // tmpa$_ a:# b:# = Simple;
@@ -1307,7 +1341,7 @@ export function storeComplexTypedField(complexTypedField: ComplexTypedField): (b
 // a$_ a:^ExprArgUser = CellTypedField;
 
 export function loadCellTypedField(slice: Slice): CellTypedField {
-    let slice1 = slice.loadRef().beginParse();
+    let slice1 = slice.loadRef().beginParse(true);
     let a: ExprArgUser = loadExprArgUser(slice1);
     return {
         kind: 'CellTypedField',
@@ -1329,16 +1363,16 @@ export function storeCellTypedField(_cellTypedField: CellTypedField): (builder: 
 
 export function loadCellsSimple(slice: Slice): CellsSimple {
     let t: number = slice.loadUint(32);
-    let slice1 = slice.loadRef().beginParse();
+    let slice1 = slice.loadRef().beginParse(true);
     let q: number = slice1.loadUint(32);
-    let slice2 = slice.loadRef().beginParse();
+    let slice2 = slice.loadRef().beginParse(true);
     let a: number = slice2.loadUint(32);
-    let slice21 = slice2.loadRef().beginParse();
+    let slice21 = slice2.loadRef().beginParse(true);
     let e: number = slice21.loadUint(32);
-    let slice22 = slice2.loadRef().beginParse();
+    let slice22 = slice2.loadRef().beginParse(true);
     let b: number = slice22.loadUint(32);
     let d: number = slice22.loadUint(32);
-    let slice221 = slice22.loadRef().beginParse();
+    let slice221 = slice22.loadRef().beginParse(true);
     let c: number = slice221.loadUint(32);
     return {
         kind: 'CellsSimple',
@@ -1382,7 +1416,7 @@ export function loadIntBits<Arg>(slice: Slice, loadArg: (slice: Slice) => Arg): 
     let d: number = slice.loadInt(11);
     let g: BitString = slice.loadBits(2);
     let arg: Arg = loadArg(slice);
-    let x: Slice = slice;
+    let x: Cell = slice.asCell();
     return {
         kind: 'IntBits',
         d: d,
@@ -1398,7 +1432,7 @@ export function storeIntBits<Arg>(intBits: IntBits<Arg>, storeArg: (arg: Arg) =>
         builder.storeInt(intBits.d, 11);
         builder.storeBits(intBits.g);
         storeArg(intBits.arg)(builder);
-        builder.storeSlice(intBits.x);
+        builder.storeSlice(intBits.x.beginParse(true));
     })
 
 }
@@ -1456,7 +1490,7 @@ export function loadIntBitsParametrized(slice: Slice, e: number): IntBitsParamet
     let i: BitString = slice.loadBits((5 + e));
     let j: number = slice.loadInt(5);
     let k: bigint = slice.loadUintBig(e);
-    let tc: Slice = slice;
+    let tc: Cell = slice.asCell();
     return {
         kind: 'IntBitsParametrized',
         e: e,
@@ -1477,7 +1511,7 @@ export function storeIntBitsParametrized(intBitsParametrized: IntBitsParametrize
         builder.storeBits(intBitsParametrized.i);
         builder.storeInt(intBitsParametrized.j, 5);
         builder.storeUint(intBitsParametrized.k, intBitsParametrized.e);
-        builder.storeSlice(intBitsParametrized.tc);
+        builder.storeSlice(intBitsParametrized.tc.beginParse(true));
     })
 
 }
@@ -1994,19 +2028,19 @@ export function loadCombArgCellRef<X>(slice: Slice, loadX: (slice: Slice) => X):
     let info: number = slice.loadInt(32);
     let init: Maybe<Either<X, number>> = loadMaybe<Either<X, number>>(slice, ((slice: Slice) => {
         return loadEither<X, number>(slice, loadX, ((slice: Slice) => {
-            let slice1 = slice.loadRef().beginParse();
+            let slice1 = slice.loadRef().beginParse(true);
             return slice1.loadInt(22)
 
         }))
 
     }));
     let other: Either<X, OneComb<X>> = loadEither<X, OneComb<X>>(slice, loadX, ((slice: Slice) => {
-        let slice1 = slice.loadRef().beginParse();
+        let slice1 = slice.loadRef().beginParse(true);
         return loadOneComb<X>(slice1, loadX)
 
     }));
     let body: Either<X, X> = loadEither<X, X>(slice, loadX, ((slice: Slice) => {
-        let slice1 = slice.loadRef().beginParse();
+        let slice1 = slice.loadRef().beginParse(true);
         return loadX(slice1)
 
     }));
@@ -2088,7 +2122,7 @@ export function storeCombArgCellRefUser(combArgCellRefUser: CombArgCellRefUser):
 // a$_ {n:#} ref:^(BitLenArg (n + 2)) = MathExprAsCombArg (n + 2);
 
 export function loadMathExprAsCombArg(slice: Slice, arg0: number): MathExprAsCombArg {
-    let slice1 = slice.loadRef().beginParse();
+    let slice1 = slice.loadRef().beginParse(true);
     let ref: BitLenArg = loadBitLenArg(slice1, ((arg0 - 2) + 2));
     return {
         kind: 'MathExprAsCombArg',
@@ -2258,9 +2292,9 @@ export function loadHashmapNode<X>(slice: Slice, arg0: number, loadX: (slice: Sl
 
     }
     if (true) {
-        let slice1 = slice.loadRef().beginParse();
+        let slice1 = slice.loadRef().beginParse(true);
         let left: Hashmap<X> = loadHashmap<X>(slice1, (arg0 - 1), loadX);
-        let slice2 = slice.loadRef().beginParse();
+        let slice2 = slice.loadRef().beginParse(true);
         let right: Hashmap<X> = loadHashmap<X>(slice2, (arg0 - 1), loadX);
         return {
             kind: 'HashmapNode_hmn_fork',
@@ -2617,9 +2651,9 @@ export function storeParamNamedArgInSecondConstr(paramNamedArgInSecondConstr: Pa
 // a$_ msg:^(Maybe Any) = RefCombinatorAny;
 
 export function loadRefCombinatorAny(slice: Slice): RefCombinatorAny {
-    let slice1 = slice.loadRef().beginParse();
-    let msg: Maybe<Slice> = loadMaybe<Slice>(slice1, ((slice: Slice) => {
-        return slice
+    let slice1 = slice.loadRef().beginParse(true);
+    let msg: Maybe<Cell> = loadMaybe<Cell>(slice1, ((slice: Slice) => {
+        return slice.asCell()
 
     }));
     return {
@@ -2632,9 +2666,9 @@ export function loadRefCombinatorAny(slice: Slice): RefCombinatorAny {
 export function storeRefCombinatorAny(refCombinatorAny: RefCombinatorAny): (builder: Builder) => void {
     return ((builder: Builder) => {
         let cell1 = beginCell();
-        storeMaybe<Slice>(refCombinatorAny.msg, ((arg: Slice) => {
+        storeMaybe<Cell>(refCombinatorAny.msg, ((arg: Cell) => {
             return ((builder: Builder) => {
-                builder.storeSlice(arg);
+                builder.storeSlice(arg.beginParse(true));
             })
 
         }))(cell1);
@@ -2672,7 +2706,7 @@ export function storeEqualityExpression(equalityExpression: EqualityExpression):
 export function loadConditionalRef(slice: Slice): ConditionalRef {
     let x: number = slice.loadUint(1);
     let y: Simple | undefined = (x ? ((slice: Slice) => {
-        let slice1 = slice.loadRef().beginParse();
+        let slice1 = slice.loadRef().beginParse(true);
         return loadSimple(slice1)
 
     })(slice) : undefined);
@@ -2879,7 +2913,7 @@ export function storeCheckKeyword(checkKeyword: CheckKeyword): (builder: Builder
 export function loadRefCombinatorInRefHelper<X>(slice: Slice, loadX: (slice: Slice) => X): RefCombinatorInRefHelper<X> {
     let t: number = slice.loadUint(32);
     let y: Maybe<X> = loadMaybe<X>(slice, ((slice: Slice) => {
-        let slice1 = slice.loadRef().beginParse();
+        let slice1 = slice.loadRef().beginParse(true);
         return loadX(slice1)
 
     }));
@@ -2910,9 +2944,9 @@ export function storeRefCombinatorInRefHelper<X>(refCombinatorInRefHelper: RefCo
 // a$_ msg:^(RefCombinatorInRefHelper Any) = RefCombinatorInRef;
 
 export function loadRefCombinatorInRef(slice: Slice): RefCombinatorInRef {
-    let slice1 = slice.loadRef().beginParse();
-    let msg: RefCombinatorInRefHelper<Slice> = loadRefCombinatorInRefHelper<Slice>(slice1, ((slice: Slice) => {
-        return slice
+    let slice1 = slice.loadRef().beginParse(true);
+    let msg: RefCombinatorInRefHelper<Cell> = loadRefCombinatorInRefHelper<Cell>(slice1, ((slice: Slice) => {
+        return slice.asCell()
 
     }));
     return {
@@ -2925,9 +2959,9 @@ export function loadRefCombinatorInRef(slice: Slice): RefCombinatorInRef {
 export function storeRefCombinatorInRef(refCombinatorInRef: RefCombinatorInRef): (builder: Builder) => void {
     return ((builder: Builder) => {
         let cell1 = beginCell();
-        storeRefCombinatorInRefHelper<Slice>(refCombinatorInRef.msg, ((arg: Slice) => {
+        storeRefCombinatorInRefHelper<Cell>(refCombinatorInRef.msg, ((arg: Cell) => {
             return ((builder: Builder) => {
-                builder.storeSlice(arg);
+                builder.storeSlice(arg.beginParse(true));
             })
 
         }))(cell1);
@@ -3160,7 +3194,7 @@ export function loadHashmapTPCell(slice: Slice): HashmapTPCell {
     let x: Dictionary<bigint, TypedParam> = Dictionary.load(Dictionary.Keys.BigUint(100), {
         serialize: () => { throw new Error('Not implemented') },
         parse: ((slice: Slice) => {
-        let slice1 = slice.loadRef().beginParse();
+        let slice1 = slice.loadRef().beginParse(true);
         return loadTypedParam(slice1)
 
     }),
@@ -3425,9 +3459,9 @@ export function loadHashmapAugNode<X, Y>(slice: Slice, arg0: number, loadX: (sli
 
     }
     if (true) {
-        let slice1 = slice.loadRef().beginParse();
+        let slice1 = slice.loadRef().beginParse(true);
         let left: HashmapAug<X, Y> = loadHashmapAug<X, Y>(slice1, (arg0 - 1), loadX, loadY);
-        let slice2 = slice.loadRef().beginParse();
+        let slice2 = slice.loadRef().beginParse(true);
         let right: HashmapAug<X, Y> = loadHashmapAug<X, Y>(slice2, (arg0 - 1), loadX, loadY);
         let extra: Y = loadY(slice);
         return {
@@ -3508,3 +3542,184 @@ export function storeHashmapAugEUser(hashmapAugEUser: HashmapAugEUser): (builder
 
 }
 
+// message$_ {X:Type} body:(Either X ^X) = Message X;
+
+export function loadMessage<X>(slice: Slice, loadX: (slice: Slice) => X): Message<X> {
+    let body: Either<X, X> = loadEither<X, X>(slice, loadX, ((slice: Slice) => {
+        let slice1 = slice.loadRef().beginParse(true);
+        return loadX(slice1)
+
+    }));
+    return {
+        kind: 'Message',
+        body: body,
+    }
+
+}
+
+export function storeMessage<X>(message: Message<X>, storeX: (x: X) => (builder: Builder) => void): (builder: Builder) => void {
+    return ((builder: Builder) => {
+        storeEither<X, X>(message.body, storeX, ((arg: X) => {
+            return ((builder: Builder) => {
+                let cell1 = beginCell();
+                storeX(arg)(cell1);
+                builder.storeRef(cell1);
+
+            })
+
+        }))(builder);
+    })
+
+}
+
+// _ (Message Any) = MessageAny;
+
+export function loadMessageAny(slice: Slice): MessageAny {
+    let anon0: Message<Cell> = loadMessage<Cell>(slice, ((slice: Slice) => {
+        return slice.asCell()
+
+    }));
+    return {
+        kind: 'MessageAny',
+        anon0: anon0,
+    }
+
+}
+
+export function storeMessageAny(messageAny: MessageAny): (builder: Builder) => void {
+    return ((builder: Builder) => {
+        storeMessage<Cell>(messageAny.anon0, ((arg: Cell) => {
+            return ((builder: Builder) => {
+                builder.storeSlice(arg.beginParse(true));
+            })
+
+        }))(builder);
+    })
+
+}
+
+// _ x:^FixedIntParam = ShardState;
+
+export function loadShardState(slice: Slice): ShardState {
+    let slice1 = slice.loadRef().beginParse(true);
+    let x: FixedIntParam = loadFixedIntParam(slice1);
+    return {
+        kind: 'ShardState',
+        x: x,
+    }
+
+}
+
+export function storeShardState(shardState: ShardState): (builder: Builder) => void {
+    return ((builder: Builder) => {
+        let cell1 = beginCell();
+        storeFixedIntParam(shardState.x)(cell1);
+        builder.storeRef(cell1);
+    })
+
+}
+
+// a$_ {X:Type} a:^X = InsideCell X;
+
+export function loadInsideCell<X>(slice: Slice, loadX: (slice: Slice) => X): InsideCell<X> {
+    let slice1 = slice.loadRef().beginParse(true);
+    let a: X = loadX(slice1);
+    return {
+        kind: 'InsideCell',
+        a: a,
+    }
+
+}
+
+export function storeInsideCell<X>(insideCell: InsideCell<X>, storeX: (x: X) => (builder: Builder) => void): (builder: Builder) => void {
+    return ((builder: Builder) => {
+        let cell1 = beginCell();
+        storeX(insideCell.a)(cell1);
+        builder.storeRef(cell1);
+    })
+
+}
+
+// a$_ inside_cell:^(InsideCell ShardState) = InsideCellUser;
+
+export function loadInsideCellUser(slice: Slice): InsideCellUser {
+    let slice1 = slice.loadRef().beginParse(true);
+    let inside_cell: InsideCell<ShardState> = loadInsideCell<ShardState>(slice1, loadShardState);
+    return {
+        kind: 'InsideCellUser',
+        inside_cell: inside_cell,
+    }
+
+}
+
+export function storeInsideCellUser(insideCellUser: InsideCellUser): (builder: Builder) => void {
+    return ((builder: Builder) => {
+        let cell1 = beginCell();
+        storeInsideCell<ShardState>(insideCellUser.inside_cell, storeShardState)(cell1);
+        builder.storeRef(cell1);
+    })
+
+}
+
+export let ALLMETHODS: any = {
+    'Simple': [storeSimple, loadSimple],
+'TypedArgUser': [storeTypedArgUser, loadTypedArgUser],
+'ParamAndTypedArgUser': [storeParamAndTypedArgUser, loadParamAndTypedArgUser],
+'TwoSimples': [storeTwoSimples, loadTwoSimples],
+'TwoMaybes': [storeTwoMaybes, loadTwoMaybes],
+'TwoConstructors': [storeTwoConstructors, loadTwoConstructors],
+'FixedIntParam': [storeFixedIntParam, loadFixedIntParam],
+'TypedField': [storeTypedField, loadTypedField],
+'SharpConstructor': [storeSharpConstructor, loadSharpConstructor],
+'TypedParam': [storeTypedParam, loadTypedParam],
+'BitLenArgUser': [storeBitLenArgUser, loadBitLenArgUser],
+'ExprArgUser': [storeExprArgUser, loadExprArgUser],
+'ComplexTypedField': [storeComplexTypedField, loadComplexTypedField],
+'CellTypedField': [storeCellTypedField, loadCellTypedField],
+'CellsSimple': [storeCellsSimple, loadCellsSimple],
+'IntBitsOutside': [storeIntBitsOutside, loadIntBitsOutside],
+'IntBitsParametrizedOutside': [storeIntBitsParametrizedOutside, loadIntBitsParametrizedOutside],
+'LessThan': [storeLessThan, loadLessThan],
+'ManyComb': [storeManyComb, loadManyComb],
+'ParamDifNamesUser': [storeParamDifNamesUser, loadParamDifNamesUser],
+'UnaryUserCheckOrder': [storeUnaryUserCheckOrder, loadUnaryUserCheckOrder],
+'CombArgCellRefUser': [storeCombArgCellRefUser, loadCombArgCellRefUser],
+'EmptyTag': [storeEmptyTag, loadEmptyTag],
+'SharpTag': [storeSharpTag, loadSharpTag],
+'DollarTag': [storeDollarTag, loadDollarTag],
+'TupleCheck': [storeTupleCheck, loadTupleCheck],
+'HashmapEUser': [storeHashmapEUser, loadHashmapEUser],
+'ConditionalField': [storeConditionalField, loadConditionalField],
+'BitSelection': [storeBitSelection, loadBitSelection],
+'ImplicitCondition': [storeImplicitCondition, loadImplicitCondition],
+'True': [storeTrue, loadTrue],
+'RefCombinatorAny': [storeRefCombinatorAny, loadRefCombinatorAny],
+'EqualityExpression': [storeEqualityExpression, loadEqualityExpression],
+'ConditionalRef': [storeConditionalRef, loadConditionalRef],
+'LoadFromNegationOutsideExpr': [storeLoadFromNegationOutsideExpr, loadLoadFromNegationOutsideExpr],
+'AnonymousData': [storeAnonymousData, loadAnonymousData],
+'FalseAnonField': [storeFalseAnonField, loadFalseAnonField],
+'ConstructorOrder': [storeConstructorOrder, loadConstructorOrder],
+'CheckCrc32': [storeCheckCrc32, loadCheckCrc32],
+'CheckKeyword': [storeCheckKeyword, loadCheckKeyword],
+'RefCombinatorInRef': [storeRefCombinatorInRef, loadRefCombinatorInRef],
+'BoolUser': [storeBoolUser, loadBoolUser],
+'Anycast': [storeAnycast, loadAnycast],
+'AddressUser': [storeAddressUser, loadAddressUser],
+'ExtAddressUser': [storeExtAddressUser, loadExtAddressUser],
+'AnyAddressUser': [storeAnyAddressUser, loadAnyAddressUser],
+'InsideAddressUser': [storeInsideAddressUser, loadInsideAddressUser],
+'BitUser': [storeBitUser, loadBitUser],
+'VarUIntegerUser': [storeVarUIntegerUser, loadVarUIntegerUser],
+'VarIntegerUser': [storeVarIntegerUser, loadVarIntegerUser],
+'GramsUser': [storeGramsUser, loadGramsUser],
+'HashmapVUIUser': [storeHashmapVUIUser, loadHashmapVUIUser],
+'HashmapTPCell': [storeHashmapTPCell, loadHashmapTPCell],
+'HashmapVarKeyUser': [storeHashmapVarKeyUser, loadHashmapVarKeyUser],
+'HashmapExprKeyUser': [storeHashmapExprKeyUser, loadHashmapExprKeyUser],
+'HashmapOneCombUser': [storeHashmapOneCombUser, loadHashmapOneCombUser],
+'HashmapAugEUser': [storeHashmapAugEUser, loadHashmapAugEUser],
+'MessageAny': [storeMessageAny, loadMessageAny],
+'InsideCellUser': [storeInsideCellUser, loadInsideCellUser],
+'ShardState': [storeShardState, loadShardState],
+}

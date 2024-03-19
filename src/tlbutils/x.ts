@@ -1,9 +1,9 @@
-import { Address, BitString, Cell, Dictionary, beginCell } from "ton-core";
-import { Simple, storeSimple } from "../../test/generated_files/generated_test";
-import { TLBCode, TLBConstructor, TLBField, TLBFieldType, TLBType } from "../ast";
-import { getSubStructName } from "../utils";
+import { Address, Cell, Dictionary, beginCell } from "@ton/core";
+import { TLBCode, TLBConstructor, TLBField, TLBFieldType, TLBType, TLBVariable
+    	// @ts-ignore
+    } from "@polyprogrammist_test/tlb-codegen/build";
+import { getSubStructName, evaluateExpression } from "./utils";
 import util from 'util';
-import { evaluateExpression } from "../astbuilder/utils";
 
 let constructorsIndex: Map<string, TLBConstructor> = new Map<string, TLBConstructor>();
 
@@ -17,8 +17,8 @@ export function toBase64(typeName: string, tlbCode: TLBCode, json: any, method: 
 
 function fillConstructorIndex(tlbCode: TLBCode) {
     if (constructorsIndex.size == 0) {
-        tlbCode.types.forEach(tlbType => {
-            tlbType.constructors.forEach(constructor => {
+        tlbCode.types.forEach((tlbType: TLBType) => {
+            tlbType.constructors.forEach((constructor: TLBConstructor) => {
                 constructorsIndex.set(getSubStructName(tlbType, constructor), constructor);
             })
         })
@@ -58,7 +58,7 @@ function getTLBConstructorResult(kindName: string, constructor: TLBConstructor, 
     let result: any = {};
     result.kind = kindName;
 
-    constructor.variables.forEach(variable => {
+    constructor.variables.forEach((variable: TLBVariable) => {
         if (variable.type == "#" && !variable.isField) {
             result[variable.name] = json[variable.name];
         }
@@ -69,7 +69,7 @@ function getTLBConstructorResult(kindName: string, constructor: TLBConstructor, 
         y.set(constructor.parameters[i].variable.name, parameters[i]);
     }
 
-    constructor.fields.forEach((field) => {
+    constructor.fields.forEach((field: TLBField) => {
         let json_to_pass = json.hasOwnProperty(field.name) ? json[field.name] : json;
         Object.assign(result, handleField(field, tlbCode, json_to_pass, y))
     });
@@ -88,7 +88,7 @@ function handleField(
         return res
     } else {
         let res: any = {}
-        field.subFields.forEach((fieldDef) => {
+        field.subFields.forEach((fieldDef: TLBField) => {
             let json_to_pass = json[fieldDef.name] != undefined ? json[fieldDef.name] : json;
             Object.assign(res, handleField(fieldDef, tlbCode, json_to_pass, y))
         });
@@ -141,7 +141,7 @@ function handleType(
         }
         res = builder.endCell().beginParse().loadBits(json.length - 2)
     } else if (fieldType.kind == "TLBCellType") {
-        res = Cell.fromBase64(json.toString()).beginParse();
+        res = Cell.fromBase64(json.toString());
     } else if (fieldType.kind == "TLBBoolType") {
         res = json;
     } else if (fieldType.kind == "TLBCoinsType") {

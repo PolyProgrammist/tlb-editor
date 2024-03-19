@@ -1,4 +1,4 @@
-import { Address, BitString, Cell, Slice } from "ton-core";
+import { Address, BitString, Cell, Slice } from "@ton/core";
 
 export function fromBase64(base64: String, loadFunction: any) {
     let cell = Cell.fromBase64(base64.toString())

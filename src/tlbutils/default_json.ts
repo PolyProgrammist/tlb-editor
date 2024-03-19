@@ -1,28 +1,21 @@
-import { beginCell } from "ton";
-import { TLBCode, TLBConstructor, TLBField, TLBMathExpr, TLBFieldType, TLBNumberExpr, TLBParameter, TLBType, TLBVarExpr, TLBNamedType } from "../../ast"
-import { CodeBuilder } from "../CodeBuilder"
-import { CodeGenerator, CommonGenDeclaration } from "../generator"
-import { Expression, GenDeclaration, ObjectExpression, ObjectProperty, TheNode, id, tDeclareVariable, tIdentifier, tNumericLiteral, tObjectExpression, tObjectProperty, tStringLiteral, tTypedIdentifier, toCode } from "../typescript/tsgen"
-import { getSubStructName } from "../../utils";
-import { evaluateExpression } from "../../astbuilder/utils";
-import util from 'util'
+import { beginCell } from "@ton/core";
+import { TLBCode, TLBConstructor, TLBField, TLBMathExpr, TLBFieldType, TLBType, TLBVarExpr, TLBParameter, TLBVariable 
+    	// @ts-ignore
+} from "@polyprogrammist_test/tlb-codegen/build"
+import { evaluateExpression, getSubStructName } from "./utils";
 
 export type JsonContext = {
     constructorsReached: Set<String>;
     constructorsCalculated: Map<String, number>;
 }
 
-export class DefaultJsonGenerator implements CodeGenerator {
-    jsCodeDeclarations: GenDeclaration[] = [];
-    jsCodeConstructorDeclarations: CommonGenDeclaration[] = []
-    jsCodeFunctionsDeclarations: CommonGenDeclaration[] = []
+export class DefaultJsonGenerator {
     tlbCode: TLBCode;
 
     constructor(tlbCode: TLBCode) {
         this.tlbCode = tlbCode;
     }
 
-    addTonCoreClassUsage(name: string): void {}
     addBitLenFunction(): void {}
 
     addTlbType(tlbType: TLBType): any {
@@ -37,19 +30,19 @@ export class DefaultJsonGenerator implements CodeGenerator {
         return x;
     }
 
-    getTLBTypeNameResult(tlbTypeName: string, ctx: JsonContext, parameters: TLBMathExpr[]): ObjectExpression | undefined {
+    getTLBTypeNameResult(tlbTypeName: string, ctx: JsonContext, parameters: TLBMathExpr[]): any | undefined {
         let tlbType = this.tlbCode.types.get(tlbTypeName);
         if (tlbType) {
             return this.getTLBTypeResult(tlbType, ctx, parameters);
         }
     }
 
-    getTLBConstructorResult(tlbType: TLBType, constructor: TLBConstructor, ctx: JsonContext, parameters: TLBMathExpr[], constructorIdx: number): ObjectExpression | undefined {
+    getTLBConstructorResult(tlbType: TLBType, constructor: TLBConstructor, ctx: JsonContext, parameters: TLBMathExpr[], constructorIdx: number): any | undefined {
         ctx.constructorsReached.add(tlbType.name);
         let x: any = {};
 
         let hasParams = false;
-        constructor.parameters.forEach(parameter => {
+        constructor.parameters.forEach((parameter: TLBParameter) => {
             if (parameter.variable.type == 'Type') {
                 hasParams = true;
             }
@@ -65,7 +58,7 @@ export class DefaultJsonGenerator implements CodeGenerator {
 
         x.kind = getSubStructName(tlbType, constructor);
         
-        constructor.variables.forEach(variable => {
+        constructor.variables.forEach((variable: TLBVariable) => {
             if (variable.type == "#" && !variable.isField) {
                 if (y.has(variable.name)) {
                     x[variable.name] = y.get(variable.name);
@@ -77,7 +70,7 @@ export class DefaultJsonGenerator implements CodeGenerator {
 
         let ok = true;
 
-        constructor.fields.forEach((field) => {
+        constructor.fields.forEach((field: TLBField) => {
             let handleFieldResult = this.handleField(field, x, ctx, y);
             if (!handleFieldResult) {
                 ok = false;
@@ -88,7 +81,7 @@ export class DefaultJsonGenerator implements CodeGenerator {
             return undefined;
         }
 
-        constructor.variables.forEach(variable => {
+        constructor.variables.forEach((variable: TLBVariable) => {
             if (variable.type == "#") {
                 if (y.has(variable.name)) {
                     let t = y.get(variable.name)
@@ -132,7 +125,7 @@ export class DefaultJsonGenerator implements CodeGenerator {
       ): boolean {
         if (field.subFields.length > 0) {
             let ok = true;
-            field.subFields.forEach((fieldDef) => {
+            field.subFields.forEach((fieldDef: TLBField) => {
                 let fieldResult = this.handleField(fieldDef, x, ctx, y);
                 if (!fieldResult) {
                     ok = false;
@@ -279,10 +272,6 @@ export class DefaultJsonGenerator implements CodeGenerator {
             }
         });
         return parameters;
-    }
-
-    toCode(node: TheNode, code: CodeBuilder): CodeBuilder {
-        return toCode(node, code)
     }
 }
 
