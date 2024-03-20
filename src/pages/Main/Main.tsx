@@ -165,8 +165,9 @@ export const Main: React.FC = () => {
 			const currentModule = module || newModule;
 
 			const tree = ast(tlbSchema);
+			let humanReadableJson = JSON.parse(value);
 			let tlbCode = getTLBCodeByAST(tree, tlbSchema);
-			let data = await humanJsonToBase64(type, tlbCode, JSON.parse(value), currentModule[`store${type}`]);
+			let data = await humanJsonToBase64(humanReadableJson['kind'], tlbCode, humanReadableJson, currentModule[`store${type}`]);
 			// { "kind": "BitSelection", "a": 5,
 			// "b": 5 }
 
