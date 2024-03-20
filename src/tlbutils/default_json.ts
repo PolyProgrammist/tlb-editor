@@ -1,4 +1,4 @@
-import { TLBCode, TLBConstructor, TLBField, TLBMathExpr, TLBFieldType, TLBType, TLBVarExpr, TLBParameter, TLBVariable 
+import { TLBCode, TLBConstructor, TLBField, TLBMathExpr, TLBFieldType, TLBType, TLBVarExpr, TLBParameter, TLBVariable, isBigIntExrForJson, isBigIntForJson 
     	// @ts-ignore
 } from "@polyprogrammist_test/tlb-codegen/build"
 import { evaluateExpression, getSubStructName } from "./utils";
@@ -166,7 +166,11 @@ export class DefaultJsonGenerator {
         let res: any | undefined = undefined;
 
         if (fieldType.kind == "TLBNumberType") {
-            res = 0;
+            if (isBigIntForJson(fieldType)) {
+                res = '0';
+            } else {
+                res = 0;
+            }
         } else if (fieldType.kind == "TLBBitsType") {
             let bitsNumber = evaluateExpression(fieldType.bits, y);
             if (bitsNumber) {
@@ -179,9 +183,9 @@ export class DefaultJsonGenerator {
         } else if (fieldType.kind == "TLBBoolType") {
             res = false;
         } else if (fieldType.kind == "TLBCoinsType") {
-            res = 0;
+            res = '0';
         } else if (fieldType.kind == "TLBVarIntegerType") {
-            res = 0;
+            res = '0';
         } else if (fieldType.kind == "TLBAddressType") {
             if (fieldType.addrType == "Internal") {
                 res = "0:0000000000000000000000000000000000000000000000000000000000000000";
@@ -191,7 +195,11 @@ export class DefaultJsonGenerator {
                 res = null;
             }
         } else if (fieldType.kind == "TLBExprMathType") {
-            res = 0;
+            if (isBigIntExrForJson(fieldType)) {
+                res = '0';
+            } else {      
+                res = 0;
+            }
         } else if (fieldType.kind == "TLBNegatedType") {
             res = 0;
         } else if (fieldType.kind == "TLBNamedType") {

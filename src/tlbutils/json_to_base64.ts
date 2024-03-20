@@ -1,5 +1,5 @@
 import { importTonDependencies } from "@/pages/Main/utils";
-import { TLBCode, TLBConstructor, TLBField, TLBFieldType, TLBType, TLBVariable
+import { TLBCode, TLBConstructor, TLBField, TLBFieldType, TLBType, TLBVariable, isBigIntExprForJson, isBigIntForJson
     	// @ts-ignore
     } from "@polyprogrammist_test/tlb-codegen/build";
 import { getSubStructName, evaluateExpression } from "./utils";
@@ -123,7 +123,11 @@ class X {
         let res: any = json;
     
         if (fieldType.kind == "TLBNumberType") {
-            res = json;
+            if (isBigIntForJson(fieldType)) {
+                res = BigInt(json);
+            } else {
+                res = json;
+            }
         } else if (fieldType.kind == "TLBBitsType") {
             let builder = this.beginCell();
             for (let i = 2; i < json.length; i++) {
@@ -136,10 +140,10 @@ class X {
         } else if (fieldType.kind == "TLBBoolType") {
             res = json;
         } else if (fieldType.kind == "TLBCoinsType") {
-            res = json;
+            res = BigInt(json);
         } 
         else if (fieldType.kind == "TLBVarIntegerType") {
-            res = json;
+            res = BigInt(json);
         } else if (fieldType.kind == "TLBAddressType") {
             if (json == null) {
                 res = null;
@@ -148,7 +152,11 @@ class X {
             }
         } 
         else if (fieldType.kind == "TLBExprMathType") {
-            res = json;
+            if (isBigIntExprForJson(fieldType)) {
+                res = BigInt(json); 
+            } else {
+                res = json;
+            }
         } else if (fieldType.kind == "TLBNegatedType") {
             res = json;
         } else if (fieldType.kind == "TLBNamedType") {
@@ -160,10 +168,10 @@ class X {
                 res = this.getTLBTypeNameResult(json['kind'], tlbCode, json, parameters)
             }
         } else if (fieldType.kind == "TLBCondType") {
-            if (json == null || json[field.name] == null) {
-                res = null;
+            if (json == null) {
+                res = undefined;
             } else {
-                res = this.handleType(field, fieldType.value, tlbCode, json[field.name], y);
+                res = this.handleType(field, fieldType.value, tlbCode, json, y);
             }
         } else if (fieldType.kind == "TLBMultipleType") {
             let x = this.handleType(field, fieldType.value, tlbCode, json[0], y)

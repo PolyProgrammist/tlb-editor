@@ -20,7 +20,7 @@ async function typeToHumanJson(obj: any) {
     if (obj.kind) {
         result['kind'] = obj.kind;
     }
-    if (typeof obj === 'number' || typeof obj === 'bigint' || typeof obj === 'string') {
+    if (typeof obj === 'number' || typeof obj === 'bigint' || typeof obj === 'string' || typeof obj === 'boolean') {
         result = obj
     } else if (obj instanceof Address) {
         result = obj.toRawString();
