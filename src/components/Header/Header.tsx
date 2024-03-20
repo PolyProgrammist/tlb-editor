@@ -29,7 +29,7 @@ export const Header: React.FC = () => {
 		)}&json=${LZString.compressToEncodedURIComponent(jsonData)}`;
 
 		// Construct the new URL with query parameters
-		const newUrl = `${window.location.host}/#/main?${queryParams}`;
+		const newUrl = `${window.location.host}/tlb-editor/#/main?${queryParams}`;
 
 		// Copy the new URL to the clipboard
 		navigator.clipboard
