@@ -3,20 +3,37 @@ import React, { useContext } from 'react';
 import { Button, Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react';
 
 import { AppContext } from '@/context/AppContext';
-import { getDefaulHumanJson, getTLBCodeByAST } from '@/tlbutils';
+import { base64ToHumanJson, getDefaulHumanJsonUnsafe, getTLBCodeByAST, humanJsonToBase64 } from '@/tlbutils';
 import { ast } from '@ton-community/tlb-parser';
 
 
 export const TypeMenu: React.FC = () => {
 
-	const { types, tlbSchema, tlbError, selectedType, setSelectedType, setJsonData } =
+	const { types, tlbSchema, module, tlbError, selectedType, setSelectedType, setJsonData } =
 		useContext(AppContext);
 
 	const handleTlbChange = async (value = '')  => {
 		setSelectedType(value)
+		if (!value) {
+			return;
+		}
+
 		const tree = ast(tlbSchema);
 		let tlbCode = getTLBCodeByAST(tree, tlbSchema);
-		let humanReadableJson = await getDefaulHumanJson(tlbCode, tlbCode.types.get(value)!);
+		let humanReadableJson = await getDefaulHumanJsonUnsafe(tlbCode, tlbCode.types.get(value)!);
+
+		humanReadableJson = JSON.stringify(
+			humanReadableJson,
+			(_, value) => (typeof value === 'bigint' ? value.toString() : value),
+			'\t'
+		)
+
+		// reload humanReadableJson so that it becomes valid
+		const currentModule = module;
+		humanReadableJson = JSON.parse(humanReadableJson);
+		let base64 = await humanJsonToBase64(humanReadableJson['kind'], tlbCode, humanReadableJson, currentModule[`store${value}`]);
+		humanReadableJson = await base64ToHumanJson(base64, currentModule[`load${value}`]);
+
 		setJsonData(
 			JSON.stringify(
 				humanReadableJson,

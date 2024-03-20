@@ -3,7 +3,6 @@ import { TLBCode, TLBConstructor, TLBField, TLBFieldType, TLBType, TLBVariable, 
     	// @ts-ignore
     } from "@polyprogrammist_test/tlb-codegen/build";
 import { getSubStructName, evaluateExpression } from "./utils";
-import util from 'util';
 
 let constructorsIndex: Map<string, TLBConstructor> = new Map<string, TLBConstructor>();
 
@@ -15,7 +14,6 @@ export async function humanJsonToBase64(typeName: string, tlbCode: TLBCode, json
     s.Dictionary = Dictionary;
     s.beginCell = beginCell;
     s = s.jsonToType(typeName, tlbCode, json);
-    console.log(util.inspect(s, false, null, true))
     let builder = beginCell();
     method(s)(builder);
     return builder.asCell().toBoc().toString('base64');

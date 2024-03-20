@@ -4,7 +4,11 @@ import { TLBCode, TLBConstructor, TLBField, TLBMathExpr, TLBFieldType, TLBType, 
 import { evaluateExpression, getSubStructName } from "./utils";
 import { importTonDependencies } from '../pages/Main/utils';
 
-export async function getDefaulHumanJson(tlbCode: TLBCode, tlbType: TLBType) {
+/// Note: This function tries to generate a default JSON object. 
+/// However it does not check the conditions. So it may return an invalid JSON object.
+/// In order to try to make it valid, you should store this object using corresponding 
+/// store function and then load it back using corresponding load function.
+export async function getDefaulHumanJsonUnsafe(tlbCode: TLBCode, tlbType: TLBType) {
     let jsonGen = new DefaultJsonGenerator(tlbCode);
     const { beginCell } = await importTonDependencies();
     jsonGen.beginCell = beginCell;
