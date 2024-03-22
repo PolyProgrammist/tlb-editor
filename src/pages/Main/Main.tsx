@@ -1,6 +1,6 @@
 import React, { useCallback, useContext, useEffect } from 'react';
 
-import { debounce, last } from 'lodash';
+import { debounce } from 'lodash';
 import LZString from 'lz-string';
 import { useSearchParams } from 'react-router-dom';
 import * as ts from 'typescript';
@@ -130,10 +130,8 @@ export const Main: React.FC = () => {
 		}
 	};
 
-	const handleSerializedDataChangeDebounced: OnChange = useCallback(
-		debounce((value) => serializedDataHandler(value), 1000),
-		[serializedDataHandler]
-	);
+	const handleSerializedDataChangeDebounced: OnChange = (value) =>
+		serializedDataHandler(value);
 
 	const handleSerializedDataChange: OnChange = useCallback(
 		(value, model) => {
@@ -189,10 +187,7 @@ export const Main: React.FC = () => {
 		}
 	};
 
-	const handleJsonDataChangeDebounced: OnChange = useCallback(
-		debounce((value) => jsonHandler(value), 1000),
-		[jsonHandler]
-	);
+	const handleJsonDataChangeDebounced: OnChange = (value) => jsonHandler(value);
 
 	const handleJsonDataChange: OnChange = useCallback(
 		(value, model) => {
@@ -285,10 +280,7 @@ export const Main: React.FC = () => {
 		]
 	);
 
-	const handleTlbChangeDebounced: OnChange = useCallback(
-		debounce(tlbHandler, 1000),
-		[]
-	);
+	const handleTlbChangeDebounced: OnChange = (value) => tlbHandler(value);
 
 	const handleTlbChange: OnChange = useCallback(
 		async (value, model) => {
