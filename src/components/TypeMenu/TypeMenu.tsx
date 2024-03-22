@@ -72,7 +72,7 @@ export const TypeMenu: React.FC = () => {
 				as={Button}
 				alignSelf={'center'}
 				isDisabled={!tlbSchema || Boolean(tlbError)}
-				mb={3}
+				size={'sm'}
 			>
 				{selectedType || 'Types'}
 			</MenuButton>

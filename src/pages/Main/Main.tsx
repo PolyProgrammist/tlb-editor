@@ -1,6 +1,5 @@
 import React, { useCallback, useContext, useEffect } from 'react';
 
-import { debounce } from 'lodash';
 import LZString from 'lz-string';
 import { useSearchParams } from 'react-router-dom';
 import * as ts from 'typescript';
@@ -337,7 +336,16 @@ export const Main: React.FC = () => {
 					options={{
 						minimap: { enabled: false },
 					}}
-					footer={<TypeMenu />}
+					footer={
+						<Flex
+							justifyContent={'center'}
+							alignItems={'center'}
+							flexGrow={1}
+							py={3}
+						>
+							<TypeMenu />
+						</Flex>
+					}
 					errorMessage={tlbError}
 					fileName={'scheme.tlb'}
 				/>

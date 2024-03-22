@@ -85,10 +85,19 @@ export const Editor: React.FC<EditorProps> = ({
 			>
 				{header}
 				<Box>
-					<Button onClick={handleCopy} isDisabled={!Boolean(value)} mr={3}>
+					<Button
+						onClick={handleCopy}
+						isDisabled={!Boolean(value)}
+						mr={3}
+						size={'sm'}
+					>
 						Copy
 					</Button>
-					<Button onClick={handleDownload} isDisabled={!Boolean(value)}>
+					<Button
+						onClick={handleDownload}
+						isDisabled={!Boolean(value)}
+						size={'sm'}
+					>
 						Download
 					</Button>
 				</Box>
