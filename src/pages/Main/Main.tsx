@@ -1,25 +1,25 @@
 import React, { useCallback, useContext, useEffect } from 'react';
 
-import { debounce } from 'lodash';
+import { debounce, last } from 'lodash';
 import LZString from 'lz-string';
 import { useSearchParams } from 'react-router-dom';
 import * as ts from 'typescript';
 import { Flex, Text } from '@chakra-ui/react';
-import { ast } from '@ton-community/tlb-parser';
 import { OnChange } from '@monaco-editor/react';
-import {
-	generateCodeByAST,
-	TypescriptGenerator,
-	base64ToHumanJson, 
-	getTLBCodeByAST, 
-	humanJsonToBase64
-	// @ts-ignore
-} from '@/tlbutils';
+import { ast } from '@ton-community/tlb-parser';
 
 import { Editor } from '@/components/Editor';
 import { SerializedDataTypeTab } from '@/components/SerializedDataTypeTab';
 import { TypeMenu } from '@/components/TypeMenu';
 import { AppContext } from '@/context/AppContext';
+import {
+	base64ToHumanJson,
+	generateCodeByAST,
+	getTLBCodeByAST,
+	humanJsonToBase64,
+	TypescriptGenerator,
+	// @ts-ignore
+} from '@/tlbutils';
 
 import { base64ToHex, hexToBase64 } from './utils';
 
@@ -160,14 +160,19 @@ export const Main: React.FC = () => {
 				return;
 			}
 
-			console.log("logging value", JSON.parse(value));
+			console.log('logging value', JSON.parse(value));
 
 			const currentModule = module || newModule;
 
 			const tree = ast(tlbSchema);
 			let humanReadableJson = JSON.parse(value);
 			let tlbCode = getTLBCodeByAST(tree, tlbSchema);
-			let data = await humanJsonToBase64(humanReadableJson['kind'], tlbCode, humanReadableJson, currentModule[`store${type}`]);
+			let data = await humanJsonToBase64(
+				humanReadableJson['kind'],
+				tlbCode,
+				humanReadableJson,
+				currentModule[`store${type}`]
+			);
 			// { "kind": "BitSelection", "a": 5,
 			// "b": 5 }
 
@@ -198,81 +203,98 @@ export const Main: React.FC = () => {
 		[handleJsonDataChangeDebounced, setIsSerializedDataLoading]
 	);
 
-	const tlbHandler = async (value = '') => {
-		console.log('change tlb change');
-		try {
-			setTlbSchema(value);
-			if (!value) {
-				setCode('');
-				return;
-			}
-			setIsCodeLoading(true);
-			const tree = ast(value);
-			const newCode = generateCodeByAST(tree, value, getGenerator);
-
-			setTypes(
-				[...generator.tlbCode.types.keys()]
-					.filter(
-						(type: string) =>
-							generator.tlbCode.types.get(type).constructors[0]?.parameters
-								.length === 0
-					)
-					.sort()
-			);
-			setCode(newCode);
-
-			const jsCode = ts
-				.transpile(newCode, { target: 2 })
-				.replace(/import { ([^}]+) } from '@ton\/core';/g, '');
-			const blob = new Blob([jsCode], {
-				type: 'application/javascript; charset=utf-8',
-			});
-
-			const scriptURL = URL.createObjectURL(blob);
-
-			const newModule = await import(scriptURL);
-			setModule(newModule);
-
-			setTlbError('');
-
-			setIsCodeLoading(false);
-
-			if (lastEdited === 'serialized') {
-				console.log('start regenerate srialized');
-				if (
-					(selectedSerializedDataType === 'base64' && !base64) ||
-					(selectedSerializedDataType === 'hex' && !hex)
-				) {
-					return newModule;
+	const tlbHandler = useCallback(
+		async (value = '') => {
+			console.log('change tlb change');
+			try {
+				setTlbSchema(value);
+				if (!value) {
+					setCode('');
+					return;
 				}
-				handleSerializedDataChange(
-					selectedSerializedDataType === 'base64' ? base64 || '' : hex || '',
-					dummyEvent
-				);
-			} else {
-				handleJsonDataChange(jsonData, dummyEvent);
-			}
+				setIsCodeLoading(true);
+				const tree = ast(value);
+				const newCode = generateCodeByAST(tree, value, getGenerator);
 
-			return newModule;
-		} catch (error) {
-			console.error(error);
-			setCode('');
-			setTlbError('Scheme is incorrect');
-		} finally {
-			setIsCodeLoading(false);
-		}
-	};
+				setTypes(
+					[...generator.tlbCode.types.keys()]
+						.filter(
+							(type: string) =>
+								generator.tlbCode.types.get(type).constructors[0]?.parameters
+									.length === 0
+						)
+						.sort()
+				);
+				setCode(newCode);
+
+				const jsCode = ts
+					.transpile(newCode, { target: 2 })
+					.replace(/import { ([^}]+) } from '@ton\/core';/g, '');
+				const blob = new Blob([jsCode], {
+					type: 'application/javascript; charset=utf-8',
+				});
+
+				const scriptURL = URL.createObjectURL(blob);
+
+				const newModule = await import(scriptURL);
+				setModule(newModule);
+
+				setTlbError('');
+
+				setIsCodeLoading(false);
+
+				if (lastEdited === 'serialized') {
+					console.log('start regenerate srialized');
+					if (
+						(selectedSerializedDataType === 'base64' && !base64) ||
+						(selectedSerializedDataType === 'hex' && !hex)
+					) {
+						return newModule;
+					}
+					handleSerializedDataChange(
+						selectedSerializedDataType === 'base64' ? base64 || '' : hex || '',
+						dummyEvent
+					);
+				} else {
+					handleJsonDataChange(jsonData, dummyEvent);
+				}
+
+				return newModule;
+			} catch (error) {
+				console.error(error);
+				setCode('');
+				setTlbError('Scheme is incorrect');
+			} finally {
+				setIsCodeLoading(false);
+			}
+		},
+		[
+			base64,
+			handleJsonDataChange,
+			hex,
+			jsonData,
+			setCode,
+			setModule,
+			setIsCodeLoading,
+			lastEdited,
+			setTlbError,
+			setTlbSchema,
+			setTypes,
+			handleSerializedDataChange,
+			selectedSerializedDataType,
+		]
+	);
 
 	const handleTlbChangeDebounced: OnChange = useCallback(
 		debounce(tlbHandler, 1000),
-		[tlbHandler]
+		[]
 	);
 
 	const handleTlbChange: OnChange = useCallback(
 		async (value, model) => {
 			setIsCodeLoading(true);
 
-			await handleTlbChangeDebounced(value, model);
+			handleTlbChangeDebounced(value, model);
 		},
 		[handleTlbChangeDebounced, setIsCodeLoading]
 	);
