@@ -4,7 +4,7 @@ export {
 	getTLBCode,
 	getTLBCodeByAST,
 	// @ts-ignore
-} from "@polyprogrammist_test/tlb-codegen/build";
+} from "@ton-community/tlb-codegen/build";
 
 export { getDefaulHumanJsonUnsafe } from './default_json';
 export { humanJsonToBase64 } from "./json_to_base64";

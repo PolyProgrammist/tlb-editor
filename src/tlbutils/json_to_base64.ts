@@ -8,7 +8,7 @@ import {
 	TLBType,
 	TLBVariable,
 	// @ts-ignore
-} from '@polyprogrammist_test/tlb-codegen/build';
+} from '@ton-community/tlb-codegen/build';
 
 import { importTonDependencies } from '@/pages/Main/utils';
 

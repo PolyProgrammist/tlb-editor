@@ -1,6 +1,6 @@
 import { TLBCode, TLBConstructor, TLBField, TLBMathExpr, TLBFieldType, TLBType, TLBVarExpr, TLBParameter, TLBVariable, isBigIntExrForJson, isBigIntForJson 
     	// @ts-ignore
-} from "@polyprogrammist_test/tlb-codegen/build"
+} from "@ton-community/tlb-codegen/build"
 import { evaluateExpression, getSubStructName } from "./utils";
 import { importTonDependencies } from '../pages/Main/utils';
 

@@ -1,7 +1,7 @@
 
 import { TLBMathExpr, TLBVarExpr, TLBNumberExpr, TLBBinaryOp, TLBType, TLBConstructor 
     	// @ts-ignore
-    } from "@polyprogrammist_test/tlb-codegen/build"
+    } from "@ton-community/tlb-codegen/build"
 
 export function getSubStructName(
   tlbType: TLBType,
