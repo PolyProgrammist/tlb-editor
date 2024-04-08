@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { Box, Heading, Text } from '@chakra-ui/react';
+import { Link as RouterLink } from 'react-router-dom';
+import { Box, Heading, Link, Text } from '@chakra-ui/react';
 
 export const About: React.FC = () => {
 	return (
@@ -8,42 +9,48 @@ export const About: React.FC = () => {
 			<Text>
 				This is a tool for working with TON TL-B schema. It allows you to
 				generate Typescript code from TL-B schema using{' '}
-				<a
+				<Link
 					href="https://github.com/ton-community/tlb-codegen"
-					style={{ color: 'blue' }}
+					color={'blue'}
 				>
 					tlb-codegen
-				</a>
+				</Link>
 				. You can find documentation about TL-B schema{' '}
-				<a
+				<Link
 					href="https://docs.ton.org/develop/data-formats/tl-b-language"
-					style={{ color: 'blue' }}
+					color={'blue'}
 				>
 					here
-				</a>
+				</Link>
 				. Also advanced docs are available{' '}
-				<a
+				<Link
 					href="https://docs.ton.org/develop/data-formats/tl-b-types"
-					style={{ color: 'blue' }}
+					color={'blue'}
 				>
 					here
-				</a>
+				</Link>
 				. Besides generating code, you can also convert your data in base64
 				format to JSON and vice versa according to the schema. As well, you can
 				enjoy hex format of the data.
 			</Text>
-			<Heading size="md">Example: CoolMessage</Heading>
-			You can play with this example here:{' '}
-			<a
-				href="https://polyprogrammist.github.io/tlb-editor/#/main?tlb=LYUwzmCGDmIMQGYBmBWALAdgGwGNIAIA3SAGwFcQAuOfAXnwGEB7JkgWXClgG4g&type=MIexBsFkFMGdYIYHNpA&base64=&json=N4KAkARA1glgdgEwgLgAQQMIHssBsCyApgM7ECGA5oRADTgQBuZuArtWgIwgC+QA"
-				style={{ color: 'blue' }}
-			>
-				here
-			</a>
-			.
-			<br />
-			Schema:
-			<pre>{'message#3f5476ca value:# = CoolMessage;'}</pre>
+			<Heading size="md" pt={5} pb={3}>
+				Example: CoolMessage
+			</Heading>
+			<Text>
+				You can play with this example&nbsp;
+				<Link
+					as={RouterLink}
+					to="/main?tlb=LYUwzmCGDmIMQGYBmBWALAdgGwGNIAIA3SAGwFcQAuOfAXnwGEB7JkgWXClgG4g&type=MIexBsFkFMGdYIYHNpA&base64=&json=N4KAkARA1glgdgEwgLgAQQMIHssBsCyApgM7ECGA5oRADTgQBuZuArtWgIwgC+QA"
+					color={'blue'}
+				>
+					here
+				</Link>
+				:
+			</Text>
+			<p>
+				Schema:
+				<pre>{'message#3f5476ca value:# = CoolMessage;'}</pre>
+			</p>
 			When you insert the schema, the typescript code is generated:
 			<pre>
 				{`

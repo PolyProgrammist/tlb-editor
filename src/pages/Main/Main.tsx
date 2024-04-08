@@ -141,7 +141,12 @@ export const Main: React.FC = () => {
 		[handleSerializedDataChangeDebounced, setIsJsonDataLoading]
 	);
 
-	const jsonHandler = async (value = '', type = '', newModule?: {}) => {
+	const jsonHandler = async (
+		value = '',
+		type = '',
+		newTlbSchema = '',
+		newModule?: {}
+	) => {
 		try {
 			console.log('json change');
 			setJsonData(value);
@@ -156,18 +161,22 @@ export const Main: React.FC = () => {
 			if (!type) {
 				return;
 			}
+			const currentModule = Object.keys(newModule || {}).length
+				? newModule
+				: module;
 
-			console.log('logging value', JSON.parse(value));
+			const currentTlbSchema = newTlbSchema || tlbSchema;
 
-			const currentModule = module || newModule;
-
-			const tree = ast(tlbSchema);
+			const tree = ast(currentTlbSchema);
 			let humanReadableJson = JSON.parse(value);
-			let tlbCode = getTLBCodeByAST(tree, tlbSchema);
+
+			console.log('schema', tlbSchema);
+			let tlbCode = getTLBCodeByAST(tree, currentTlbSchema);
 			let data = await humanJsonToBase64(
 				humanReadableJson['kind'],
 				tlbCode,
 				humanReadableJson,
+				//@ts-ignore
 				currentModule[`store${type}`]
 			);
 			// { "kind": "BitSelection", "a": 5,
@@ -316,7 +325,7 @@ export const Main: React.FC = () => {
 			if (base64State) {
 				await serializedDataHandler(base64State, typeState, module);
 			} else if (jsonState) {
-				await jsonHandler(jsonState, typeState, module);
+				await jsonHandler(jsonState, typeState, tlbState, module);
 			}
 		};
 

@@ -33,6 +33,7 @@ export async function humanJsonToBase64(
 	s.Dictionary = Dictionary;
 	s.beginCell = beginCell;
 	s = s.jsonToType(typeName, tlbCode, json);
+
 	let builder = beginCell();
 	method(s)(builder);
 	return builder.asCell().toBoc().toString('base64');
@@ -240,34 +241,54 @@ class X {
 				res = this.handleType(field, fieldType.value, tlbCode, json, y);
 			}
 		} else if (fieldType.kind == 'TLBMultipleType') {
-			res = []
-            for (let i = 0; i < json.length; i++) {
-                res.push(this.handleType(field, fieldType.value, tlbCode, json[i], y))
-            }
+			res = [];
+			for (let i = 0; i < json.length; i++) {
+				res.push(this.handleType(field, fieldType.value, tlbCode, json[i], y));
+			}
 		} else if (fieldType.kind == 'TLBCellInsideType') {
 			res = this.handleType(field, fieldType.value, tlbCode, json, y);
 		} else if (fieldType.kind == 'TLBHashmapType') {
 			if (isBigIntExprForJson(fieldType.key)) {
-                res = this.Dictionary.empty(this.Dictionary.Keys.BigInt(evaluateExpression(fieldType.key, y)));
-            } else {
-                res = this.Dictionary.empty();
-            }
-            for (var key of Object.keys(json)) {
-                let intkey = BigInt(key);
-                let value = undefined;
-                if (fieldType.extra) {
-                    let extra = this.handleType(field, fieldType.extra, tlbCode, json[key]['extra'], y);
-                    value = this.handleType(field, fieldType.value, tlbCode, json[key]['value'], y);
-                    value = {extra: extra, value: value}
-                } else {
-                    value = this.handleType(field, fieldType.value, tlbCode, json[key], y)
-                }
-                if (isBigIntExprForJson(fieldType.key)) {
-                    res.set(BigInt(intkey), value);
-                } else {
-                    res.set(Number(intkey), value);
-                }
-            }
+				res = this.Dictionary.empty(
+					this.Dictionary.Keys.BigInt(evaluateExpression(fieldType.key, y))
+				);
+			} else {
+				res = this.Dictionary.empty();
+			}
+			for (let key of Object.keys(json)) {
+				let intkey = BigInt(key);
+				let value = undefined;
+				if (fieldType.extra) {
+					let extra = this.handleType(
+						field,
+						fieldType.extra,
+						tlbCode,
+						json[key]['extra'],
+						y
+					);
+					value = this.handleType(
+						field,
+						fieldType.value,
+						tlbCode,
+						json[key]['value'],
+						y
+					);
+					value = { extra: extra, value: value };
+				} else {
+					value = this.handleType(
+						field,
+						fieldType.value,
+						tlbCode,
+						json[key],
+						y
+					);
+				}
+				if (isBigIntExprForJson(fieldType.key)) {
+					res.set(BigInt(intkey), value);
+				} else {
+					res.set(Number(intkey), value);
+				}
+			}
 		} else if (fieldType.kind == 'TLBExoticType') {
 			res = this.Cell.fromBase64(json.toString());
 		}
