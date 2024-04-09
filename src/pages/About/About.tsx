@@ -6,7 +6,7 @@ import { Box, Heading, Link, Text } from '@chakra-ui/react';
 
 export const About: React.FC = () => {
 	return (
-		<Box p={5}>
+		<Box p={5} px={'10rem'}>
 			<Text>
 				This is a tool for working with TON TL-B schema. It allows you to
 				generate Typescript code from TL-B schema using{' '}
