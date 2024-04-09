@@ -219,15 +219,16 @@ export const Main: React.FC = () => {
 				const tree = ast(value);
 				const newCode = generateCodeByAST(tree, value, getGenerator);
 
-				setTypes(
-					[...generator.tlbCode.types.keys()]
-						.filter(
-							(type: string) =>
-								generator.tlbCode.types.get(type).constructors[0]?.parameters
-									.length === 0
-						)
-						.sort()
-				);
+				const types = [...generator.tlbCode.types.keys()]
+					.filter(
+						(type: string) =>
+							generator.tlbCode.types.get(type).constructors[0]?.parameters
+								.length === 0
+					)
+					.sort();
+
+				setTypes(types);
+				setSelectedType(types[0]);
 				setCode(newCode);
 
 				const jsCode = ts

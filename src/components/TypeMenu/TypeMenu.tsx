@@ -20,9 +20,10 @@ export const TypeMenu: React.FC = () => {
 		selectedType,
 		setSelectedType,
 		setJsonData,
+		setBase64,
 	} = useContext(AppContext);
 
-	const handleTlbChange = async (value = '') => {
+	const handleTypeChange = async (value = '') => {
 		setSelectedType(value);
 		if (!value) {
 			return;
@@ -51,6 +52,7 @@ export const TypeMenu: React.FC = () => {
 			humanReadableJson,
 			currentModule[`store${value}`]
 		);
+
 		humanReadableJson = await base64ToHumanJson(
 			base64,
 			currentModule[`load${value}`]
@@ -63,6 +65,16 @@ export const TypeMenu: React.FC = () => {
 				'\t'
 			)
 		);
+
+		let data = await humanJsonToBase64(
+			humanReadableJson['kind'],
+			tlbCode,
+			humanReadableJson,
+			//@ts-ignore
+			currentModule[`store${value}`]
+		);
+
+		setBase64(data);
 	};
 
 	return (
@@ -78,7 +90,7 @@ export const TypeMenu: React.FC = () => {
 			</MenuButton>
 			<MenuList maxHeight={'10rem'} overflow={'scroll'}>
 				{types.map((type) => (
-					<MenuItem key={type} onClick={() => handleTlbChange(type)}>
+					<MenuItem key={type} onClick={() => handleTypeChange(type)}>
 						{type}
 					</MenuItem>
 				))}
