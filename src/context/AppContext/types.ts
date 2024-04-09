@@ -35,6 +35,7 @@ export interface IAppContext {
 	>;
 	lastEdited: FieldType;
 	setLastEdited: React.Dispatch<React.SetStateAction<FieldType>>;
+	handleTypeChange: (value: string) => void;
 }
 
 export type SerializedDataType = 'base64' | 'hex';

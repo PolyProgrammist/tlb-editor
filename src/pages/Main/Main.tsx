@@ -70,6 +70,7 @@ export const Main: React.FC = () => {
 		setHex,
 		setLastEdited,
 		lastEdited,
+		handleTypeChange,
 	} = useContext(AppContext);
 
 	const [searchParams] = useSearchParams();
@@ -231,6 +232,8 @@ export const Main: React.FC = () => {
 				setSelectedType(types[0]);
 				setCode(newCode);
 
+				handleTypeChange(types[0]);
+
 				const jsCode = ts
 					.transpile(newCode, { target: 2 })
 					.replace(/import { ([^}]+) } from '@ton\/core';/g, '');
@@ -286,6 +289,7 @@ export const Main: React.FC = () => {
 			setTypes,
 			handleSerializedDataChange,
 			selectedSerializedDataType,
+			setSelectedType,
 		]
 	);
 
