@@ -34,7 +34,7 @@ export const About: React.FC = () => {
 				format to JSON and vice versa according to the schema. As well, you can
 				enjoy hex format of the data.
 			</Text>
-			<Heading size="md" pt={5} pb={3}>
+			<Heading size="lg" pt={5} pb={3}>
 				Example: CoolMessage
 			</Heading>
 			<Text>
@@ -56,6 +56,7 @@ export const About: React.FC = () => {
 			</Box>
 			<Box py={3}>
 				When you insert the schema, the typescript code is generated:
+				<br /><br />
 				<SyntaxHighlighter language="javascript">
 					{`export interface CoolMessage {
     readonly kind: 'CoolMessage';
@@ -91,6 +92,7 @@ export function storeCoolMessage(coolMessage: CoolMessage): (builder: Builder) =
 				<br />
 				When you choose a type CoolMessage from types dropdown, the default JSON
 				is generated:
+				<br /><br />
 				<SyntaxHighlighter language="json">
 					{`{
 	"kind": "CoolMessage",
@@ -100,6 +102,7 @@ export function storeCoolMessage(coolMessage: CoolMessage): (builder: Builder) =
 			</Box>
 			<Box py={3}>
 				When you insert the JSON, the base64 format is generated:
+				<br />
 				<SyntaxHighlighter language="javascript">
 					{'te6cckEBAQEACgAAED9UdsoAAAABXN7Z8Q=='}
 				</SyntaxHighlighter>
@@ -126,31 +129,40 @@ export function storeCoolMessage(coolMessage: CoolMessage): (builder: Builder) =
 				Limitations
 			</Heading>
 			<Heading size={'md'}>Types with parameters</Heading>
+			<br />
 			Please note that types with parameters are not supported. For example, the
 			following type is not supported:
+			<br /><br />
 			<SyntaxHighlighter language={'javascript'}>
 				{`nothing$0 {X:Type} = Maybe X;
 just$1 {X:Type} value:X = Maybe X;`}
 			</SyntaxHighlighter>
+			<br />
 			In order to still use the type, you can define a new type without
 			parameters that uses Maybe type:
+			<br /><br />
 			<SyntaxHighlighter language={'javascript'}>
 				{`nothing$0 {X:Type} = Maybe X;
 just$1 {X:Type} value:X = Maybe X;
 
 user$_ t:(Maybe int32) = MaybeUser;`}
 			</SyntaxHighlighter>
+			<br />
 			It will generate the Maybe type and data accordingly.
+			<br />
 			<Heading size="md" py={3} pb={2}>
 				Default JSON generation for types that have conditions
 			</Heading>
+			<br />
 			You can't generate default JSON for types with conditions. However the
 			code will be generated correctly, and you can serialize and deserialize
 			data. For example, generating default JSON for the following type is not
 			supported:
+			<br /><br />
 			<SyntaxHighlighter language={'javascript'}>
 				{'cond$0 n:# {n < 0} = ConditionType;'}
 			</SyntaxHighlighter>
+			<br />
 			Please note it may be the case that the default JSON is still generated
 			for some conditions that are easily matched.
 		</Box>
