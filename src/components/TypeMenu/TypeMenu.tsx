@@ -1,28 +1,12 @@
 import React, { useContext } from 'react';
 
 import { Button, Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react';
-import { ast } from '@ton-community/tlb-parser';
 
 import { AppContext } from '@/context/AppContext';
-import {
-	base64ToHumanJson,
-	getDefaulHumanJsonUnsafe,
-	getTLBCodeByAST,
-	humanJsonToBase64,
-} from '@/tlbutils';
 
 export const TypeMenu: React.FC = () => {
-	const {
-		types,
-		tlbSchema,
-		module,
-		tlbError,
-		selectedType,
-		setSelectedType,
-		setJsonData,
-		setBase64,
-		handleTypeChange,
-	} = useContext(AppContext);
+	const { types, tlbSchema, tlbError, selectedType, handleTypeChange } =
+		useContext(AppContext);
 
 	return (
 		<Menu placement={'bottom'}>
