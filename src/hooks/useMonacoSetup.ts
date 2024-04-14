@@ -47,8 +47,6 @@ const syntaxConfig = {
 		'while',
 		'true',
 		'false',
-		'Type',
-		'#',
 	],
 
 	typeKeywords: [
@@ -62,6 +60,7 @@ const syntaxConfig = {
 		'long',
 		'float',
 		'Type',
+		'#',
 	],
 
 	operators: [
@@ -121,13 +120,15 @@ const syntaxConfig = {
 					cases: {
 						'@typeKeywords': 'keyword',
 						'@keywords': 'keyword',
-						'@default': 'variable',
+						'@default': 'identifier',
 					},
 				},
 			],
-			[/Type/, 'keyword'], // to show class names nicely
+			[/Type/, 'type.keyword'], // to show class names nicely
 			[/#\w*/, 'type.keyword'],
 			[/\$\w*/, 'type.keyword'],
+			[/Either/, 'keyword'],
+			[/\$\d*/, 'tag'],
 			// // whitespace
 			{ include: '@whitespace' },
 			// // delimiters and operators

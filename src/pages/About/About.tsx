@@ -56,7 +56,8 @@ export const About: React.FC = () => {
 			</Box>
 			<Box py={3}>
 				When you insert the schema, the typescript code is generated:
-				<br /><br />
+				<br />
+				<br />
 				<SyntaxHighlighter language="javascript">
 					{`export interface CoolMessage {
     readonly kind: 'CoolMessage';
@@ -92,7 +93,8 @@ export function storeCoolMessage(coolMessage: CoolMessage): (builder: Builder) =
 				<br />
 				When you choose a type CoolMessage from types dropdown, the default JSON
 				is generated:
-				<br /><br />
+				<br />
+				<br />
 				<SyntaxHighlighter language="json">
 					{`{
 	"kind": "CoolMessage",
@@ -132,7 +134,8 @@ export function storeCoolMessage(coolMessage: CoolMessage): (builder: Builder) =
 			<br />
 			Please note that types with parameters are not supported. For example, the
 			following type is not supported:
-			<br /><br />
+			<br />
+			<br />
 			<SyntaxHighlighter language={'javascript'}>
 				{`nothing$0 {X:Type} = Maybe X;
 just$1 {X:Type} value:X = Maybe X;`}
@@ -140,7 +143,8 @@ just$1 {X:Type} value:X = Maybe X;`}
 			<br />
 			In order to still use the type, you can define a new type without
 			parameters that uses Maybe type:
-			<br /><br />
+			<br />
+			<br />
 			<SyntaxHighlighter language={'javascript'}>
 				{`nothing$0 {X:Type} = Maybe X;
 just$1 {X:Type} value:X = Maybe X;
@@ -158,7 +162,8 @@ user$_ t:(Maybe int32) = MaybeUser;`}
 			code will be generated correctly, and you can serialize and deserialize
 			data. For example, generating default JSON for the following type is not
 			supported:
-			<br /><br />
+			<br />
+			<br />
 			<SyntaxHighlighter language={'javascript'}>
 				{'cond$0 n:# {n < 0} = ConditionType;'}
 			</SyntaxHighlighter>
