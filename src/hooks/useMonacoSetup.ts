@@ -124,11 +124,13 @@ const syntaxConfig = {
 					},
 				},
 			],
-			[/Type/, 'type.keyword'], // to show class names nicely
+			// to show class names nicely
+			[/Type\b/, 'type.keyword'],
 			[/#\w*/, 'type.keyword'],
 			[/\$\w*/, 'type.keyword'],
-			[/Either/, 'keyword'],
-			[/\$\d*/, 'tag'],
+
+			// [/:/, 'operator', '@afterColon'],
+			[/=/, 'operator', '@postEqual'],
 			// // whitespace
 			{ include: '@whitespace' },
 			// // delimiters and operators
@@ -172,6 +174,34 @@ const syntaxConfig = {
 			[/[ \t\r\n]+/, 'white'],
 			[/\/\*/, 'comment', '@comment'],
 			[/\/\/.*$/, 'comment'],
+		],
+
+		postEqual: [
+			// Match words after "="
+			[/\s+/, 'white'], // skip whitespaces
+			[/[a-zA-Z_$][\w$]*/, 'variable', '@pop'], // Highlight word and return to the root state
+			[/$/, '', '@pop'], // Return to root state at end of line
+		],
+
+		afterColon: [
+			[/Type\b/, 'type.keyword', '@pop'],
+			[/\(/, 'delimiter.parenthesis', '@insideParens'], // Match opening parenthesis and switch to insideParens state
+			[/$/, '', '@pop'], // Handle end of line to return to root
+			[/@.*/, 'text'], // Catch all other text and classify as text, staying in afterColon
+		],
+
+		insideParens: [
+			[/Type\b/, 'type.keyword'],
+			[/[A-Z][\w$]*/, 'variable', '@maybeCloseParen'], // Match words starting with capital letters
+			[/\)/, 'delimiter.parenthesis', '@pop'], // Match closing parenthesis and pop to afterColon
+			[/@.*/, 'text'], // All other text remains regular text
+		],
+
+		maybeCloseParen: [
+			[/\s+/, 'white'], // Handle whitespace
+			[/\)/, 'delimiter.parenthesis', '@popall'], // Pop all states when closing parenthesis
+			[/[A-Z][\w$]*/, 'variable'], // Continue to match capital letter words
+			[/@.*/, 'text'], // Other characters are just text
 		],
 	},
 };

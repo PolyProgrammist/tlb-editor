@@ -1,5 +1,6 @@
 import React, { useCallback, useContext, useEffect } from 'react';
 
+import { debounce } from 'lodash';
 import LZString from 'lz-string';
 import { useSearchParams } from 'react-router-dom';
 import * as ts from 'typescript';
@@ -292,7 +293,10 @@ export const Main: React.FC = () => {
 		]
 	);
 
-	const handleTlbChangeDebounced: OnChange = (value) => tlbHandler(value);
+	const handleTlbChangeDebounced: OnChange = useCallback(
+		debounce((value) => tlbHandler(value), 1000),
+		[]
+	);
 
 	const handleTlbChange: OnChange = useCallback(
 		async (value, model) => {
