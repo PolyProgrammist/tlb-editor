@@ -39,60 +39,72 @@ export const AppContextProvider: React.FC<PropsWithChildren> = ({
 
 	useMonacoSetup();
 
-	const handleTypeChange = async (value = '') => {
-		setSelectedType(value);
-		if (!value) {
-			return;
-		}
+	const handleTypeChange = async (
+		value = '',
+		newModule = {},
+		newTlbSchema = ''
+	) => {
+		try {
+			setSelectedType(value);
+			if (!value) {
+				return;
+			}
+			const currentTlbSchema = newTlbSchema || tlbSchema;
+			console.log(currentTlbSchema);
+			const tree = ast(currentTlbSchema);
+			console.log(tree);
+			let tlbCode = getTLBCodeByAST(tree, currentTlbSchema);
+			console.log(tlbCode.types.get(value));
+			let humanReadableJson = await getDefaulHumanJsonUnsafe(
+				tlbCode,
+				tlbCode.types.get(value)!
+			);
 
-		const tree = ast(tlbSchema);
-		let tlbCode = getTLBCodeByAST(tree, tlbSchema);
-
-		let humanReadableJson = await getDefaulHumanJsonUnsafe(
-			tlbCode,
-			tlbCode.types.get(value)!
-		);
-
-		humanReadableJson = JSON.stringify(
-			humanReadableJson,
-			(_, value) => (typeof value === 'bigint' ? value.toString() : value),
-			'\t'
-		);
-
-		// reload humanReadableJson so that it becomes valid
-		const currentModule = module;
-		humanReadableJson = JSON.parse(humanReadableJson);
-		let base64 = await humanJsonToBase64(
-			humanReadableJson['kind'],
-			tlbCode,
-			humanReadableJson,
-			//@ts-ignore
-			currentModule[`store${value}`]
-		);
-
-		humanReadableJson = await base64ToHumanJson(
-			base64,
-			//@ts-ignore
-			currentModule[`load${value}`]
-		);
-
-		setJsonData(
-			JSON.stringify(
+			humanReadableJson = JSON.stringify(
 				humanReadableJson,
 				(_, value) => (typeof value === 'bigint' ? value.toString() : value),
 				'\t'
-			)
-		);
+			);
 
-		let data = await humanJsonToBase64(
-			humanReadableJson['kind'],
-			tlbCode,
-			humanReadableJson,
-			//@ts-ignore
-			currentModule[`store${value}`]
-		);
+			// reload humanReadableJson so that it becomes valid
+			const currentModule = Object.keys(newModule).length ? newModule : module;
 
-		setBase64(data);
+			humanReadableJson = JSON.parse(humanReadableJson);
+			let base64 = await humanJsonToBase64(
+				humanReadableJson['kind'],
+				tlbCode,
+				humanReadableJson,
+				//@ts-ignore
+				currentModule[`store${value}`]
+			);
+
+			humanReadableJson = await base64ToHumanJson(
+				base64,
+				//@ts-ignore
+				currentModule[`load${value}`]
+			);
+
+			setJsonData(
+				JSON.stringify(
+					humanReadableJson,
+					(_, value) => (typeof value === 'bigint' ? value.toString() : value),
+					'\t'
+				)
+			);
+
+			let data = await humanJsonToBase64(
+				humanReadableJson['kind'],
+				tlbCode,
+				humanReadableJson,
+				//@ts-ignore
+				currentModule[`store${value}`]
+			);
+
+			setBase64(data);
+			setJsonDataError('');
+		} catch (e) {
+			setJsonDataError('Default JSON generation failed.');
+		}
 	};
 
 	return (

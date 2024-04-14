@@ -21,61 +21,8 @@ export const TypeMenu: React.FC = () => {
 		setSelectedType,
 		setJsonData,
 		setBase64,
+		handleTypeChange,
 	} = useContext(AppContext);
-
-	const handleTypeChange = async (value = '') => {
-		setSelectedType(value);
-		if (!value) {
-			return;
-		}
-
-		const tree = ast(tlbSchema);
-		let tlbCode = getTLBCodeByAST(tree, tlbSchema);
-
-		let humanReadableJson = await getDefaulHumanJsonUnsafe(
-			tlbCode,
-			tlbCode.types.get(value)!
-		);
-
-		humanReadableJson = JSON.stringify(
-			humanReadableJson,
-			(_, value) => (typeof value === 'bigint' ? value.toString() : value),
-			'\t'
-		);
-
-		// reload humanReadableJson so that it becomes valid
-		const currentModule = module;
-		humanReadableJson = JSON.parse(humanReadableJson);
-		let base64 = await humanJsonToBase64(
-			humanReadableJson['kind'],
-			tlbCode,
-			humanReadableJson,
-			currentModule[`store${value}`]
-		);
-
-		humanReadableJson = await base64ToHumanJson(
-			base64,
-			currentModule[`load${value}`]
-		);
-
-		setJsonData(
-			JSON.stringify(
-				humanReadableJson,
-				(_, value) => (typeof value === 'bigint' ? value.toString() : value),
-				'\t'
-			)
-		);
-
-		let data = await humanJsonToBase64(
-			humanReadableJson['kind'],
-			tlbCode,
-			humanReadableJson,
-			//@ts-ignore
-			currentModule[`store${value}`]
-		);
-
-		setBase64(data);
-	};
 
 	return (
 		<Menu placement={'bottom'}>

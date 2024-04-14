@@ -231,9 +231,6 @@ export const Main: React.FC = () => {
 				setTypes(types);
 				setSelectedType(types[0]);
 				setCode(newCode);
-
-				handleTypeChange(types[0]);
-
 				const jsCode = ts
 					.transpile(newCode, { target: 2 })
 					.replace(/import { ([^}]+) } from '@ton\/core';/g, '');
@@ -249,6 +246,8 @@ export const Main: React.FC = () => {
 				setTlbError('');
 
 				setIsCodeLoading(false);
+
+				handleTypeChange(types[0], newModule, value);
 
 				if (lastEdited === 'serialized') {
 					console.log('start regenerate srialized');
@@ -339,7 +338,7 @@ export const Main: React.FC = () => {
 		//eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [searchParams]);
 	return (
-		<Flex as="main" flexGrow={1} gap={5}>
+		<Flex as="main" flexGrow={1} gap={5} px={'1.25rem'} pt={'1.25rem'}>
 			<Flex flexDirection="column" flexGrow={1} gap={5}>
 				<Editor
 					header={<Text>TLB Schema</Text>}
