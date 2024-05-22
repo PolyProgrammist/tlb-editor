@@ -1,10 +1,9 @@
 import React, { useCallback, useContext, useEffect } from 'react';
 
-import { debounce, throttle } from 'lodash';
+import { debounce } from 'lodash';
 import LZString from 'lz-string';
 import { useSearchParams } from 'react-router-dom';
 import * as ts from 'typescript';
-import { useDebounce, useDebouncedCallback } from 'use-debounce';
 import { Flex, Text } from '@chakra-ui/react';
 import { OnChange } from '@monaco-editor/react';
 import { ast } from '@ton-community/tlb-parser';
