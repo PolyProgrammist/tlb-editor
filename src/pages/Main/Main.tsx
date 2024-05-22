@@ -1,9 +1,10 @@
 import React, { useCallback, useContext, useEffect } from 'react';
 
-import { debounce } from 'lodash';
+import { debounce, throttle } from 'lodash';
 import LZString from 'lz-string';
 import { useSearchParams } from 'react-router-dom';
 import * as ts from 'typescript';
+import { useDebounce, useDebouncedCallback } from 'use-debounce';
 import { Flex, Text } from '@chakra-ui/react';
 import { OnChange } from '@monaco-editor/react';
 import { ast } from '@ton-community/tlb-parser';
@@ -143,61 +144,62 @@ export const Main: React.FC = () => {
 		[handleSerializedDataChangeDebounced, setIsJsonDataLoading]
 	);
 
-	const jsonHandler = async (
-		value = '',
-		type = '',
-		newTlbSchema = '',
-		newModule?: {}
-	) => {
-		try {
-			console.log('json change');
-			setJsonData(value);
+	const jsonHandler = useCallback(
+		async (value = '', type = '', newTlbSchema = '', newModule?: {}) => {
+			try {
+				console.log('json change');
+				setJsonData(value);
 
-			if (!value) {
-				setHex('');
-				setBase64('');
-				return;
+				if (!value) {
+					setHex('');
+					setBase64('');
+					return;
+				}
+
+				type = type || selectedType;
+				if (!type) {
+					return;
+				}
+				const currentModule = Object.keys(newModule || {}).length
+					? newModule
+					: module;
+
+				const currentTlbSchema = newTlbSchema || tlbSchema;
+
+				const tree = ast(currentTlbSchema);
+				let humanReadableJson = JSON.parse(value);
+
+				console.log('schema', tlbSchema);
+				let tlbCode = getTLBCodeByAST(tree, currentTlbSchema);
+				let data = await humanJsonToBase64(
+					humanReadableJson['kind'],
+					tlbCode,
+					humanReadableJson,
+					//@ts-ignore
+					currentModule[`store${type}`]
+				);
+				// { "kind": "BitSelection", "a": 5,
+				// "b": 5 }
+
+				setBase64(data);
+				setHex(base64ToHex(data));
+
+				setJsonDataError('');
+				setLastEdited('json');
+			} catch (error) {
+				console.error(error);
+				setJsonDataError('Data is invalid');
+			} finally {
+				setIsSerializedDataLoading(false);
 			}
+		},
+		[module]
+	);
 
-			type = type || selectedType;
-			if (!type) {
-				return;
-			}
-			const currentModule = Object.keys(newModule || {}).length
-				? newModule
-				: module;
-
-			const currentTlbSchema = newTlbSchema || tlbSchema;
-
-			const tree = ast(currentTlbSchema);
-			let humanReadableJson = JSON.parse(value);
-
-			console.log('schema', tlbSchema);
-			let tlbCode = getTLBCodeByAST(tree, currentTlbSchema);
-			let data = await humanJsonToBase64(
-				humanReadableJson['kind'],
-				tlbCode,
-				humanReadableJson,
-				//@ts-ignore
-				currentModule[`store${type}`]
-			);
-			// { "kind": "BitSelection", "a": 5,
-			// "b": 5 }
-
-			setBase64(data);
-			setHex(base64ToHex(data));
-
-			setJsonDataError('');
-			setLastEdited('json');
-		} catch (error) {
-			console.error(error);
-			setJsonDataError('Data is invalid');
-		} finally {
-			setIsSerializedDataLoading(false);
-		}
-	};
-
-	const handleJsonDataChangeDebounced: OnChange = (value) => jsonHandler(value);
+	const handleJsonDataChangeDebounced: OnChange = useCallback(
+		debounce((value) => jsonHandler(value), 400),
+		[jsonHandler]
+	);
 
 	const handleJsonDataChange: OnChange = useCallback(
 		(value, model) => {
