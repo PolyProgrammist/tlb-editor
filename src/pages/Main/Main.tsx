@@ -168,7 +168,6 @@ export const Main: React.FC = () => {
 				const tree = ast(currentTlbSchema);
 				let humanReadableJson = JSON.parse(value);
 
-				console.log('schema', tlbSchema);
 				let tlbCode = getTLBCodeByAST(tree, currentTlbSchema);
 				let data = await humanJsonToBase64(
 					humanReadableJson['kind'],
@@ -231,7 +230,9 @@ export const Main: React.FC = () => {
 					.sort();
 
 				setTypes(types);
-				setSelectedType(types[0]);
+				console.log('selected Type');
+				const newSelectedType = selectedType || types[0];
+				setSelectedType(newSelectedType);
 				setCode(newCode);
 				const jsCode = ts
 					.transpile(newCode, { target: 2 })
@@ -249,7 +250,7 @@ export const Main: React.FC = () => {
 
 				setIsCodeLoading(false);
 
-				handleTypeChange(types[0], newModule, value);
+				handleTypeChange(newSelectedType, newModule, value);
 
 				if (lastEdited === 'serialized') {
 					console.log('start regenerate srialized');
@@ -277,6 +278,7 @@ export const Main: React.FC = () => {
 			}
 		},
 		[
+			selectedType,
 			base64,
 			handleJsonDataChange,
 			hex,
@@ -296,7 +298,7 @@ export const Main: React.FC = () => {
 
 	const handleTlbChangeDebounced: OnChange = useCallback(
 		debounce((value) => tlbHandler(value), 1000),
-		[]
+		[selectedType]
 	);
 
 	const handleTlbChange: OnChange = useCallback(
