@@ -95,7 +95,6 @@ export const Main: React.FC = () => {
 			}
 
 			if (value === '') {
-				console.log('empty');
 				setJsonData('');
 				setIsJsonDataLoading(false);
 				return;
@@ -195,7 +194,7 @@ export const Main: React.FC = () => {
 	);
 
 	const handleJsonDataChangeDebounced: OnChange = useCallback(
-		debounce((value) => jsonHandler(value), 400),
+		(value) => jsonHandler(value),
 		[jsonHandler]
 	);
 
@@ -210,7 +209,6 @@ export const Main: React.FC = () => {
 
 	const tlbHandler = useCallback(
 		async (value = '') => {
-			console.log('change tlb change');
 			try {
 				setTlbSchema(value);
 				if (!value) {
@@ -332,6 +330,7 @@ export const Main: React.FC = () => {
 
 			setSelectedType(typeState);
 			setBase64(base64State);
+			console.log('-----', base64State);
 
 			if (base64State) {
 				await serializedDataHandler(base64State, typeState, module);

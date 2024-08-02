@@ -50,11 +50,11 @@ export const AppContextProvider: React.FC<PropsWithChildren> = ({
 				return;
 			}
 			const currentTlbSchema = newTlbSchema || tlbSchema;
-			console.log(currentTlbSchema);
+
 			const tree = ast(currentTlbSchema);
 			console.log(tree);
 			let tlbCode = getTLBCodeByAST(tree, currentTlbSchema);
-			console.log(tlbCode.types.get(value));
+
 			let humanReadableJson = await getDefaulHumanJsonUnsafe(
 				tlbCode,
 				tlbCode.types.get(value)!
