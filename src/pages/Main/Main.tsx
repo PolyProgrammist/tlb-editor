@@ -110,7 +110,7 @@ export const Main: React.FC = () => {
 				: newModule || {};
 			//@ts-ignore
 			let ft = currentModule[`load${type}`];
-
+			console.log('base64 from serialized data handler', value);
 			const json = await base64ToHumanJson(value, ft);
 
 			setJsonData(
@@ -248,7 +248,7 @@ export const Main: React.FC = () => {
 
 				setIsCodeLoading(false);
 
-				handleTypeChange(newSelectedType, newModule, value);
+				// handleTypeChange(newSelectedType, newModule, value);
 
 				if (lastEdited === 'serialized') {
 					console.log('start regenerate srialized');
@@ -333,6 +333,7 @@ export const Main: React.FC = () => {
 			console.log('-----', base64State);
 
 			if (base64State) {
+				await serializedDataHandler(base64State, typeState, module);
 				await serializedDataHandler(base64State, typeState, module);
 			} else if (jsonState) {
 				await jsonHandler(jsonState, typeState, tlbState, module);

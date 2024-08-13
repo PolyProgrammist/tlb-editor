@@ -5,7 +5,6 @@ export async function base64ToHumanJson(base64: String, loadFunction: any) {
 
 	let cell = Cell.fromBase64(base64.toString());
 	let loadedType = loadFunction(cell.beginParse());
-
 	return await typeToHumanJson(loadedType);
 }
 

@@ -77,7 +77,7 @@ export const AppContextProvider: React.FC<PropsWithChildren> = ({
 				//@ts-ignore
 				currentModule[`store${value}`]
 			);
-
+			console.log('base64 from type change', base64);
 			humanReadableJson = await base64ToHumanJson(
 				base64,
 				//@ts-ignore
