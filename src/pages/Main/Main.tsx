@@ -71,7 +71,7 @@ export const Main: React.FC = () => {
 		setHex,
 		setLastEdited,
 		lastEdited,
-		handleTypeChange,
+		// handleTypeChange,
 	} = useContext(AppContext);
 
 	const [searchParams] = useSearchParams();
